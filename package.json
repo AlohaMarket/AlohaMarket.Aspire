@@ -1,0 +1,31 @@
+{
+    "name": "aloha_aspire",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "commit": "cz"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/the-khiem7/Aloha_Aspire.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "commonjs",
+    "bugs": {
+        "url": "https://github.com/the-khiem7/Aloha_Aspire/issues"
+    },
+    "homepage": "https://github.com/the-khiem7/Aloha_Aspire#readme",
+    "devDependencies": {
+        "commitizen": "^4.3.1",
+        "cz-conventional-changelog": "^3.3.0"
+    },
+    "config": {
+        "commitizen": {
+            "path": "cz-conventional-changelog"
+        }
+    }
+}
