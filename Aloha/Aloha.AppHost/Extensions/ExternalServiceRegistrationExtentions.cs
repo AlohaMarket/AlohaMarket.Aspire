@@ -1,32 +1,33 @@
 ﻿using Aspire.Hosting;
 using Microsoft.Extensions.Configuration;
-using System.Net.Http.Json;
 
+namespace Aloha.AppHost.Extensions;
 
-namespace Aloha.AppHost.Extensions
+public static class ApplicationServiceExtensions
 {
-    public static class ExternalServiceRegistrationExtentions
+    public static IDistributedApplicationBuilder AddApplicationServices(this IDistributedApplicationBuilder builder)
     {
-        public static IDistributedApplicationBuilder AddApplicationServices(this IDistributedApplicationBuilder builder)
+        var postgres = builder.AddPostgres("postgres");
+        
+        if (!builder.Configuration.GetValue("IsTest", false))
         {
-            //var cache = builder.AddRedis("redis");
-            //var rabbitMq = builder.AddRabbitMq("rabbitmq");
-
-            var postgres = builder.AddPostgres("postgres")
-                                  .WithImageTag("latest")
-                                  .WithVolume("postgres-db", "var/lib/postgresql/data") // Mount Docker volume to keep the data when stop the container
-                                  .WithLifetime(ContainerLifetime.Persistent) // Keep the container running even if the Aspire stops
-                                  .WithPgAdmin(pgBuilder =>{
-                                      pgBuilder.WithImageTag("latest");
-                                  });
-
-            var AlohaDb = postgres.AddDatabase("aloha-db", "aloha");
-
-            builder.AddProjectWithPostfix<Projects.Aloha_API>();
-
-            builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>();
-
-            return builder;
+            postgres = postgres.WithLifetime(ContainerLifetime.Persistent)
+                .WithVolume("postgres-db", "var/lib/postgresql/data")
+                .WithPgAdmin(pgBuilder => {
+                    pgBuilder.WithImageTag("latest");
+                });
         }
+        
+        // Add application services using helper methods
+        var alohaDb = postgres.AddDefaultDatabase<Projects.Aloha_API>();
+        
+        var apiService = builder.AddProjectWithPostfix<Projects.Aloha_API>()
+            .WithReference(postgres)
+            .WithReference(alohaDb, "DefaultConnection");
+            
+        var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
+            .WithReference(apiService);
+            
+        return builder;
     }
 }
