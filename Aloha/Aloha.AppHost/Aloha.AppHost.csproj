@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Aloha.ApiGateway\Aloha.ApiGateway.csproj" />
     <ProjectReference Include="..\..\Aloha.API\Aloha.API.csproj" />
   </ItemGroup>
 
