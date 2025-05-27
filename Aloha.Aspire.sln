@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.API", "Aloha.API\Aloh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.ApiGateway", "Aloha.ApiGateway\Aloha.ApiGateway.csproj", "{867395F9-EFB0-5ABE-BF42-C4C4DCF7E8B4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.LocationService", "Aloha.LocationService\Aloha.LocationService.csproj", "{133BF00F-5608-458A-BD8D-67EF2A53659B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{867395F9-EFB0-5ABE-BF42-C4C4DCF7E8B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{867395F9-EFB0-5ABE-BF42-C4C4DCF7E8B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{867395F9-EFB0-5ABE-BF42-C4C4DCF7E8B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{133BF00F-5608-458A-BD8D-67EF2A53659B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{133BF00F-5608-458A-BD8D-67EF2A53659B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{133BF00F-5608-458A-BD8D-67EF2A53659B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{133BF00F-5608-458A-BD8D-67EF2A53659B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
