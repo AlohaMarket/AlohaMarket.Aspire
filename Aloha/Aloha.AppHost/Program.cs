@@ -6,4 +6,6 @@ builder.AddApplicationServices();
 
 builder.AddProject<Projects.Aloha_LocationService>("aloha-locationservice");
 
+builder.AddProject<Projects.Aloha_EventBus>("aloha-eventbus");
+
 builder.Build().Run();
