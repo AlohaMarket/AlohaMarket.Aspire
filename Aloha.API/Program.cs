@@ -1,6 +1,11 @@
 using Aloha.ServiceDefaults.Hosting;
+using Aloha.ServiceDefaults.Settings;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Initialize connection manager for environment-based connection strings
+ConnectionManager.Initialize(builder.Configuration);
 
 builder.AddServiceDefaults();
 
@@ -9,6 +14,9 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// Example: Add MongoDB with secure connection string management
+// builder.Services.AddMongoDB(builder.Configuration, "LocationService");
 
 var app = builder.Build();
 
