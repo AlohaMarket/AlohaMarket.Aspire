@@ -1,3 +1,5 @@
+using Aloha.ServiceDefaults.Hosting;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
