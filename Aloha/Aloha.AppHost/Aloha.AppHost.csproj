@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Aloha.ApiGateway\Aloha.ApiGateway.csproj" />
     <ProjectReference Include="..\..\Aloha.API\Aloha.API.csproj" />
+    <ProjectReference Include="..\..\Aloha.CategoryService\Aloha.CategoryService.csproj" />
     <ProjectReference Include="..\..\Aloha.LocationService\Aloha.LocationService.csproj" />
   </ItemGroup>
 
