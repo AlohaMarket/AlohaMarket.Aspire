@@ -2,6 +2,7 @@ using Aloha.LocationService.Data;
 using Aloha.LocationService.Repositories;
 using Aloha.LocationService.Services;
 using Aloha.LocationService.Settings;
+using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.ServiceDefaults.Hosting;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -72,6 +73,8 @@ public class Program
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "Aloha Location Service API V1");
             c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
         });
+
+        app.UseSharedPolicies();
 
         app.UseHttpsRedirection();
 

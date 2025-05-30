@@ -11,5 +11,6 @@ namespace Aloha.CategoryService.Repositories
         Task UpdateCategoryAsync(Category category);
         Task DeleteCategoryAsync(Guid id);
         Task<bool> CategoryExistsAsync(Guid id);
+        Task<int> CountCategoriesInSameLevel(int level);
     }
 }

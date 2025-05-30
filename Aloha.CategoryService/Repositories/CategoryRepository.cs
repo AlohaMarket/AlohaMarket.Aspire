@@ -18,6 +18,15 @@ namespace Aloha.CategoryService.Repositories
             return await context.Categories.AnyAsync(c => c.Id == id);
         }
 
+        public Task<int> CountCategoriesInSameLevel(int level)
+        {
+            if (level <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(level), "Level must be greater than 0.");
+            }
+            return context.Categories.CountAsync(c => c.Level == level);
+        }
+
         public async Task DeleteCategoryAsync(Guid id)
         {
             var category = await context.Categories.FindAsync(id);
