@@ -43,6 +43,7 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
     });
 }
+app.UseSharedPolicies();
 
 app.UseHttpsRedirection();
 
