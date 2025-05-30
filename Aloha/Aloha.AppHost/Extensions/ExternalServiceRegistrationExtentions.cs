@@ -20,7 +20,7 @@ public static class ApplicationServiceExtensions
         
         // Add application services using helper methods
         var alohaDb = postgres.AddDefaultDatabase<Projects.Aloha_API>();
-        
+
         var apiService = builder.AddProjectWithPostfix<Projects.Aloha_API>()
             .WithReference(postgres)
             .WithReference(alohaDb, "DefaultConnection");
@@ -28,6 +28,10 @@ public static class ApplicationServiceExtensions
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
             .WithReference(apiService);
             
+        var evenBus = builder.AddProjectWithPostfix<Projects.Aloha_EventBus>();
+
+        var locationService = builder.AddProjectWithPostfix<Projects.Aloha_LocationService>();
+
         return builder;
     }
 }
