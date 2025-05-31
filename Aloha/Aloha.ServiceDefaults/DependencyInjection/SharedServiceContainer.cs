@@ -11,6 +11,8 @@ namespace Aloha.ServiceDefaults.DependencyInjection
         public static IServiceCollection AddSharedServices<TContext>
             (this IServiceCollection services, IConfiguration configuration) where TContext : DbContext
         {
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
             services.AddDbContext<TContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("SupabaseConnection"),
                 npgsqlOptionsAction: sqlOptions =>

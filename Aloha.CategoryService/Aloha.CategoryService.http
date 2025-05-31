@@ -1,0 +1,6 @@
+@Aloha.CategoryService_HostAddress = http://localhost:5042
+
+GET {{Aloha.CategoryService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
