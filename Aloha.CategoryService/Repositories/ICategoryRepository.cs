@@ -5,12 +5,12 @@ namespace Aloha.CategoryService.Repositories
     public interface ICategoryRepository
     {
         Task<IEnumerable<Category>> GetAllCategoriesAsync();
-        Task<Category?> GetCategoryByIdAsync(Guid id);
-        Task<IEnumerable<Category>> GetCategoriesByParentIdAsync(Guid? parentId);
+        Task<Category?> GetCategoryByIdAsync(int id);
+        Task<IEnumerable<Category>> GetCategoriesByParentIdAsync(int parentId);
         Task AddCategoryAsync(Category category);
         Task UpdateCategoryAsync(Category category);
-        Task DeleteCategoryAsync(Guid id);
-        Task<bool> CategoryExistsAsync(Guid id);
+        Task DeleteCategoryAsync(int id);
+        Task<bool> CategoryExistsAsync(int id);
         Task<int> CountCategoriesInSameLevel(int level);
     }
 }

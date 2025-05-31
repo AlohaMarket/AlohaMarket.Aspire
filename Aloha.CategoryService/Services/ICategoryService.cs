@@ -1,16 +1,17 @@
 ﻿using Aloha.CategoryService.Models.Entities;
 using Aloha.CategoryService.Models.Requests;
+using Aloha.CategoryService.Models.Responses;
 
 namespace Aloha.CategoryService.Services
 {
     public interface ICategoryService
     {
-        Task<IEnumerable<Category>> GetCategoriesAsync();
-        Task<Category> GetCategoryByIdAsync(Guid id);
+        Task<IEnumerable<ViewCategoryResponse>> GetCategoriesAsync();
+        Task<ViewCategoryResponse> GetCategoryByIdAsync(int id);
         Task<Category> CreateCategoryAsync(AddCategoryRequest category);
-        Task<Category> UpdateCategoryAsync(Guid id, UpdateCategoryRequest category);
-        Task<bool> DeleteCategoryAsync(Guid id);
-        Task<IEnumerable<Category>> GetCategoriesByParentIdAsync(Guid? parentId);
-        Task<IEnumerable<Guid>> GetCategoryPath(Guid id);
+        Task<Category> UpdateCategoryAsync(int id, UpdateCategoryRequest category);
+        Task<bool> DeleteCategoryAsync(int id);
+        Task<IEnumerable<Category>> GetCategoriesByParentIdAsync(int parentId);
+        Task<IEnumerable<int>> GetCategoryPath(int id);
     }
 }

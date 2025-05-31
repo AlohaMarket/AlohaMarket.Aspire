@@ -13,7 +13,7 @@ namespace Aloha.CategoryService.Repositories
             await context.SaveChangesAsync();
         }
 
-        public async Task<bool> CategoryExistsAsync(Guid id)
+        public async Task<bool> CategoryExistsAsync(int id)
         {
             return await context.Categories.AnyAsync(c => c.Id == id);
         }
@@ -27,7 +27,7 @@ namespace Aloha.CategoryService.Repositories
             return context.Categories.CountAsync(c => c.Level == level);
         }
 
-        public async Task DeleteCategoryAsync(Guid id)
+        public async Task DeleteCategoryAsync(int id)
         {
             var category = await context.Categories.FindAsync(id);
             if (category != null)
@@ -43,12 +43,13 @@ namespace Aloha.CategoryService.Repositories
 
         public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
         {
-            return await context.Categories.AsNoTracking()
+            return await context.Categories.Where(c => c.Level == 1)
+                .Include(c => c.Children).AsNoTracking()
                 .ToListAsync()
                 .ContinueWith(task => task.Result.AsEnumerable());
         }
 
-        public async Task<IEnumerable<Category>> GetCategoriesByParentIdAsync(Guid? parentId)
+        public async Task<IEnumerable<Category>> GetCategoriesByParentIdAsync(int parentId)
         {
             return await context.Categories
                 .Where(c => c.ParentId == parentId)
@@ -56,9 +57,11 @@ namespace Aloha.CategoryService.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Category?> GetCategoryByIdAsync(Guid id)
+        public async Task<Category?> GetCategoryByIdAsync(int id)
         {
-            return await context.Categories.FindAsync(id);
+            return await context.Categories
+                .Include(c => c.Children)
+                .FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task UpdateCategoryAsync(Category category)

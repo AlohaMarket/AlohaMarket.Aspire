@@ -1,5 +1,6 @@
 ﻿using Aloha.CategoryService.Models.Entities;
 using Aloha.CategoryService.Models.Requests;
+using Aloha.CategoryService.Models.Responses;
 using Aloha.CategoryService.Repositories;
 using Aloha.ServiceDefaults.Exceptions;
 using AutoMapper;
@@ -35,7 +36,7 @@ namespace Aloha.CategoryService.Services
             return categoryEntity;
         }
 
-        public async Task<bool> DeleteCategoryAsync(Guid id)
+        public async Task<bool> DeleteCategoryAsync(int id)
         {
             var category = await repo.GetCategoryByIdAsync(id);
             if (category is null)
@@ -47,30 +48,31 @@ namespace Aloha.CategoryService.Services
             return true;
         }
 
-        public Task<IEnumerable<Category>> GetCategoriesAsync()
+        public async Task<IEnumerable<ViewCategoryResponse>> GetCategoriesAsync()
         {
-            return repo.GetAllCategoriesAsync();
+            var categories = await repo.GetAllCategoriesAsync();
+            return mapper.Map<IEnumerable<ViewCategoryResponse>>(categories);
         }
 
-        public async Task<IEnumerable<Category>> GetCategoriesByParentIdAsync(Guid? parentId)
+        public async Task<IEnumerable<Category>> GetCategoriesByParentIdAsync(int parentId)
         {
             var categoryList = await repo.GetCategoriesByParentIdAsync(parentId);
             return categoryList;
         }
 
-        public async Task<Category> GetCategoryByIdAsync(Guid id)
+        public async Task<ViewCategoryResponse> GetCategoryByIdAsync(int id)
         {
             var category = await repo.GetCategoryByIdAsync(id);
             if (category == null)
             {
                 throw new NotFoundException($"Category with ID {id} not found.");
             }
-            return category;
+            return mapper.Map<ViewCategoryResponse>(category);
         }
 
-        public async Task<IEnumerable<Guid>> GetCategoryPath(Guid id)
+        public async Task<IEnumerable<int>> GetCategoryPath(int id)
         {
-            var path = new List<Guid>();
+            var path = new List<int>();
             var current = await repo.GetCategoryByIdAsync(id);
             if (current == null)
             {
@@ -84,7 +86,7 @@ namespace Aloha.CategoryService.Services
             return path;
         }
 
-        public async Task<Category> UpdateCategoryAsync(Guid id, UpdateCategoryRequest categoryRequest)
+        public async Task<Category> UpdateCategoryAsync(int id, UpdateCategoryRequest categoryRequest)
         {
             var existingCategory = await repo.GetCategoryByIdAsync(id);
             if (existingCategory == null)
