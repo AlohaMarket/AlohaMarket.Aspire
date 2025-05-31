@@ -27,6 +27,7 @@ builder.Services.AddSharedServices<CategoryDbContext>(builder.Configuration);
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddTransient<DataSeeder>();
 
 var app = builder.Build();
 
@@ -44,6 +45,12 @@ if (app.Environment.IsDevelopment())
     });
 }
 app.UseSharedPolicies();
+
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
+    seeder.Seed();
+}
 
 app.UseHttpsRedirection();
 
