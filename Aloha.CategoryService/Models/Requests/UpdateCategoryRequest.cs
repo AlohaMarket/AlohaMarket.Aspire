@@ -2,16 +2,24 @@
 
 namespace Aloha.CategoryService.Models.Requests
 {
-    public class AddCategoryRequest
+    public class UpdateCategoryRequest
     {
         [Required(ErrorMessage = "Name is required.")]
         [StringLength(100, ErrorMessage = "Name cannot exceed 100 characters.")]
         public string Name { get; set; }
+
+        [Required(ErrorMessage = "DisplayName is required.")]
+        [StringLength(100, ErrorMessage = "DisplayName cannot exceed 100 characters.")]
+        public string DisplayName { get; set; }
 
         public string Description { get; set; }
 
         [Required(ErrorMessage = "SortOrder is required.")]
         [Range(1, int.MaxValue, ErrorMessage = "SortOrder must be a non-negative integer.")]
         public int SortOrder { get; set; }
+
+        [Required(ErrorMessage = "IsActive is required.")]
+        [Range(typeof(bool), "true", "true", ErrorMessage = "IsActive must be true or false.")]
+        public bool IsActive { get; set; }
     }
 }

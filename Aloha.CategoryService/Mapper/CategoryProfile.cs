@@ -1,5 +1,6 @@
 ﻿using Aloha.CategoryService.Models.Entities;
 using Aloha.CategoryService.Models.Requests;
+using Aloha.CategoryService.Models.Responses;
 using AutoMapper;
 
 namespace Aloha.CategoryService.Mapper
@@ -18,6 +19,8 @@ namespace Aloha.CategoryService.Mapper
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Children, opt => opt.Ignore())
                 .ForMember(dest => dest.Parent, opt => opt.Ignore());
+
+            CreateMap<Category, ViewCategoryResponse>();
         }
     }
 }

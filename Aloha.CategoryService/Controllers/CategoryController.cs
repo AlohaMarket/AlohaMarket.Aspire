@@ -18,8 +18,8 @@ namespace Aloha.CategoryService.Controllers
             return Ok(ApiResponseBuilder.BuildResponse(message: "categories retrieve successfully!", categories));
         }
 
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetCategoryById(Guid id)
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetCategoryById(int id)
         {
             var category = await categoryService.GetCategoryByIdAsync(id);
             return Ok(ApiResponseBuilder.BuildResponse(message: "category retrieve successfully", category));
@@ -34,30 +34,30 @@ namespace Aloha.CategoryService.Controllers
                 ApiResponseBuilder.BuildResponse(message: "category created successfully", category));
         }
 
-        [HttpPut("{id:guid}")]
+        [HttpPut("{id:int}")]
         [ValidateModel]
-        public async Task<IActionResult> UpdateCategory(Guid id, [FromBody] UpdateCategoryRequest request)
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] UpdateCategoryRequest request)
         {
             var category = await categoryService.UpdateCategoryAsync(id, request);
             return Ok(ApiResponseBuilder.BuildResponse(message: "category updated successfully", category));
         }
 
-        [HttpDelete("{id:guid}")]
-        public async Task<IActionResult> DeleteCategory(Guid id)
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteCategory(int id)
         {
             var result = await categoryService.DeleteCategoryAsync(id);
             return Ok(ApiResponseBuilder.BuildResponse(message: "category delete successfully", result));
         }
 
-        [HttpGet("{id:guid}/category_path")]
-        public async Task<IActionResult> GetCategoryPath(Guid id)
+        [HttpGet("{id:int}/category_path")]
+        public async Task<IActionResult> GetCategoryPath(int id)
         {
             var path = await categoryService.GetCategoryPath(id);
             return Ok(ApiResponseBuilder.BuildResponse(message: "category path retrieve successfully", path));
         }
 
-        [HttpGet("parent/{parentId:guid?}")]
-        public async Task<IActionResult> GetCategoriesByParentId(Guid? parentId)
+        [HttpGet("parent/{parentId:int}")]
+        public async Task<IActionResult> GetCategoriesByParentId(int parentId)
         {
             var categories = await categoryService.GetCategoriesByParentIdAsync(parentId);
             return Ok(ApiResponseBuilder.BuildResponse(message: "categories by parent retrieve successfully",
