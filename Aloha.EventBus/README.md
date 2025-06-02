@@ -5,7 +5,7 @@ sequenceDiagram
     participant Kafka as Apache Kafka
     participant Consumer as EventHandlingService
     participant Factory as IIntegrationEventFactory
-    participant Mediator as IMediator (MediatR)
+    participant Mediator as IMediator
     participant Handler as IIntegrationEventHandler<T>
 
     %% Event Publishing Flow
