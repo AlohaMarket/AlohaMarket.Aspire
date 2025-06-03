@@ -7,6 +7,7 @@ public static class ApplicationServiceExtensions
     public static IDistributedApplicationBuilder AddApplicationServices(this IDistributedApplicationBuilder builder)
     {
         var postgres = builder.AddPostgres("postgres");
+        var kafka = builder.AddKafka("kafka");
 
         if (!builder.Configuration.GetValue("IsTest", false))
         {
@@ -16,6 +17,8 @@ public static class ApplicationServiceExtensions
                 {
                     pgBuilder.WithImageTag("latest");
                 });
+
+            kafka = kafka.WithLifetime(ContainerLifetime.Persistent).WithDataVolume().WithKafkaUI();
         }
 
         // Add application services using helper methods
@@ -25,14 +28,20 @@ public static class ApplicationServiceExtensions
             .WithReference(postgres)
             .WithReference(alohaDb, "DefaultConnection");
 
-        var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
-            .WithReference(apiService);
 
-        var evenBus = builder.AddProjectWithPostfix<Projects.Aloha_EventBus>();
+        var eventBus = builder.AddProjectWithPostfix<Projects.Aloha_EventBus>();
+
+        //var ;
 
         var locationService = builder.AddProjectWithPostfix<Projects.Aloha_LocationService>();
 
         var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_CategoryService>();
+
+        var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
+            .WithReference(apiService)
+            .WithReference(locationService)
+            .WithReference(categoryService)
+            ;
 
         return builder;
     }

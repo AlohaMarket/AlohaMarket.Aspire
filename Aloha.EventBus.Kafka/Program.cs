@@ -7,6 +7,6 @@ var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
-app.MapGet("/", () => "Hello EventBus!");
+app.MapGet("/", () => "Hello Kafka!");
 
 app.Run();
