@@ -1,9 +1,17 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace Aloha.AppHost.Extensions;
 
 public static class ApplicationServiceExtensions
 {
+    /// <summary>
+    /// Configures and registers core application services, including PostgreSQL, Kafka, and project-specific services, to the distributed application builder.
+    /// </summary>
+    /// <remarks>
+    /// Sets up persistent storage and management UIs for PostgreSQL and Kafka when not in test mode, adds a default database, and registers API, event bus, location, category, and gateway services with appropriate dependencies.
+    /// </remarks>
+    /// <param name="builder">The distributed application builder to configure.</param>
+    /// <returns>The configured distributed application builder instance.</returns>
     public static IDistributedApplicationBuilder AddApplicationServices(this IDistributedApplicationBuilder builder)
     {
         var postgres = builder.AddPostgres("postgres");
