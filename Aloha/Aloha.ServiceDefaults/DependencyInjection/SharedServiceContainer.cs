@@ -1,6 +1,4 @@
-﻿using Aloha.ServiceDefaults.Middlewares;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -36,13 +34,6 @@ namespace Aloha.ServiceDefaults.DependencyInjection
             });
 
             return services;
-        }
-
-        public static IApplicationBuilder UseSharedPolicies(this IApplicationBuilder app)
-        {
-            app.UseMiddleware<ApiExceptionHandlerMiddleware>();
-            // app.UseMiddleware<ListenToOnlyApiGatewayMiddleware>();
-            return app;
         }
     }
 }

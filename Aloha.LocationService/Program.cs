@@ -2,9 +2,10 @@ using Aloha.LocationService.Data;
 using Aloha.LocationService.Repositories;
 using Aloha.LocationService.Services;
 using Aloha.LocationService.Settings;
-using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.ServiceDefaults.Hosting;
+using Aloha.ServiceDefaults.Middlewares;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
 
 namespace Aloha.LocationService;
@@ -29,6 +30,41 @@ public class Program
                 Title = "Aloha Location Service API",
                 Version = "v1"
             });
+
+            c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+            {
+                Type = SecuritySchemeType.OAuth2,
+                Flows = new OpenApiOAuthFlows
+                {
+                    Implicit = new OpenApiOAuthFlow
+                    {
+                        AuthorizationUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/auth"),
+                        TokenUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/token"),
+                        Scopes = new Dictionary<string, string>
+                        {
+                            { "openid", "OpenID" },
+                            { "profile", "Profile" }
+                        }
+                    }
+                }
+            });
+
+            // Add security requirement for all operations
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "oauth2"
+                        }
+                    },
+                    new[] { "openid", "profile" }
+                }
+            });
+
         });
 
         builder.Services.Configure<MongoSettings>(
@@ -64,17 +100,21 @@ public class Program
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
+            app.MapOpenApi();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Aloha Location Service API V1");
+                c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+            });
 
         }
-        app.MapOpenApi();
-        app.UseSwagger();
-        app.UseSwaggerUI(c =>
-        {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Aloha Location Service API V1");
-            c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
-        });
 
-        app.UseSharedPolicies();
+        // Use the exception handler middleware
+        app.UseMiddleware<ApiExceptionHandlerMiddleware>();
+
+        // Optional - add status code pages if needed
+        app.UseStatusCodePages();
 
         app.UseHttpsRedirection();
 

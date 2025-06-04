@@ -3,6 +3,8 @@ using Aloha.CategoryService.Repositories;
 using Aloha.CategoryService.Services;
 using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.ServiceDefaults.Hosting;
+using Aloha.ServiceDefaults.Middlewares;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,40 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "Aloha Category Service API",
         Version = "v1"
+    });
+
+    c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.OAuth2,
+        Flows = new OpenApiOAuthFlows
+        {
+            Implicit = new OpenApiOAuthFlow
+            {
+                AuthorizationUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/auth"),
+                TokenUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/token"),
+                Scopes = new Dictionary<string, string>
+                {
+                    { "openid", "OpenID" },
+                    { "profile", "Profile" }
+                }
+            }
+        }
+    });
+
+    // Add security requirement for all operations
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "oauth2"
+                }
+            },
+            new[] { "openid", "profile" }
+        }
     });
 });
 
@@ -44,13 +80,14 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
     });
 }
-app.UseSharedPolicies();
 
 using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
     seeder.Seed();
 }
+
+app.UseMiddleware<ApiExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 
