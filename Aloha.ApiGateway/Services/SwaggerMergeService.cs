@@ -16,37 +16,74 @@ namespace Aloha.ApiGateway.Services
 
         public async Task<OpenApiDocument> GetMergedSwaggerAsync()
         {
-            var downstreamUrls = _configuration.GetSection("DownstreamSwaggerUrls").Get<Dictionary<string, string>>();
-            var openApiReader = new OpenApiStringReader();
             var mergedDoc = new OpenApiDocument
             {
-                Info = new OpenApiInfo { Title = "Aloha Gateway API", Version = "v1" },
+                Info = new OpenApiInfo
+                {
+                    Title = "Unified Aloha API",
+                    Version = "v1",
+                    Description = "Merged OpenAPI from all downstream services"
+                },
                 Paths = new OpenApiPaths(),
-                Components = new OpenApiComponents()
+                Components = new OpenApiComponents(),
+                Tags = new List<OpenApiTag>(),
+                Servers = new List<OpenApiServer>
+                {
+                    new OpenApiServer { Url = _configuration["GatewayBaseUrl"] ?? "https://localhost:7000" }
+                }
             };
 
-            foreach (var kvp in downstreamUrls)
+            var reader = new OpenApiStringReader();
+            var downstreamUrls = _configuration
+                .GetSection("DownstreamSwaggerUrls")
+                .Get<Dictionary<string, string>>();
+
+            foreach (var (serviceName, url) in downstreamUrls)
             {
-                var name = kvp.Key;
-                var url = kvp.Value;
+                var client = _httpClientFactory.CreateClient();
+                string json;
 
-                using var client = _httpClientFactory.CreateClient();
-                var json = await client.GetStringAsync(url);
-                var doc = openApiReader.Read(json, out var diagnostic);
-
-                // Prefix paths to avoid conflicts
-                foreach (var path in doc.Paths)
+                try
                 {
-                    var prefixedPath = $"/api/{name.ToLower()}{path.Key}";
-                    mergedDoc.Paths[prefixedPath] = path.Value;
+                    json = await client.GetStringAsync(url);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to fetch Swagger from {serviceName}: {ex.Message}");
+                    continue;
                 }
 
-                // Merge components (you might need deduplication logic for larger projects)
-                foreach (var schema in doc.Components.Schemas)
-                    mergedDoc.Components.Schemas.TryAdd(schema.Key, schema.Value);
+                var doc = reader.Read(json, out var diagnostic);
+                if (diagnostic?.Errors.Count > 0)
+                {
+                    Console.WriteLine($"Warning: Errors reading Swagger from {serviceName}");
+                }
 
-                foreach (var response in doc.Components.Responses)
-                    mergedDoc.Components.Responses.TryAdd(response.Key, response.Value);
+                if (!mergedDoc.Tags.Any(t => t.Name == serviceName))
+                {
+                    mergedDoc.Tags.Add(new OpenApiTag { Name = serviceName });
+                }
+
+                foreach (var (pathKey, pathItem) in doc.Paths)
+                {
+                    // Avoid conflict by prefixing with service name if desired
+                    // var mergedPathKey = $"/{serviceName}{pathKey}";
+
+                    var mergedPathKey = pathKey;
+                    if (!mergedDoc.Paths.ContainsKey(mergedPathKey))
+                    {
+                        mergedDoc.Paths[mergedPathKey] = pathItem;
+
+                        // Retag each operation for the service
+                        foreach (var op in pathItem.Operations)
+                        {
+                            op.Value.Tags = new List<OpenApiTag> { new OpenApiTag { Name = serviceName } };
+                        }
+                    }
+                }
+
+                // Optionally merge components (schemas, responses, etc.)
+                // You should handle name conflicts if you go this route
             }
 
             return mergedDoc;
