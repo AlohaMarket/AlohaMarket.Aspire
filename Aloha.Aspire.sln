@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.CategoryService", "Al
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.EventBus.Kafka", "Aloha.EventBus.Kafka\Aloha.EventBus.Kafka.csproj", "{498955B6-711F-CC01-543E-C63B036F60EA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.NotificationService", "Aloha.NotificationService\Aloha.NotificationService.csproj", "{39D26D10-ED63-44E7-B9FB-43B12D34B0E4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{498955B6-711F-CC01-543E-C63B036F60EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{498955B6-711F-CC01-543E-C63B036F60EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{498955B6-711F-CC01-543E-C63B036F60EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39D26D10-ED63-44E7-B9FB-43B12D34B0E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39D26D10-ED63-44E7-B9FB-43B12D34B0E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39D26D10-ED63-44E7-B9FB-43B12D34B0E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39D26D10-ED63-44E7-B9FB-43B12D34B0E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -37,6 +37,8 @@ public static class ApplicationServiceExtensions
 
         var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_CategoryService>();
 
+        var notificationService = builder.AddProjectWithPostfix<Projects.Aloha_NotificationService>();
+
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
             .WithReference(apiService)
             .WithReference(locationService)

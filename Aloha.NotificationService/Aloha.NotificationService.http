@@ -1,0 +1,6 @@
+@Aloha.NotificationService_HostAddress = http://localhost:5226
+
+GET {{Aloha.NotificationService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
