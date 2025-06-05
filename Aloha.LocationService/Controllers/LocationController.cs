@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Aloha.LocationService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/location")]
     [ApiController]
     public class LocationController(ILogger<LocationController> logger, ILocationService locationService) : ControllerBase
     {

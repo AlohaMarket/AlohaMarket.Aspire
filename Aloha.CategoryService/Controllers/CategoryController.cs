@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Aloha.CategoryService.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/category")]
     [ApiController]
     public class CategoryController(ICategoryService categoryService, ILogger<CategoryController> logger)
         : ControllerBase
@@ -22,7 +22,7 @@ namespace Aloha.CategoryService.Controllers
         public async Task<IActionResult> GetCategoryById(int id)
         {
             var category = await categoryService.GetCategoryByIdAsync(id);
-            return Ok(ApiResponseBuilder.BuildResponse(message: "category retrieve successfully", category));
+            return Ok(category);
         }
 
         [HttpPost]
@@ -39,7 +39,7 @@ namespace Aloha.CategoryService.Controllers
         public async Task<IActionResult> UpdateCategory(int id, [FromBody] UpdateCategoryRequest request)
         {
             var category = await categoryService.UpdateCategoryAsync(id, request);
-            return Ok(ApiResponseBuilder.BuildResponse(message: "category updated successfully", category));
+            return Ok(category);
         }
 
         [HttpDelete("{id:int}")]
