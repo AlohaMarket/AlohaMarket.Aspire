@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.Confluent.Kafka" Version="9.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Aloha\Aloha.ServiceDefaults\Aloha.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Aloha.EventBus\Aloha.EventBus.csproj" />
   </ItemGroup>
 
 </Project>
