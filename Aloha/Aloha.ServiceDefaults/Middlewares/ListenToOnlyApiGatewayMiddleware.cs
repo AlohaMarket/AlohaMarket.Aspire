@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 
 namespace Aloha.ServiceDefaults.Middlewares
 {
@@ -20,6 +21,14 @@ namespace Aloha.ServiceDefaults.Middlewares
                 // if it is from the API Gateway => continue to the next middleware
                 await next(context);
             }
+        }
+    }
+
+    public static class ListenToOnlyApiGatewayMiddlewareExtensions
+    {
+        public static IApplicationBuilder UseListenToOnlyApiGateway(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<ListenToOnlyApiGatewayMiddleware>();
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using Aloha.ServiceDefaults.Middlewares;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +9,8 @@ namespace Aloha.ServiceDefaults.DependencyInjection
         public static IServiceCollection AddSharedServices<TContext>
             (this IServiceCollection services, IConfiguration configuration) where TContext : DbContext
         {
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
             services.AddDbContext<TContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("SupabaseConnection"),
                 npgsqlOptionsAction: sqlOptions =>
@@ -34,13 +34,6 @@ namespace Aloha.ServiceDefaults.DependencyInjection
             });
 
             return services;
-        }
-
-        public static IApplicationBuilder UseSharedPolicies(this IApplicationBuilder app)
-        {
-            app.UseMiddleware<ApiExceptionHandlerMiddleware>();
-            // app.UseMiddleware<ListenToOnlyApiGatewayMiddleware>();
-            return app;
         }
     }
 }

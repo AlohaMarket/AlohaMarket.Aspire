@@ -1,0 +1,2341 @@
+[
+  {
+    "catid": 11035567,
+    "parent_catid": 0,
+    "name": "Men Clothes",
+    "display_name": "Thời Trang Nam",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11035568,
+        "parent_catid": 11035567,
+        "name": "Jackets, Coats & Vests",
+        "display_name": "Áo Khoác",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035572,
+        "parent_catid": 11035567,
+        "name": "Suit Jackets & Blazers",
+        "display_name": "Áo Vest và Blazer",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035578,
+        "parent_catid": 11035567,
+        "name": "Hoodies & Sweatshirts",
+        "display_name": "Áo Hoodie, Áo Len & Áo Nỉ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035583,
+        "parent_catid": 11035567,
+        "name": "Jeans",
+        "display_name": "Quần Jeans",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035584,
+        "parent_catid": 11035567,
+        "name": "Pants/Suits",
+        "display_name": "Quần Dài/Quần Âu",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035590,
+        "parent_catid": 11035567,
+        "name": "Shorts",
+        "display_name": "Quần Short",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035592,
+        "parent_catid": 11035567,
+        "name": "Tops",
+        "display_name": "Áo",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035597,
+        "parent_catid": 11035567,
+        "name": "Tanks",
+        "display_name": "Áo Ba Lỗ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035598,
+        "parent_catid": 11035567,
+        "name": "Innerwear & Underwear",
+        "display_name": "Đồ Lót",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035603,
+        "parent_catid": 11035567,
+        "name": "Sleepwear",
+        "display_name": "Đồ Ngủ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035604,
+        "parent_catid": 11035567,
+        "name": "Sets",
+        "display_name": "Đồ Bộ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035605,
+        "parent_catid": 11035567,
+        "name": "Socks",
+        "display_name": "Vớ/Tất",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035606,
+        "parent_catid": 11035567,
+        "name": "Traditional Wear",
+        "display_name": "Trang Phục Truyền Thống",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035611,
+        "parent_catid": 11035567,
+        "name": "Costumes",
+        "display_name": "Đồ Hóa Trang",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035612,
+        "parent_catid": 11035567,
+        "name": "Occupational Attire",
+        "display_name": "Trang Phục Ngành Nghề",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035613,
+        "parent_catid": 11035567,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035614,
+        "parent_catid": 11035567,
+        "name": "Men Jewelries",
+        "display_name": "Trang Sức Nam",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035620,
+        "parent_catid": 11035567,
+        "name": "Eyewear",
+        "display_name": "Kính Mắt Nam",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035625,
+        "parent_catid": 11035567,
+        "name": "Belts",
+        "display_name": "Thắt Lưng Nam",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035626,
+        "parent_catid": 11035567,
+        "name": "Neckties, Bow Ties & Cravats",
+        "display_name": "Cà vạt & Nơ cổ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035627,
+        "parent_catid": 11035567,
+        "name": "Additional Accessories",
+        "display_name": "Phụ Kiện Nam",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11035639,
+    "parent_catid": 0,
+    "name": "Women Clothes",
+    "display_name": "Thời Trang Nữ",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11035648,
+        "parent_catid": 11035639,
+        "name": "Pants & Leggings",
+        "display_name": "Quần",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035652,
+        "parent_catid": 11035639,
+        "name": "Shorts",
+        "display_name": "Quần đùi",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035656,
+        "parent_catid": 11035639,
+        "name": "Skirts",
+        "display_name": "Chân váy",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035657,
+        "parent_catid": 11035639,
+        "name": "Jeans",
+        "display_name": "Quần jeans",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035658,
+        "parent_catid": 11035639,
+        "name": "Dresses",
+        "display_name": "Đầm/Váy",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035659,
+        "parent_catid": 11035639,
+        "name": "Wedding Dresses",
+        "display_name": "Váy cưới",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035660,
+        "parent_catid": 11035639,
+        "name": "Jumpsuits, Playsuits & Overalls",
+        "display_name": "Đồ liền thân",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035665,
+        "parent_catid": 11035639,
+        "name": "Jackets, Coats & Vests",
+        "display_name": "Áo khoác, Áo choàng & Vest",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035672,
+        "parent_catid": 11035639,
+        "name": "Sweaters & Cardigans",
+        "display_name": "Áo len & Cardigan",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035673,
+        "parent_catid": 11035639,
+        "name": "Hoodies & Sweatshirts",
+        "display_name": "Hoodie và Áo nỉ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035677,
+        "parent_catid": 11035639,
+        "name": "Sets",
+        "display_name": "Bộ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035682,
+        "parent_catid": 11035639,
+        "name": "Lingerie & Underwear",
+        "display_name": "Đồ lót",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035692,
+        "parent_catid": 11035639,
+        "name": "Sleepwear & Pajamas",
+        "display_name": "Đồ ngủ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035640,
+        "parent_catid": 11035639,
+        "name": "Tops",
+        "display_name": "Áo",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035730,
+        "parent_catid": 11035639,
+        "name": "Sportwear",
+        "display_name": "Đồ tập",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035697,
+        "parent_catid": 11035639,
+        "name": "Maternity Wear",
+        "display_name": "Đồ Bầu",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035705,
+        "parent_catid": 11035639,
+        "name": "Traditional Wear",
+        "display_name": "Đồ truyền thống",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035711,
+        "parent_catid": 11035639,
+        "name": "Costumes",
+        "display_name": "Đồ hóa trang",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035713,
+        "parent_catid": 11035639,
+        "name": "Fabric",
+        "display_name": "Vải",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035726,
+        "parent_catid": 11035639,
+        "name": "Socks & Stockings",
+        "display_name": "Vớ/ Tất",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035712,
+        "parent_catid": 11035639,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11036030,
+    "parent_catid": 0,
+    "name": "Mobile & Gadgets",
+    "display_name": "Điện Thoại & Phụ Kiện",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11036031,
+        "parent_catid": 11036030,
+        "name": "Mobile Phones",
+        "display_name": "Điện thoại",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036041,
+        "parent_catid": 11036030,
+        "name": "Tablets",
+        "display_name": "Máy tính bảng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036048,
+        "parent_catid": 11036030,
+        "name": "Powerbanks",
+        "display_name": "Pin Dự Phòng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036054,
+        "parent_catid": 11036030,
+        "name": "Batteries, Cables & Charger",
+        "display_name": "Pin Gắn Trong, Cáp và Bộ Sạc",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036060,
+        "parent_catid": 11036030,
+        "name": "Cases, Covers, & Skins",
+        "display_name": "Ốp lưng, bao da, Miếng dán điện thoại",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036064,
+        "parent_catid": 11036030,
+        "name": "Screen Protectors",
+        "display_name": "Bảo vệ màn hình",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036074,
+        "parent_catid": 11036030,
+        "name": "Phone Holders",
+        "display_name": "Đế giữ điện thoại",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036083,
+        "parent_catid": 11036030,
+        "name": "Memory Cards",
+        "display_name": "Thẻ nhớ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036084,
+        "parent_catid": 11036030,
+        "name": "Sims",
+        "display_name": "Sim",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036091,
+        "parent_catid": 11036030,
+        "name": "Other Accessories",
+        "display_name": "Phụ kiện khác",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036097,
+        "parent_catid": 11036030,
+        "name": "Other devices",
+        "display_name": "Thiết bị khác",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11036132,
+    "parent_catid": 0,
+    "name": "Consumer Electronics",
+    "display_name": "Thiết Bị Điện Tử",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11036160,
+        "parent_catid": 11036132,
+        "name": "Wearable Devices",
+        "display_name": "Thiết bị đeo thông minh",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036167,
+        "parent_catid": 11036132,
+        "name": "Tivi Accessories",
+        "display_name": "Phụ kiện tivi",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036172,
+        "parent_catid": 11036132,
+        "name": "Gaming & Console",
+        "display_name": "Máy Game Console",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036182,
+        "parent_catid": 11036132,
+        "name": "Console Accessories",
+        "display_name": "Phụ kiện Console",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036184,
+        "parent_catid": 11036132,
+        "name": "Video Games",
+        "display_name": "Đĩa game",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036133,
+        "parent_catid": 11036132,
+        "name": "Accessories and spare parts",
+        "display_name": "Linh phụ kiện",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036143,
+        "parent_catid": 11036132,
+        "name": "Earphones",
+        "display_name": "Tai nghe nhét tai",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036135,
+        "parent_catid": 11036132,
+        "name": "Audio",
+        "display_name": "Loa",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036151,
+        "parent_catid": 11036132,
+        "name": "Tivi",
+        "display_name": "Tivi",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036157,
+        "parent_catid": 11036132,
+        "name": "Tivi Box",
+        "display_name": "Tivi Box",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11109141,
+        "parent_catid": 11036132,
+        "name": "Headphones",
+        "display_name": "Headphones",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11036670,
+    "parent_catid": 0,
+    "name": "Home & Living",
+    "display_name": "Nhà Cửa & Đời Sống",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11036683,
+        "parent_catid": 11036670,
+        "name": "Bedding",
+        "display_name": "Chăn, Ga, Gối & Nệm",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036695,
+        "parent_catid": 11036670,
+        "name": "Furniture",
+        "display_name": "Đồ nội thất",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036717,
+        "parent_catid": 11036670,
+        "name": "Home Decoration",
+        "display_name": "Trang trí nhà cửa",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036732,
+        "parent_catid": 11036670,
+        "name": "Tools and Home improvement",
+        "display_name": "Dụng cụ & Thiết bị tiện ích",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036748,
+        "parent_catid": 11036670,
+        "name": "Kitchenware and food storage",
+        "display_name": "Đồ dùng nhà bếp và hộp đựng thực phẩm",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036760,
+        "parent_catid": 11036670,
+        "name": "Lighting",
+        "display_name": "Đèn",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036776,
+        "parent_catid": 11036670,
+        "name": "Outdoor & Garden",
+        "display_name": "Ngoài trời & Sân vườn",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036671,
+        "parent_catid": 11036670,
+        "name": "Bathroom",
+        "display_name": "Đồ dùng phòng tắm",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11111670,
+        "parent_catid": 11036670,
+        "name": "Regilious and Worship items",
+        "display_name": "Vật phẩm thờ cúng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11111669,
+        "parent_catid": 11036670,
+        "name": "Party supplies",
+        "display_name": "Đồ trang trí tiệc",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11111665,
+        "parent_catid": 11036670,
+        "name": "Housekeeping and Laundry",
+        "display_name": "Chăm sóc nhà cửa và giặt ủi",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11111668,
+        "parent_catid": 11036670,
+        "name": "Houseorganizers",
+        "display_name": "Sắp xếp nhà cửa",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11111666,
+        "parent_catid": 11036670,
+        "name": "Drinkware",
+        "display_name": "Dụng cụ pha chế",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11111664,
+        "parent_catid": 11036670,
+        "name": "Home Fragrance & Aromatherapy",
+        "display_name": "Tinh dầu thơm phòng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11111667,
+        "parent_catid": 11036670,
+        "name": "Dinnerware",
+        "display_name": "Đồ dùng phòng ăn",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11035954,
+    "parent_catid": 0,
+    "name": "Computer & Accessories",
+    "display_name": "Máy Tính & Laptop",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11035955,
+        "parent_catid": 11035954,
+        "name": "Desktop Computers",
+        "display_name": "Máy Tính Bàn",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035961,
+        "parent_catid": 11035954,
+        "name": "Monitors",
+        "display_name": "Màn Hình",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035962,
+        "parent_catid": 11035954,
+        "name": "Desktop & Laptop Components",
+        "display_name": "Linh Kiện Máy Tính",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035975,
+        "parent_catid": 11035954,
+        "name": "Data Storage",
+        "display_name": "Thiết Bị Lưu Trữ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035983,
+        "parent_catid": 11035954,
+        "name": "Network Components",
+        "display_name": "Thiết Bị Mạng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035993,
+        "parent_catid": 11035954,
+        "name": "Printers, Scanners & Projectors",
+        "display_name": "Máy In, Máy Scan & Máy Chiếu",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036000,
+        "parent_catid": 11035954,
+        "name": "Peripherals & Accessories",
+        "display_name": "Phụ Kiện Máy Tính",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036015,
+        "parent_catid": 11035954,
+        "name": "Laptops",
+        "display_name": "Laptop",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036016,
+        "parent_catid": 11035954,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036023,
+        "parent_catid": 11035954,
+        "name": "Gaming",
+        "display_name": "Gaming",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11036279,
+    "parent_catid": 0,
+    "name": "Beauty & Personal Care",
+    "display_name": "Sắc Đẹp",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11036328,
+        "parent_catid": 11036279,
+        "name": "Skincare",
+        "display_name": "Chăm sóc da mặt",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036280,
+        "parent_catid": 11036279,
+        "name": "Bath & Body Care",
+        "display_name": "Tắm & chăm sóc cơ thể",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036314,
+        "parent_catid": 11036279,
+        "name": "Makeup",
+        "display_name": "Trang điểm",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036297,
+        "parent_catid": 11036279,
+        "name": "Hair Care",
+        "display_name": "Chăm sóc tóc",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036321,
+        "parent_catid": 11036279,
+        "name": "Beauty Tools & Accessories",
+        "display_name": "Dụng cụ & Phụ kiện Làm đẹp",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11111646,
+        "parent_catid": 11036279,
+        "name": "Oral Care",
+        "display_name": "Vệ sinh răng miệng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036310,
+        "parent_catid": 11036279,
+        "name": "Perfumes & Fragrances",
+        "display_name": "Nước hoa",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036304,
+        "parent_catid": 11036279,
+        "name": "Men's Care",
+        "display_name": "Chăm sóc nam giới",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036344,
+        "parent_catid": 11036279,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11111647,
+        "parent_catid": 11036279,
+        "name": "Feminine Care",
+        "display_name": "Chăm sóc phụ nữ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036343,
+        "parent_catid": 11036279,
+        "name": "Beauty Sets & Packages",
+        "display_name": "Bộ sản phẩm làm đẹp",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11036101,
+    "parent_catid": 0,
+    "name": "Cameras",
+    "display_name": "Máy Ảnh & Máy Quay Phim",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11036102,
+        "parent_catid": 11036101,
+        "name": "Cameras",
+        "display_name": "Máy ảnh - Máy quay phim",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036109,
+        "parent_catid": 11036101,
+        "name": "Security Cameras & Systems",
+        "display_name": "Camera giám sát & Camera hệ thống",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036114,
+        "parent_catid": 11036101,
+        "name": "Memory Cards",
+        "display_name": "Thẻ nhớ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036115,
+        "parent_catid": 11036101,
+        "name": "Lenses",
+        "display_name": "Ống kính",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036119,
+        "parent_catid": 11036101,
+        "name": "Camera Accessories",
+        "display_name": "Phụ kiện máy ảnh",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036129,
+        "parent_catid": 11036101,
+        "name": "Drones",
+        "display_name": "Máy bay camera & Phụ kiện",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11036345,
+    "parent_catid": 0,
+    "name": "Health",
+    "display_name": "Sức Khỏe",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11036352,
+        "parent_catid": 11036345,
+        "name": "Medical Supplies",
+        "display_name": "Vật tư y tế",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036373,
+        "parent_catid": 11036345,
+        "name": "Insect Repellents",
+        "display_name": "Chống muỗi & xua đuổi côn trùng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036346,
+        "parent_catid": 11036345,
+        "name": "Food Supplement",
+        "display_name": "Thực phẩm chức năng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036370,
+        "parent_catid": 11036345,
+        "name": "Adult Diapers & Incontinence",
+        "display_name": "Tã người lớn",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036348,
+        "parent_catid": 11036345,
+        "name": "Beauty Supplements",
+        "display_name": "Hỗ trợ làm đẹp",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036375,
+        "parent_catid": 11036345,
+        "name": "Sexual Wellness",
+        "display_name": "Hỗ trợ tình dục",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036372,
+        "parent_catid": 11036345,
+        "name": "Massage & Therapy Devices",
+        "display_name": "Dụng cụ massage và trị liệu",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036381,
+        "parent_catid": 11036345,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11035788,
+    "parent_catid": 0,
+    "name": "Watches",
+    "display_name": "Đồng Hồ",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11035789,
+        "parent_catid": 11035788,
+        "name": "Men Watches",
+        "display_name": "Đồng Hồ Nam",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035790,
+        "parent_catid": 11035788,
+        "name": "Women Watches",
+        "display_name": "Đồng Hồ Nữ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035791,
+        "parent_catid": 11035788,
+        "name": "Set & Couple Watches",
+        "display_name": "Bộ Đồng Hồ & Đồng Hồ Cặp",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035792,
+        "parent_catid": 11035788,
+        "name": "Kid Watches",
+        "display_name": "Đồng Hồ Trẻ Em",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035793,
+        "parent_catid": 11035788,
+        "name": "Watches Accessories",
+        "display_name": "Phụ Kiện Đồng Hồ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035800,
+        "parent_catid": 11035788,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11035825,
+    "parent_catid": 0,
+    "name": "Women Shoes",
+    "display_name": "Giày Dép Nữ",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11035826,
+        "parent_catid": 11035825,
+        "name": "Boots",
+        "display_name": "Bốt",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035830,
+        "parent_catid": 11035825,
+        "name": "Sneakers",
+        "display_name": "Giày Thể Thao/ Sneaker",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035831,
+        "parent_catid": 11035825,
+        "name": "Flats",
+        "display_name": "Giày Đế Bằng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035837,
+        "parent_catid": 11035825,
+        "name": "Heels",
+        "display_name": "Giày Cao Gót",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035838,
+        "parent_catid": 11035825,
+        "name": "Wedges",
+        "display_name": "Giày Đế Xuồng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035839,
+        "parent_catid": 11035825,
+        "name": "Flat Sandals & Flip Flops",
+        "display_name": "Xăng-đan Và Dép",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035845,
+        "parent_catid": 11035825,
+        "name": "Shoe Care & Accessories",
+        "display_name": "Phụ Kiện Giày",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035852,
+        "parent_catid": 11035825,
+        "name": "Others",
+        "display_name": "Giày Khác",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11035801,
+    "parent_catid": 0,
+    "name": "Men Shoes",
+    "display_name": "Giày Dép Nam",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11035802,
+        "parent_catid": 11035801,
+        "name": "Boots",
+        "display_name": "Bốt",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035807,
+        "parent_catid": 11035801,
+        "name": "Sneakers",
+        "display_name": "Giày Thể Thao/ Sneakers",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035808,
+        "parent_catid": 11035801,
+        "name": "Slip Ons & Mules",
+        "display_name": "Giày Sục",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035809,
+        "parent_catid": 11035801,
+        "name": "Loafers & Boat Shoes",
+        "display_name": "Giày Tây Lười",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035810,
+        "parent_catid": 11035801,
+        "name": "Oxfords & Lace-Ups",
+        "display_name": "Giày Oxfords & Giày Buộc Dây",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035811,
+        "parent_catid": 11035801,
+        "name": "Sandals & Flip Flops",
+        "display_name": "Xăng-đan và Dép",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035817,
+        "parent_catid": 11035801,
+        "name": "Shoe Care & Accessories",
+        "display_name": "Phụ kiện giày dép",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035824,
+        "parent_catid": 11035801,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11035761,
+    "parent_catid": 0,
+    "name": "Women Bags",
+    "display_name": "Túi Ví Nữ",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11035762,
+        "parent_catid": 11035761,
+        "name": "Backpacks",
+        "display_name": "Ba Lô Nữ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035763,
+        "parent_catid": 11035761,
+        "name": "Laptop Bags",
+        "display_name": "Cặp Laptop",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035768,
+        "parent_catid": 11035761,
+        "name": "Clutches & Wristlets",
+        "display_name": "Ví Dự Tiệc & Ví Cầm Tay",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035769,
+        "parent_catid": 11035761,
+        "name": "Waist Bags & Chest Bags",
+        "display_name": "Túi Đeo Hông & Túi Đeo Ngực",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035770,
+        "parent_catid": 11035761,
+        "name": "Tote Bags",
+        "display_name": "Túi Tote",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035771,
+        "parent_catid": 11035761,
+        "name": "Top-handle Bags",
+        "display_name": "Túi Quai Xách",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035772,
+        "parent_catid": 11035761,
+        "name": "Crossbody & Shoulder Bags",
+        "display_name": "Túi Đeo Chéo & Túi Đeo Vai",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035773,
+        "parent_catid": 11035761,
+        "name": "Wallets",
+        "display_name": "Ví/Bóp Nữ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035780,
+        "parent_catid": 11035761,
+        "name": "Bag Accessories",
+        "display_name": "Phụ Kiện Túi",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035787,
+        "parent_catid": 11035761,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11036971,
+    "parent_catid": 0,
+    "name": "Home Appliances",
+    "display_name": "Thiết Bị Điện Gia Dụng",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11036972,
+        "parent_catid": 11036971,
+        "name": "Kitchen Appliances",
+        "display_name": "Đồ gia dụng nhà bếp",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036990,
+        "parent_catid": 11036971,
+        "name": "Large Appliance",
+        "display_name": "Đồ gia dụng lớn",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11037000,
+        "parent_catid": 11036971,
+        "name": "Vacuums & Floor care",
+        "display_name": "Máy hút bụi & Thiết bị làm sạch",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11037007,
+        "parent_catid": 11036971,
+        "name": "Air Conditioners & Fans",
+        "display_name": "Quạt & Máy nóng lạnh",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11037016,
+        "parent_catid": 11036971,
+        "name": "Garment Care",
+        "display_name": "Thiết bị chăm sóc quần áo",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11037023,
+        "parent_catid": 11036971,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11111623,
+        "parent_catid": 11036971,
+        "name": "Blenders, Mixers & Grinders",
+        "display_name": "Máy xay, ép, máy đánh trứng trộn bột, máy xay thực phẩm",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11111620,
+        "parent_catid": 11036971,
+        "name": "Electric Cookers",
+        "display_name": "Bếp điện",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11035853,
+    "parent_catid": 0,
+    "name": "Fashion Accessories",
+    "display_name": "Phụ Kiện & Trang Sức Nữ",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11035854,
+        "parent_catid": 11035853,
+        "name": "Rings",
+        "display_name": "Nhẫn",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035855,
+        "parent_catid": 11035853,
+        "name": "Earrings",
+        "display_name": "Bông tai",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035856,
+        "parent_catid": 11035853,
+        "name": "Scarves & Shawls",
+        "display_name": "Khăn choàng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035857,
+        "parent_catid": 11035853,
+        "name": "Gloves",
+        "display_name": "Găng tay",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035858,
+        "parent_catid": 11035853,
+        "name": "Hair Accessories",
+        "display_name": "Phụ kiện tóc",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035865,
+        "parent_catid": 11035853,
+        "name": "Bracelets & Bangles",
+        "display_name": "Vòng tay & Lắc tay",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035866,
+        "parent_catid": 11035853,
+        "name": "Anklets",
+        "display_name": "Lắc chân",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035867,
+        "parent_catid": 11035853,
+        "name": "Hats & Caps",
+        "display_name": "Mũ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035868,
+        "parent_catid": 11035853,
+        "name": "Necklaces",
+        "display_name": "Dây chuyền",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035869,
+        "parent_catid": 11035853,
+        "name": "Eyewear",
+        "display_name": "Kính mắt",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035874,
+        "parent_catid": 11035853,
+        "name": "Investment Precious Metals",
+        "display_name": "Kim loại quý",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035880,
+        "parent_catid": 11035853,
+        "name": "Belts",
+        "display_name": "Thắt lưng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035881,
+        "parent_catid": 11035853,
+        "name": "Neckties, Bow Ties & Cravats",
+        "display_name": "Cà vạt & Nơ cổ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035882,
+        "parent_catid": 11035853,
+        "name": "Additional Accessories",
+        "display_name": "Phụ kiện thêm",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035891,
+        "parent_catid": 11035853,
+        "name": "Accessories Sets & Packages",
+        "display_name": "Bộ phụ kiện",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035892,
+        "parent_catid": 11035853,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035893,
+        "parent_catid": 11035853,
+        "name": "Socks & Stockings",
+        "display_name": "Vớ/ Tất",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035897,
+        "parent_catid": 11035853,
+        "name": "Umbrella",
+        "display_name": "Ô/Dù",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11035478,
+    "parent_catid": 0,
+    "name": "Sport & Outdoor",
+    "display_name": "Thể Thao & Du Lịch",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11035479,
+        "parent_catid": 11035478,
+        "name": "Luggage",
+        "display_name": "Vali",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035487,
+        "parent_catid": 11035478,
+        "name": "Travel Bags",
+        "display_name": "Túi du lịch",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035492,
+        "parent_catid": 11035478,
+        "name": "Travel Accessories",
+        "display_name": "Phụ kiện du lịch",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035503,
+        "parent_catid": 11035478,
+        "name": "Sports & Outdoor Recreation Equipments",
+        "display_name": "Dụng Cụ Thể Thao & Dã Ngoại",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035531,
+        "parent_catid": 11035478,
+        "name": "Sports Footwear",
+        "display_name": "Giày Thể Thao",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035543,
+        "parent_catid": 11035478,
+        "name": "Sports & Outdoor Apparels",
+        "display_name": "Thời Trang Thể Thao & Dã Ngoại",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035553,
+        "parent_catid": 11035478,
+        "name": "Sports & Outdoor Accessories",
+        "display_name": "Phụ Kiện Thể Thao & Dã Ngoại",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035566,
+        "parent_catid": 11035478,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11036525,
+    "parent_catid": 0,
+    "name": "Grocery",
+    "display_name": "Bách Hóa Online",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11036532,
+        "parent_catid": 11036525,
+        "name": "Snacks",
+        "display_name": "Đồ ăn vặt",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036526,
+        "parent_catid": 11036525,
+        "name": "Convenience / Ready-to-eat",
+        "display_name": "Đồ chế biến sẵn",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036544,
+        "parent_catid": 11036525,
+        "name": "Food Staples",
+        "display_name": "Nhu yếu phẩm",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036552,
+        "parent_catid": 11036525,
+        "name": "Cooking Essentials",
+        "display_name": "Nguyên liệu nấu ăn",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036562,
+        "parent_catid": 11036525,
+        "name": "Baking Needs",
+        "display_name": "Đồ làm bánh",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036591,
+        "parent_catid": 11036525,
+        "name": "Dairy & Eggs",
+        "display_name": "Sữa - trứng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036576,
+        "parent_catid": 11036525,
+        "name": "Beverages",
+        "display_name": "Đồ uống",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036570,
+        "parent_catid": 11036525,
+        "name": "Breakfast Cereals & Spread",
+        "display_name": "Ngũ cốc & mứt",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036611,
+        "parent_catid": 11036525,
+        "name": "Bakery",
+        "display_name": "Các loại bánh",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036616,
+        "parent_catid": 11036525,
+        "name": "Alcoholic Beverages",
+        "display_name": "Đồ uống có cồn",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036622,
+        "parent_catid": 11036525,
+        "name": "Gift Set & Hampers",
+        "display_name": "Bộ quà tặng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036601,
+        "parent_catid": 11036525,
+        "name": "Fresh & Frozen Food",
+        "display_name": "Thực phẩm tươi sống và thực phẩm đông lạnh",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036623,
+        "parent_catid": 11036525,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11036793,
+    "parent_catid": 0,
+    "name": "Automotive",
+    "display_name": "Ô Tô & Xe Máy & Xe Đạp",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11036794,
+        "parent_catid": 11036793,
+        "name": "Bike, E-bike",
+        "display_name": "Xe đạp, xe điện",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036804,
+        "parent_catid": 11036793,
+        "name": "Motorbike",
+        "display_name": "Mô tô, xe máy",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036811,
+        "parent_catid": 11036793,
+        "name": "Car",
+        "display_name": "Xe Ô tô",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036817,
+        "parent_catid": 11036793,
+        "name": "Helmets",
+        "display_name": "Mũ bảo hiểm",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036824,
+        "parent_catid": 11036793,
+        "name": "Motorbike Accessories",
+        "display_name": "Phụ kiện xe máy",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036846,
+        "parent_catid": 11036793,
+        "name": "Bicycle & E-bike Accessories",
+        "display_name": "Phụ kiện xe đạp",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11108984,
+        "parent_catid": 11036793,
+        "name": "Interior Accessories",
+        "display_name": "Phụ kiện bên trong ô tô",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11108967,
+        "parent_catid": 11036793,
+        "name": "Automotive Oils & Lubes",
+        "display_name": "Dầu nhớt & dầu nhờn",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11109015,
+        "parent_catid": 11036793,
+        "name": "Auto Parts & Spares",
+        "display_name": "Phụ tùng ô tô",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11108953,
+        "parent_catid": 11036793,
+        "name": "Motorbike Spare Parts",
+        "display_name": "Phụ tùng xe máy",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11109002,
+        "parent_catid": 11036793,
+        "name": "Exterior Accessories",
+        "display_name": "Phụ kiện bên ngoài ô tô",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11108974,
+        "parent_catid": 11036793,
+        "name": "Automotive Care",
+        "display_name": "Chăm sóc ô tô",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11116267,
+        "parent_catid": 11036793,
+        "name": "Automotive Services",
+        "display_name": "Dịch vụ cho xe",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11036863,
+    "parent_catid": 0,
+    "name": "Books & Stationery",
+    "display_name": "Nhà Sách Online",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11108503,
+        "parent_catid": 11036863,
+        "name": "Domestic Books",
+        "display_name": "Sách Tiếng Việt",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11108540,
+        "parent_catid": 11036863,
+        "name": "Foreign Books",
+        "display_name": "Sách ngoại văn",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11108576,
+        "parent_catid": 11036863,
+        "name": "Gift & Wrapping",
+        "display_name": "Gói Quà",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11108584,
+        "parent_catid": 11036863,
+        "name": "Writing & Correction",
+        "display_name": "Bút viết",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11108591,
+        "parent_catid": 11036863,
+        "name": "School & Office Supplies",
+        "display_name": "Dụng cụ học sinh & văn phòng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11108635,
+        "parent_catid": 11036863,
+        "name": "Coloring & Arts",
+        "display_name": "Màu, Họa Cụ và Đồ Thủ Công",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11108610,
+        "parent_catid": 11036863,
+        "name": "Notebooks & Paper Products",
+        "display_name": "Sổ và Giấy Các Loại",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036914,
+        "parent_catid": 11036863,
+        "name": "Souvenirs",
+        "display_name": "Quà Lưu Niệm",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11108624,
+        "parent_catid": 11036863,
+        "name": "Music & Media",
+        "display_name": "Nhạc cụ và phụ kiện âm nhạc",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11035741,
+    "parent_catid": 0,
+    "name": "Men Bags",
+    "display_name": "Balo & Túi Ví Nam",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11035742,
+        "parent_catid": 11035741,
+        "name": "Backpacks",
+        "display_name": "Ba Lô Nam",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035743,
+        "parent_catid": 11035741,
+        "name": "Laptop Backpacks",
+        "display_name": "Ba Lô Laptop Nam",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035744,
+        "parent_catid": 11035741,
+        "name": "Laptop Bags & Cases",
+        "display_name": "Túi & Cặp Đựng Laptop",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035747,
+        "parent_catid": 11035741,
+        "name": "Laptop Sleeves",
+        "display_name": "Túi Chống Sốc Laptop Nam",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035748,
+        "parent_catid": 11035741,
+        "name": "Tote Bags",
+        "display_name": "Túi Tote Nam",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035749,
+        "parent_catid": 11035741,
+        "name": "Briefcases",
+        "display_name": "Cặp Xách Công Sở Nam",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035750,
+        "parent_catid": 11035741,
+        "name": "Clutches",
+        "display_name": "Ví Cầm Tay Nam",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035751,
+        "parent_catid": 11035741,
+        "name": "Waist Bags & Chest Bags",
+        "display_name": "Túi Đeo Hông & Túi Đeo Ngực Nam",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035752,
+        "parent_catid": 11035741,
+        "name": "Crossbody & Shoulder Bags",
+        "display_name": "Túi Đeo Chéo Nam",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035753,
+        "parent_catid": 11035741,
+        "name": "Wallets",
+        "display_name": "Bóp/Ví Nam",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11035760,
+        "parent_catid": 11035741,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11036382,
+    "parent_catid": 0,
+    "name": "Kid Fashion",
+    "display_name": "Thời Trang Trẻ Em",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11036418,
+        "parent_catid": 11036382,
+        "name": "Boy Clothes",
+        "display_name": "Trang phục bé trai",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036438,
+        "parent_catid": 11036382,
+        "name": "Girl Clothes",
+        "display_name": "Trang phục bé gái",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036461,
+        "parent_catid": 11036382,
+        "name": "Boy Shoes",
+        "display_name": "Giày dép bé trai",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036469,
+        "parent_catid": 11036382,
+        "name": "Girl Shoes",
+        "display_name": "Giày dép bé gái",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036477,
+        "parent_catid": 11036382,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036383,
+        "parent_catid": 11036382,
+        "name": "Baby Clothes",
+        "display_name": "Quần áo em bé",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036396,
+        "parent_catid": 11036382,
+        "name": "Baby Mittens & Footwear",
+        "display_name": "Giày tập đi & Tất sơ sinh",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036397,
+        "parent_catid": 11036382,
+        "name": "Baby & Kids Accessories",
+        "display_name": "Phụ kiện trẻ em",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11036932,
+    "parent_catid": 0,
+    "name": "Toys",
+    "display_name": "Đồ Chơi",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11036933,
+        "parent_catid": 11036932,
+        "name": "Hobbies & Collectibles",
+        "display_name": "Sở thích & Sưu tầm",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036939,
+        "parent_catid": 11036932,
+        "name": "Game Zone",
+        "display_name": "Đồ chơi giải trí",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036946,
+        "parent_catid": 11036932,
+        "name": "Educational Toys",
+        "display_name": "Đồ chơi giáo dục",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036954,
+        "parent_catid": 11036932,
+        "name": "Baby & Toddler Toys",
+        "display_name": "Đồ chơi cho trẻ sơ sinh & trẻ nhỏ",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036960,
+        "parent_catid": 11036932,
+        "name": "Action & Outdoor Toys",
+        "display_name": "Đồ chơi vận động & ngoài trời",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036966,
+        "parent_catid": 11036932,
+        "name": "Dolls & Stuffed Toys",
+        "display_name": "Búp bê & Đồ chơi nhồi bông",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11036624,
+    "parent_catid": 0,
+    "name": "Home care",
+    "display_name": "Giặt Giũ & Chăm Sóc Nhà Cửa",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11036625,
+        "parent_catid": 11036624,
+        "name": "Laundry",
+        "display_name": "Giặt giũ & Chăm sóc nhà cửa",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036634,
+        "parent_catid": 11036624,
+        "name": "Toilet Paper",
+        "display_name": "Giấy vệ sinh, khăn giấy",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036639,
+        "parent_catid": 11036624,
+        "name": "Household Cleaning",
+        "display_name": "Vệ sinh nhà cửa",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036647,
+        "parent_catid": 11036624,
+        "name": "Dishwashing",
+        "display_name": "Vệ sinh bát đĩa",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036649,
+        "parent_catid": 11036624,
+        "name": "Cleaning Tools",
+        "display_name": "Dụng cụ vệ sinh",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036654,
+        "parent_catid": 11036624,
+        "name": "Air Fresheners",
+        "display_name": "Chất khử mùi, làm thơm",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036660,
+        "parent_catid": 11036624,
+        "name": "Insect Killer",
+        "display_name": "Thuốc diệt côn trùng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036664,
+        "parent_catid": 11036624,
+        "name": "Food preservation",
+        "display_name": "Túi, màng bọc thực phẩm",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036668,
+        "parent_catid": 11036624,
+        "name": "Trash Bags",
+        "display_name": "Bao bì, túi đựng rác",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11036478,
+    "parent_catid": 0,
+    "name": "Pets",
+    "display_name": "Chăm Sóc Thú Cưng",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11036479,
+        "parent_catid": 11036478,
+        "name": "Pet Food",
+        "display_name": "Thức ăn cho thú cưng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036490,
+        "parent_catid": 11036478,
+        "name": "Pet Accessories",
+        "display_name": "Phụ kiện cho thú cưng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036498,
+        "parent_catid": 11036478,
+        "name": "Litter & Toilet",
+        "display_name": "Vệ sinh cho thú cưng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036510,
+        "parent_catid": 11036478,
+        "name": "Pet Clothing & Accessories",
+        "display_name": "Quần áo thú cưng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036519,
+        "parent_catid": 11036478,
+        "name": "Pet Healthcare",
+        "display_name": "Chăm sóc sức khỏe",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11116223,
+        "parent_catid": 11036478,
+        "name": "Pet Grooming",
+        "display_name": "Làm đẹp cho thú cưng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11036524,
+        "parent_catid": 11036478,
+        "name": "Others",
+        "display_name": "Khác",
+        "level": 2,
+        "children": null
+      }
+    ]
+  },
+  {
+    "catid": 11082137,
+    "parent_catid": 0,
+    "name": "Deals Near Me",
+    "display_name": "Deal Gần Bạn",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11082138,
+        "parent_catid": 11082137,
+        "name": "Scan & Pay Voucher",
+        "display_name": "Scan & Pay Voucher",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11082139,
+        "parent_catid": 11082137,
+        "name": "Deals",
+        "display_name": "Deals",
+        "level": 2,
+        "children": null
+      }
+    ],
+    "block_buyer_platform": [ 3, 1, 5, 4, 2 ]
+  },
+  {
+    "catid": 11116484,
+    "parent_catid": 0,
+    "name": "Tools & Home Improvement",
+    "display_name": "Dụng cụ và thiết bị tiện ích",
+    "level": 1,
+    "children": [
+      {
+        "catid": 11116487,
+        "parent_catid": 11116484,
+        "name": "Handtool",
+        "display_name": "Dụng cụ cầm tay",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11116485,
+        "parent_catid": 11116484,
+        "name": "Large tools and equipment",
+        "display_name": "Dụng cụ điện và thiết bị lớn",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11116489,
+        "parent_catid": 11116484,
+        "name": "Electrical Circuitry & Parts",
+        "display_name": "Thiết bị mạch điện",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11116488,
+        "parent_catid": 11116484,
+        "name": "Building and construction",
+        "display_name": "Vật liệu xây dựng",
+        "level": 2,
+        "children": null
+      },
+      {
+        "catid": 11116486,
+        "parent_catid": 11116484,
+        "name": "Accessories",
+        "display_name": "Thiết bị và phụ kiện xây dựng",
+        "level": 2,
+        "children": null
+      }
+    ]
+  }
+]
