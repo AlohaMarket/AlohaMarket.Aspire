@@ -25,6 +25,7 @@
     <ProjectReference Include="..\..\Aloha.EventBus\Aloha.EventBus.csproj" />
     <ProjectReference Include="..\..\Aloha.CategoryService\Aloha.CategoryService.csproj" />
     <ProjectReference Include="..\..\Aloha.LocationService\Aloha.LocationService.csproj" />
+    <ProjectReference Include="..\..\Aloha.UserService\Aloha.UserService.csproj" />
   </ItemGroup>
 
 </Project>
