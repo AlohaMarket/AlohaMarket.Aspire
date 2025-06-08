@@ -15,6 +15,9 @@ public static class ApplicationServiceExtensions
 
         var userService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_User>();
 
+        var postService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Post>()
+            .WithReference(userService);
+
         var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>();
 
         var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Category>();
