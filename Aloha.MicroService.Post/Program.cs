@@ -1,27 +1,23 @@
+using Aloha.MicroService.Post.Apis;
+using Aloha.MicroService.Post.Bootstraping;
+using Aloha.MicroService.Post.Infrastructure.Data;
+using Aloha.ServiceDefaults.Hosting;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.AddApplicationServices();
 
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
-app.MapControllers();
+app.MapPostApi();
 
 app.Run();
