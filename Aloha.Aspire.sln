@@ -7,19 +7,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.AppHost", "Aloha\Aloh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.ServiceDefaults", "Aloha\Aloha.ServiceDefaults\Aloha.ServiceDefaults.csproj", "{543C54EB-2A61-BE17-E078-B4A9CAA4744E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.API", "Aloha.API\Aloha.API.csproj", "{DA828420-51EF-5A48-73CC-D9D47B559223}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.ApiGateway", "Aloha.ApiGateway\Aloha.ApiGateway.csproj", "{867395F9-EFB0-5ABE-BF42-C4C4DCF7E8B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.LocationService", "Aloha.LocationService\Aloha.LocationService.csproj", "{133BF00F-5608-458A-BD8D-67EF2A53659B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.MicroService.Location", "Aloha.LocationService\Aloha.MicroService.Location.csproj", "{133BF00F-5608-458A-BD8D-67EF2A53659B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.EventBus", "Aloha.EventBus\Aloha.EventBus.csproj", "{7798B006-D1A2-D171-D504-6EEC2CEF54E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.CategoryService", "Aloha.CategoryService\Aloha.CategoryService.csproj", "{E9894953-3AC7-43D3-9A70-D50A4946E15B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.MicroService.Category", "Aloha.CategoryService\Aloha.MicroService.Category.csproj", "{E9894953-3AC7-43D3-9A70-D50A4946E15B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.EventBus.Kafka", "Aloha.EventBus.Kafka\Aloha.EventBus.Kafka.csproj", "{498955B6-711F-CC01-543E-C63B036F60EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.UserService", "Aloha.UserService\Aloha.UserService.csproj", "{D712C3F8-99F8-4817-BC19-5B0F27663D6E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.MicroService.User", "Aloha.UserService\Aloha.MicroService.User.csproj", "{D712C3F8-99F8-4817-BC19-5B0F27663D6E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +33,6 @@ Global
 		{543C54EB-2A61-BE17-E078-B4A9CAA4744E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{543C54EB-2A61-BE17-E078-B4A9CAA4744E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{543C54EB-2A61-BE17-E078-B4A9CAA4744E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA828420-51EF-5A48-73CC-D9D47B559223}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA828420-51EF-5A48-73CC-D9D47B559223}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA828420-51EF-5A48-73CC-D9D47B559223}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA828420-51EF-5A48-73CC-D9D47B559223}.Release|Any CPU.Build.0 = Release|Any CPU
 		{867395F9-EFB0-5ABE-BF42-C4C4DCF7E8B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{867395F9-EFB0-5ABE-BF42-C4C4DCF7E8B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{867395F9-EFB0-5ABE-BF42-C4C4DCF7E8B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
