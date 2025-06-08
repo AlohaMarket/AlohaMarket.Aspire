@@ -8,10 +8,20 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.1" />
+    <PackageReference Include="MediatR" Version="12.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Aloha\Aloha.ServiceDefaults\Aloha.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Aloha.EventBus\Aloha.EventBus.csproj" />
+    <ProjectReference Include="..\Aloha.EventBus.Kafka\Aloha.EventBus.Kafka.csproj" />
+    <ProjectReference Include="..\Aloha.EventBus.Models\Aloha.EventBus.Models.csproj" />
   </ItemGroup>
 
 </Project>
