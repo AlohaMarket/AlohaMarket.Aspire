@@ -1,5 +1,4 @@
 using Aloha.UserService.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aloha.UserService.Controllers
