@@ -3,6 +3,7 @@ using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
 using Aloha.MicroService.Post.Infrastructure.Data;
 using Aloha.ServiceDefaults.Hosting;
+using Microsoft.EntityFrameworkCore;
 
 namespace Aloha.MicroService.Post.Bootstraping
 {
@@ -18,8 +19,12 @@ namespace Aloha.MicroService.Post.Bootstraping
         public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
         {
             builder.AddServiceDefaults();
-            builder.Services.AddOpenApi();
-            builder.AddNpgsqlDbContext<PostDbContext>(Consts.DefaultDatabase);
+            builder.Services.AddDbContext<PostDbContext>(options =>
+            {
+                var connectionString = builder.Configuration.GetConnectionString(Consts.DefaultDatabase);
+                options.UseNpgsql(connectionString);
+            });
+            //builder.AddNpgsqlDbContext<PostDbContext>(Consts.DefaultDatabase);
 
             builder.Services.AddMediatR(cfg => {
                 cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
