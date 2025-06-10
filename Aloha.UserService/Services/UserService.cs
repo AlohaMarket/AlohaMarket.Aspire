@@ -15,7 +15,7 @@ namespace Aloha.UserService.Services
             var isExist = await userRepository.UserExistsAsync(user.Id);
             if (isExist)
             {
-                throw new InvalidOperationException("User already exists.");
+                return await userRepository.GetUserByIdAsync(request.Id);
             }
             return await userRepository.CreateUserAsync(user);
         }

@@ -31,17 +31,17 @@ public static class ApplicationServiceExtensions
 
         var eventBus = builder.AddProjectWithPostfix<Projects.Aloha_EventBus>();
 
-        //var ;
-
         var locationService = builder.AddProjectWithPostfix<Projects.Aloha_LocationService>();
 
         var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_CategoryService>();
+
+        var userService = builder.AddProjectWithPostfix<Projects.Aloha_UserService>();
 
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
             .WithReference(apiService)
             .WithReference(locationService)
             .WithReference(categoryService)
-            ;
+            .WithReference(userService);
 
         return builder;
     }

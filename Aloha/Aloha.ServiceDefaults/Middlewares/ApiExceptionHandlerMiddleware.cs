@@ -28,18 +28,85 @@ namespace Aloha.ServiceDefaults.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
+            var requestStartTime = DateTime.UtcNow;
+            var requestId = context.TraceIdentifier;
+
             try
             {
+                // Initial request logging
+                _logger.LogInformation(
+                    "ApiExceptionMiddleware: Starting request processing - RequestId: {RequestId}, Path: {Path}, Method: {Method}",
+                    requestId,
+                    context.Request.Path,
+                    context.Request.Method);
+
+                // Check API Gateway
+                bool isFromGateway = context.Request.Headers.TryGetValue("Api-Gateway", out var gatewayHeader);
+                _logger.LogInformation(
+                    "Request source: {Source}",
+                    isFromGateway ? "API Gateway" : "Direct Client");
+
+                // Authentication status
+                var isAuthenticated = context.User?.Identity?.IsAuthenticated ?? false;
+                _logger.LogInformation(
+                    "Authentication Status - IsAuthenticated: {IsAuthenticated}, Identity: {IdentityName}",
+                    isAuthenticated,
+                    context.User?.Identity?.Name ?? "none");
+
+                // Log all headers
+                _logger.LogInformation("Request Headers:");
+                foreach (var header in context.Request.Headers)
+                {
+                    // Mask sensitive data in Authorization header
+                    if (header.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var authValue = header.Value.ToString();
+                        _logger.LogInformation("Header: {Key} = {Value}",
+                            header.Key,
+                            authValue.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
+                                ? "Bearer [token-masked]"
+                                : "[credentials-masked]");
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Header: {Key} = {Value}", header.Key, header.Value);
+                    }
+                }
+
                 await _next(context);
+
+                // Log response status
+                var requestDuration = DateTime.UtcNow - requestStartTime;
+                _logger.LogInformation(
+                    "Request completed - RequestId: {RequestId}, StatusCode: {StatusCode}, Duration: {Duration}ms",
+                    requestId,
+                    context.Response.StatusCode,
+                    requestDuration.TotalMilliseconds);
+
+                // Handle error status codes
                 if (context.Response.StatusCode >= 400 && !context.Response.HasStarted)
                 {
-                    // TODO: đọc body gốc (nếu có), hoặc build errorResponse mới
-                    await HandleExceptionAsync(context, Guid.NewGuid().ToString(), new ApiException("Upstream error", (HttpStatusCode)context.Response.StatusCode));
+                    _logger.LogWarning(
+                        "Error status code detected - RequestId: {RequestId}, StatusCode: {StatusCode}",
+                        requestId,
+                        context.Response.StatusCode);
+
+                    await HandleExceptionAsync(
+                        context,
+                        requestId,
+                        new ApiException("Upstream error", (HttpStatusCode)context.Response.StatusCode));
                 }
             }
             catch (Exception exception)
             {
                 var errorId = Guid.NewGuid().ToString();
+                _logger.LogError(
+                    exception,
+                    "Unhandled exception - RequestId: {RequestId}, ErrorId: {ErrorId}, Message: {Message}",
+                    requestId,
+                    errorId,
+                    exception.Message);
+
                 LogError(errorId, context, exception);
                 await HandleExceptionAsync(context, errorId, exception);
             }

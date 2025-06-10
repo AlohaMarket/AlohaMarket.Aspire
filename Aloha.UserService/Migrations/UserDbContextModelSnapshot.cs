@@ -30,7 +30,6 @@ namespace Aloha.UserService.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("AvatarUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
@@ -44,7 +43,6 @@ namespace Aloha.UserService.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
