@@ -14,6 +14,7 @@ namespace Aloha.MicroService.Post.Bootstraping
             public const string DefaultDatabase = "PostDatabase";
             public const string Env_EventPublishingTopics = "EventBus:PublishingTopics";
             public const string Env_EventConsumingTopics = "EventBus:ConsumingTopics";
+            public const string Env_DatabaseConnection = "Aloha_PostDB_ConnectionString";
         }
 
         public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
@@ -21,7 +22,8 @@ namespace Aloha.MicroService.Post.Bootstraping
             builder.AddServiceDefaults();
             builder.Services.AddDbContext<PostDbContext>(options =>
             {
-                var connectionString = builder.Configuration.GetConnectionString(Consts.DefaultDatabase);
+                var connectionString = Environment.GetEnvironmentVariable(Consts.Env_DatabaseConnection) 
+                                       ?? builder.Configuration.GetConnectionString(Consts.DefaultDatabase);
                 options.UseNpgsql(connectionString);
             });
             //builder.AddNpgsqlDbContext<PostDbContext>(Consts.DefaultDatabase);
