@@ -1,16 +1,11 @@
 ﻿namespace Aloha.MicroService.Payment.Mapper
 {
-    public static class PaymentMapper
-    {
-        public static Payments ToModel(PaymentCreateDto dto)
+        public class PaymentMapper : Profile
         {
-            return new Payments
+            public PaymentMapper()
             {
-                UserId = dto.UserId,
-                PlanId = dto.PlanId,
-                Price = dto.Price,
-                CreatedAt = DateTime.UtcNow
-            };
+                CreateMap<PaymentCreateDto, Payments>();
+                CreateMap<Payments, PaymentResponseModel>();
+            }
         }
-    }
 }

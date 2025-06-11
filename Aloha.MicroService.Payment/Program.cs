@@ -13,6 +13,12 @@ public class Program
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
         builder.Services.AddEndpointsApiExplorer();
+        builder.Services.Configure<MongoSettings>(
+        builder.Configuration.GetSection("MongoSettings"));
+        builder.Services.AddSingleton<IPaymentRepository, PaymentRepository>();
+        builder.Services.AddScoped<PaymentService>();
+        builder.Services.AddScoped<IVNPayService, VNPayService>();
+        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         builder.Services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -38,11 +44,8 @@ public class Program
                     }
                 }
             });
-            builder.Services.Configure<MongoSettings>(
-            builder.Configuration.GetSection("MongoDB"));
 
-            builder.Services.AddSingleton<IPaymentRepository, PaymentRepository>();
-            builder.Services.AddScoped<PaymentService>();
+
             // Add security requirement for all operations
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
@@ -65,12 +68,13 @@ public class Program
         // Gọi seeder
         using (var scope = app.Services.CreateScope())
         {
-            var mongoSettings = builder.Configuration.GetSection("MongoSettings").Get<MongoSettings>();
+            var options = scope.ServiceProvider.GetRequiredService<IOptions<MongoSettings>>();
+            var mongoSettings = options.Value;
             var mongoClient = new MongoClient(mongoSettings.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
-            var collection = database.GetCollection<Payments>("Payments");
+            var collection = database.GetCollection<Payments>(mongoSettings.CollectionName);
 
-            await MongoDbSeeder.Seed(collection); 
+            await MongoDbSeeder.Seed(collection);
         }
         app.MapDefaultEndpoints();
 
