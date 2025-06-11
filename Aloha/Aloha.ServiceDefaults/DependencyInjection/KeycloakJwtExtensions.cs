@@ -60,7 +60,7 @@ namespace Aloha.ServiceDefaults.DependencyInjection
                 ExtractRealmRoles(context, identity, roleClaims);
 
                 // Get client/resource roles (optional, uncomment if needed)
-                // ExtractClientRoles(context, identity, roleClaims);
+                ExtractClientRoles(context, identity, roleClaims);
             }
 
             return Task.CompletedTask;
@@ -95,14 +95,14 @@ namespace Aloha.ServiceDefaults.DependencyInjection
                     System.Console.WriteLine($"Error parsing Keycloak realm_access claim: {ex.Message}");
                 }
             }
-            
+
             // Add this to extract sub claim as userId
             var sub = context.Principal?.FindFirst("sub");
             if (sub != null && !string.IsNullOrEmpty(sub.Value))
             {
                 identity.AddClaim(new Claim("userId", sub.Value));
             }
-            
+
             // Add preferred_username
             var username = context.Principal?.FindFirst("preferred_username");
             if (username != null && !string.IsNullOrEmpty(username.Value))
@@ -120,30 +120,25 @@ namespace Aloha.ServiceDefaults.DependencyInjection
                 {
                     using var doc = JsonDocument.Parse(resourceAccess.Value);
 
-                    // Iterate through all client role sections
-                    foreach (var clientProperty in doc.RootElement.EnumerateObject())
+                    const string targetClient = "aloha-client";
+                    if (doc.RootElement.TryGetProperty(targetClient, out var clientAccess) &&
+                        clientAccess.TryGetProperty("roles", out var roles))
                     {
-                        string clientName = clientProperty.Name;
-
-                        if (clientProperty.Value.TryGetProperty("roles", out var roles))
+                        foreach (var role in roles.EnumerateArray())
                         {
-                            foreach (var role in roles.EnumerateArray())
+                            var roleName = role.GetString();
+                            if (!string.IsNullOrEmpty(roleName))
                             {
-                                var roleName = role.GetString();
-                                if (!string.IsNullOrEmpty(roleName))
-                                {
-                                    // Add with client prefix for clarity
-                                    var claim = new Claim("roles", $"{clientName}:{roleName}");
-                                    roleClaims.Add(claim);
-                                    identity.AddClaim(claim);
-                                }
+                                // No prefix here
+                                var claim = new Claim("roles", roleName);
+                                roleClaims.Add(claim);
+                                identity.AddClaim(claim);
                             }
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    // Log the exception if you have a logger configured
                     System.Console.WriteLine($"Error parsing Keycloak resource_access claim: {ex.Message}");
                 }
             }

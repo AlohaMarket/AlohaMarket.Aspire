@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Aloha.UserService.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20250608153157_InitDb")]
+    [Migration("20250611155640_InitDb")]
     partial class InitDb
     {
         /// <inheritdoc />
@@ -43,6 +43,9 @@ namespace Aloha.UserService.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsVerify")
                         .HasColumnType("boolean");
 
                     b.Property<string>("PhoneNumber")

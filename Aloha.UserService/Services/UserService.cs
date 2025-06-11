@@ -17,6 +17,7 @@ namespace Aloha.UserService.Services
             {
                 return await userRepository.GetUserByIdAsync(request.Id);
             }
+            user.IsVerify = false;
             return await userRepository.CreateUserAsync(user);
         }
 
@@ -55,7 +56,7 @@ namespace Aloha.UserService.Services
                 throw new NotFoundException($"User with id {request.Id} not found.");
             }
 
-            // Check if phone number has changed
+            // Check if phone has changed
             if (request.PhoneNumber != existingUser.PhoneNumber)
             {
                 var userWithSamePhone = await userRepository.UserExistsByPhoneNumberAsync(request.PhoneNumber);
@@ -71,6 +72,7 @@ namespace Aloha.UserService.Services
             mapper.Map(request, existingUser);
             existingUser.UpdatedAt = DateTime.UtcNow; // Update the timestamp
             existingUser.IsActive = true; // Ensure the user is active
+            existingUser.IsVerify = true; // Ensure the user is verified
             return await userRepository.UpdateUserAsync(existingUser);
         }
 

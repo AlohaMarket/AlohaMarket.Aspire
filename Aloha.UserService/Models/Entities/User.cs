@@ -23,6 +23,8 @@ namespace Aloha.UserService.Models.Entities
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        public bool IsActive { get; set; }
+        public bool IsVerify { get; set; } = false;
+
+        public bool IsActive { get; set; } = true;
     }
 }

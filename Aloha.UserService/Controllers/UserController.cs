@@ -60,6 +60,7 @@ namespace Aloha.UserService.Controllers
         }
 
         [HttpDelete("{userId:guid}")]
+        [Authorize]
         public async Task<IActionResult> DeleteUser(Guid userId)
         {
             var result = await userService.DeleteUserAsync(userId);
