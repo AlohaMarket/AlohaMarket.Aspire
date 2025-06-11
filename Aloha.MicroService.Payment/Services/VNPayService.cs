@@ -1,6 +1,6 @@
 ﻿namespace Aloha.MicroService.Payment.Services
 {
-    public interface VNPayService
+    public interface IVNPayService
     {
         string CreatePaymentUrl(PaymentInformationModel model, HttpContext context);
         PaymentResponseModel PaymentExecute(IQueryCollection collections);

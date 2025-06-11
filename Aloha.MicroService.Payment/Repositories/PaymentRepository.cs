@@ -1,8 +1,4 @@
-﻿
-
-using Aloha.MicroService.Payment.Models;
-
-namespace Aloha.MicroService.Payment.Repositories
+﻿namespace Aloha.MicroService.Payment.Repositories
 {
     public interface IPaymentRepository
     {

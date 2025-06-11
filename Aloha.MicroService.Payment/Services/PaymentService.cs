@@ -1,6 +1,4 @@
-﻿using Aloha.MicroService.Payment.Models;
-
-namespace Aloha.MicroService.Payment.Services
+﻿namespace Aloha.MicroService.Payment.Services
 {
     public class PaymentService
     {

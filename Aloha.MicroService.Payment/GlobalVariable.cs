@@ -13,3 +13,12 @@ global using MongoDB.Driver;
 
 global using MongoDB.Bson.Serialization.Attributes;
 global using MongoDB.Bson;
+
+global using Aloha.MicroService.Payment.DTOs.Payment;
+
+
+global using System.Globalization;
+global using System.Net.Sockets;
+global using System.Net;
+global using System.Security.Cryptography;
+global using System.Text;

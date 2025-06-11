@@ -1,9 +1,4 @@
-﻿using System.Globalization;
-using System.Net.Sockets;
-using System.Net;
-using System.Security.Cryptography;
-using System.Text;
-
+﻿
 namespace Aloha.MicroService.Payment.Services
 {
     public class VNPayLibrary
@@ -40,7 +35,6 @@ namespace Aloha.MicroService.Payment.Services
                 PaymentResponseModel result = new PaymentResponseModel()
                 {
                     Success = true,
-                    PaymentMethod = "VnPay",
                     OrderDescription = orderInfo,
                     OrderId = orderId.ToString(),
                     PaymentId = vnPayTranId.ToString(),
@@ -109,7 +103,6 @@ namespace Aloha.MicroService.Payment.Services
             return new PaymentResponseModel()
             {
                 Success = true,
-                PaymentMethod = "VnPay",
                 OrderDescription = orderInfo,
                 OrderId = orderId.ToString(),
                 PaymentId = vnPayTranId.ToString(),

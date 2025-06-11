@@ -1,5 +1,4 @@
-﻿
-namespace Aloha.MicroService.Payment.Mapper
+﻿namespace Aloha.MicroService.Payment.Mapper
 {
     public static class PaymentMapper
     {

@@ -1,6 +1,4 @@
-﻿using Aloha.MicroService.Payment.Models;
-
-namespace Aloha.MicroService.Payment.Data
+﻿namespace Aloha.MicroService.Payment.Data
 {
     public static class MongoDbSeeder
     {

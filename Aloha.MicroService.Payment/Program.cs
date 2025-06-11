@@ -1,5 +1,3 @@
-using Aloha.MicroService.Payment.Models;
-
 namespace Aloha.MicroService.Payment;
 
 public class Program
