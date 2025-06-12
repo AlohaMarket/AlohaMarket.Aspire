@@ -15,6 +15,15 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.Configure<MongoSettings>(
         builder.Configuration.GetSection("MongoSettings"));
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin()
+                      .AllowAnyHeader()
+                      .AllowAnyMethod();
+            });
+        });
         builder.Services.AddSingleton<IPaymentRepository, PaymentRepository>();
         builder.Services.AddScoped<PaymentService>();
         builder.Services.AddScoped<IVNPayService, VNPayService>();
@@ -90,12 +99,12 @@ public class Program
             });
 
         }
-
+        app.UseRouting();
+        app.UseCors("AllowAll");
         // Use the exception handler middleware
         app.UseMiddleware<ApiExceptionHandlerMiddleware>();
         // Optional - add status code pages if needed
         app.UseStatusCodePages();
-
         app.UseHttpsRedirection();
 
         app.UseAuthorization();

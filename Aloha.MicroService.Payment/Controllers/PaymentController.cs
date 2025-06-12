@@ -65,10 +65,25 @@ namespace Aloha.MicroService.Payment.Controllers
         [HttpGet("callback")]
         public IActionResult PaymentCallback()
         {
-            var response = _vnPayService.PaymentExecute(Request.Query);
-            return Redirect(response.Success
-                ? "http://localhost:5173/order-success"
-                : "http://localhost:5173/payment-callback");
+            try
+            {
+                var response = _vnPayService.PaymentExecute(Request.Query);
+                var amount = Request.Query["vnp_Amount"]; 
+                var actualAmount = int.Parse(amount) / 100; 
+
+                if (Request.Query["vnp_ResponseCode"] == "00")
+                {
+                    return Redirect($"http://localhost:3000/payment/success?status=success&amount={actualAmount}");
+                }
+                else
+                {
+                    return Redirect($"http://localhost:3000/payment/failed?status=failed&amount={actualAmount}");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
