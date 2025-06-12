@@ -2,6 +2,7 @@ using Aloha.NotificationService.Hubs;
 using Aloha.NotificationService.Services;
 using Aloha.ServiceDefaults.Hosting;
 using Aloha.NotificationService.Data;
+using Aloha.NotificationService.Repositories;
 
 namespace Aloha.NotificationService;
 
@@ -22,8 +23,7 @@ public class Program
         builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
 
         // Register HTTP clients for microservices
-        builder.Services.AddHttpClient<IUserService, UserService>();
-        builder.Services.AddHttpClient<IProductService, ProductService>();
+        // User and Product services removed as per requirements
 
         builder.Services.AddCors(options =>
         {
@@ -58,8 +58,8 @@ public class Program
         app.UseHttpsRedirection();
 
         app.UseRouting();
-        app.UseAuthorization();
         app.UseCors();
+        app.UseAuthorization();
 
         app.MapHub<NotificationHub>("/notificationHub");
 

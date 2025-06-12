@@ -1,8 +1,9 @@
 using MongoDB.Driver;
 using MongoDB.Bson;
 using Aloha.NotificationService.Models.Entities;
+using Aloha.NotificationService.Data;
 
-namespace Aloha.NotificationService.Data
+namespace Aloha.NotificationService.Repositories
 {
     public class MessageRepository : MongoRepository<Message>, IMessageRepository
     {
@@ -102,4 +103,4 @@ namespace Aloha.NotificationService.Data
                 .ToListAsync();
         }
     }
-} 
+}

@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace Aloha.NotificationService.Data
+namespace Aloha.NotificationService.Repositories
 {
     public interface IRepository<T> where T : class
     {
@@ -13,4 +13,4 @@ namespace Aloha.NotificationService.Data
         Task<long> CountAsync();
         Task<long> CountAsync(Expression<Func<T, bool>> predicate);
     }
-} 
+}

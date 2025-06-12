@@ -1,6 +1,6 @@
 using Aloha.NotificationService.Models.Entities;
 
-namespace Aloha.NotificationService.Data
+namespace Aloha.NotificationService.Repositories
 {
     public interface IConversationRepository : IRepository<Conversation>
     {
@@ -14,4 +14,4 @@ namespace Aloha.NotificationService.Data
         Task<bool> UpdateParticipantLastReadAsync(string conversationId, string userId, DateTime lastReadAt);
         Task<IEnumerable<ConversationParticipant>> GetConversationParticipantsAsync(string conversationId);
     }
-} 
+}

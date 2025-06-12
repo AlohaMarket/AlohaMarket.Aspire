@@ -2,7 +2,7 @@ using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Linq.Expressions;
 
-namespace Aloha.NotificationService.Data
+namespace Aloha.NotificationService.Repositories
 {
     public class MongoRepository<T> : IRepository<T> where T : class
     {
@@ -59,4 +59,4 @@ namespace Aloha.NotificationService.Data
             return await _collection.CountDocumentsAsync(predicate);
         }
     }
-} 
+}

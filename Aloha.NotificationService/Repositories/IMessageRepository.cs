@@ -1,6 +1,6 @@
 using Aloha.NotificationService.Models.Entities;
 
-namespace Aloha.NotificationService.Data
+namespace Aloha.NotificationService.Repositories
 {
     public interface IMessageRepository : IRepository<Message>
     {
@@ -12,4 +12,4 @@ namespace Aloha.NotificationService.Data
         Task<Message?> EditMessageAsync(string messageId, string newContent, string userId);
         Task<IEnumerable<Message>> SearchMessagesAsync(string conversationId, string searchTerm);
     }
-} 
+}

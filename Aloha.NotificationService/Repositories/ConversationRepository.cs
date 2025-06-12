@@ -1,8 +1,9 @@
 using MongoDB.Driver;
 using MongoDB.Bson;
 using Aloha.NotificationService.Models.Entities;
+using Aloha.NotificationService.Data;
 
-namespace Aloha.NotificationService.Data
+namespace Aloha.NotificationService.Repositories
 {
     public class ConversationRepository : MongoRepository<Conversation>, IConversationRepository
     {
@@ -116,4 +117,4 @@ namespace Aloha.NotificationService.Data
                 ?? new List<ConversationParticipant>();
         }
     }
-} 
+}

@@ -1,5 +1,4 @@
-﻿using Aloha.NotificationService.Hubs;
-using Aloha.NotificationService.Models.Entities;
+﻿using Aloha.NotificationService.Models.Entities;
 using Aloha.NotificationService.Models.DTOs;
 
 namespace Aloha.NotificationService.Services
@@ -12,7 +11,7 @@ namespace Aloha.NotificationService.Services
         // Conversation management
         Task<bool> IsUserInConversation(string userId, string conversationId);
         Task<List<UserDto>> GetConversationParticipants(string conversationId);
-        Task<Conversation> CreateOrGetConversation(string[] userIds, string? productId = null);
+        Task<Conversation> CreateOrGetConversation(string[] userIds);
         Task<IEnumerable<Conversation>> GetUserConversations(string userId);
 
         // Message management

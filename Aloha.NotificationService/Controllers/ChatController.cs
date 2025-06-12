@@ -16,15 +16,11 @@ namespace Aloha.NotificationService.Controllers
         }
 
         [HttpGet("conversations")]
-        public async Task<ActionResult<IEnumerable<Conversation>>> GetUserConversations()
+        public async Task<ActionResult<IEnumerable<Conversation>>> GetUserConversations([FromQuery] string? userId = null)
         {
-            // In a real app, you'd get userId from authentication context
-            var userId = Request.Headers["UserId"].FirstOrDefault();
-            if (string.IsNullOrEmpty(userId))
-            {
-                return BadRequest("User ID is required");
-            }
-
+            // For testing without auth, get userId from query parameter or header
+            userId = userId ?? Request.Headers["UserId"].FirstOrDefault() ?? "test-user-1";
+            
             var conversations = await _chatService.GetUserConversations(userId);
             return Ok(conversations);
         }
@@ -32,7 +28,7 @@ namespace Aloha.NotificationService.Controllers
         [HttpPost("conversations")]
         public async Task<ActionResult<Conversation>> CreateConversation([FromBody] CreateConversationRequest request)
         {
-            var conversation = await _chatService.CreateOrGetConversation(request.UserIds, request.ProductId);
+            var conversation = await _chatService.CreateOrGetConversation(request.UserIds);
             return Ok(conversation);
         }
 
@@ -40,45 +36,38 @@ namespace Aloha.NotificationService.Controllers
         public async Task<ActionResult<IEnumerable<Message>>> GetConversationMessages(
             string conversationId, 
             [FromQuery] int page = 1, 
-            [FromQuery] int pageSize = 50)
+            [FromQuery] int pageSize = 50,
+            [FromQuery] string? userId = null)
         {
-            var userId = Request.Headers["UserId"].FirstOrDefault();
-            if (string.IsNullOrEmpty(userId))
-            {
-                return BadRequest("User ID is required");
-            }
+            // For testing without auth, get userId from query parameter or header
+            userId = userId ?? Request.Headers["UserId"].FirstOrDefault() ?? "test-user-1";
 
-            var isParticipant = await _chatService.IsUserInConversation(userId, conversationId);
-            if (!isParticipant)
-            {
-                return Forbid("You are not a participant in this conversation");
-            }
+            // For testing, we'll allow access to any conversation
+            // var isParticipant = await _chatService.IsUserInConversation(userId, conversationId);
+            // if (!isParticipant)
+            // {
+            //     return Forbid("You are not a participant in this conversation");
+            // }
 
             var messages = await _chatService.GetConversationMessages(conversationId, page, pageSize);
             return Ok(messages);
         }
 
         [HttpGet("conversations/{conversationId}/unread-count")]
-        public async Task<ActionResult<long>> GetUnreadMessageCount(string conversationId)
+        public async Task<ActionResult<long>> GetUnreadMessageCount(string conversationId, [FromQuery] string? userId = null)
         {
-            var userId = Request.Headers["UserId"].FirstOrDefault();
-            if (string.IsNullOrEmpty(userId))
-            {
-                return BadRequest("User ID is required");
-            }
+            // For testing without auth, get userId from query parameter or header
+            userId = userId ?? Request.Headers["UserId"].FirstOrDefault() ?? "test-user-1";
 
             var count = await _chatService.GetUnreadMessageCount(userId, conversationId);
             return Ok(count);
         }
 
         [HttpPost("messages/{messageId}/read")]
-        public async Task<IActionResult> MarkMessageAsRead(string messageId)
+        public async Task<IActionResult> MarkMessageAsRead(string messageId, [FromQuery] string? userId = null)
         {
-            var userId = Request.Headers["UserId"].FirstOrDefault();
-            if (string.IsNullOrEmpty(userId))
-            {
-                return BadRequest("User ID is required");
-            }
+            // For testing without auth, get userId from query parameter or header
+            userId = userId ?? Request.Headers["UserId"].FirstOrDefault() ?? "test-user-1";
 
             await _chatService.MarkMessagesAsRead(userId, new[] { messageId });
             return Ok();

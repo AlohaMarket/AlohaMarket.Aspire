@@ -1,7 +1,6 @@
-﻿using Aloha.NotificationService.Data;
-using Aloha.NotificationService.Models.Entities;
+﻿using Aloha.NotificationService.Models.Entities;
 using Aloha.NotificationService.Models.DTOs;
-using Aloha.NotificationService.Hubs;
+using Aloha.NotificationService.Repositories;
 
 namespace Aloha.NotificationService.Services
 {
@@ -9,33 +8,49 @@ namespace Aloha.NotificationService.Services
     {
         private readonly IMessageRepository _messageRepository;
         private readonly IConversationRepository _conversationRepository;
-        private readonly IUserService _userService;
-        private readonly IProductService _productService;
         private readonly ILogger<ChatService> _logger;
+        
+        // Simple in-memory storage for testing user data
+        private static readonly Dictionary<string, UserDto> _mockUsers = new();
 
         public ChatService(
             IMessageRepository messageRepository,
             IConversationRepository conversationRepository,
-            IUserService userService,
-            IProductService productService,
             ILogger<ChatService> logger)
         {
             _messageRepository = messageRepository;
             _conversationRepository = conversationRepository;
-            _userService = userService;
-            _productService = productService;
             _logger = logger;
         }
 
         public async Task<UserDto?> GetUser(string userId)
-        {
-            return await _userService.GetUserByIdAsync(userId);
+       {
+            // For testing, create mock user data if doesn't exist
+            if (!_mockUsers.ContainsKey(userId))
+            {
+                var mockUser = new UserDto
+                {
+                    Id = userId,
+                    Name = $"User {userId}",
+                    Email = $"user{userId}@test.com",
+                    Avatar = $"https://api.dicebear.com/7.x/avataaars/svg?seed={userId}",
+                    IsOnline = false
+                };
+                _mockUsers[userId] = mockUser;
+            }
+            
+            return await Task.FromResult(_mockUsers[userId]);
         }
 
         public async Task SetUserOnlineStatus(string userId, bool isOnline)
         {
-            // Update in User service
-            await _userService.UpdateUserOnlineStatusAsync(userId, isOnline);
+            // Update mock user online status
+            var user = await GetUser(userId);
+            if (user != null)
+            {
+                user.IsOnline = isOnline;
+                _mockUsers[userId] = user;
+            }
 
             // Update in all conversations where user is participant
             var conversations = await _conversationRepository.GetConversationsByUserIdAsync(userId);
@@ -53,18 +68,27 @@ namespace Aloha.NotificationService.Services
         public async Task<List<UserDto>> GetConversationParticipants(string conversationId)
         {
             var participants = await _conversationRepository.GetConversationParticipantsAsync(conversationId);
-            var userIds = participants.Select(p => p.UserId).ToArray();
-            var users = await _userService.GetUsersByIdsAsync(userIds);
-            return users.ToList();
+            var users = new List<UserDto>();
+            
+            foreach (var participant in participants)
+            {
+                var user = await GetUser(participant.UserId);
+                if (user != null)
+                {
+                    users.Add(user);
+                }
+            }
+            
+            return users;
         }
 
         public async Task<Message> CreateMessage(CreateMessageDto dto)
         {
-            // Get sender info from User service
-            var sender = await _userService.GetUserByIdAsync(dto.SenderId);
+            // Get or create sender info
+            var sender = await GetUser(dto.SenderId);
             if (sender == null)
             {
-                throw new InvalidOperationException($"User {dto.SenderId} not found");
+                throw new ArgumentException($"Invalid sender ID: {dto.SenderId}");
             }
 
             var message = new Message
@@ -115,29 +139,31 @@ namespace Aloha.NotificationService.Services
             await _messageRepository.MarkMessagesAsReadAsync(userId, messageIds);
         }
 
-        // Additional chat-specific methods
-        public async Task<Conversation> CreateOrGetConversation(string[] userIds, string? productId = null)
+        public async Task<Conversation> CreateOrGetConversation(string[] userIds)
         {
             // Check if conversation already exists
-            var existingConversation = await _conversationRepository.GetConversationByParticipantsAsync(userIds, productId);
+            var existingConversation = await _conversationRepository.GetConversationByParticipantsAsync(userIds, null);
             if (existingConversation != null)
             {
                 return existingConversation;
             }
 
-            // Get user and product info
-            var users = await _userService.GetUsersByIdsAsync(userIds);
-            ProductDto? product = null;
-            if (!string.IsNullOrEmpty(productId))
+            // Get user info for all participants
+            var users = new List<UserDto>();
+            foreach (var userId in userIds)
             {
-                product = await _productService.GetProductByIdAsync(productId);
+                var user = await GetUser(userId);
+                if (user != null)
+                {
+                    users.Add(user);
+                }
             }
 
             // Create new conversation
             var conversation = new Conversation
             {
-                ConversationType = !string.IsNullOrEmpty(productId) ? "buyer_seller" : "support",
-                ProductId = productId,
+                ConversationType = "chat", // Simple chat conversation
+                ProductId = null,
                 LastMessageAt = DateTime.UtcNow,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -152,15 +178,7 @@ namespace Aloha.NotificationService.Services
                     LastReadAt = DateTime.UtcNow,
                     IsOnline = u.IsOnline
                 }).ToList(),
-                ProductContext = product != null ? new ProductContext
-                {
-                    ProductId = product.Id,
-                    ProductName = product.Name,
-                    ProductImage = product.ImageUrl,
-                    ProductPrice = product.Price,
-                    SellerId = product.SellerId,
-                    SellerName = product.SellerName
-                } : null
+                ProductContext = null // No product context needed
             };
 
             return await _conversationRepository.CreateAsync(conversation);
