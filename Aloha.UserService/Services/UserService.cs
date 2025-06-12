@@ -1,4 +1,5 @@
-﻿using Aloha.ServiceDefaults.Exceptions;
+﻿using Aloha.ServiceDefaults.Cloudinary;
+using Aloha.ServiceDefaults.Exceptions;
 using Aloha.UserService.Models.Entities;
 using Aloha.UserService.Models.Requests;
 using Aloha.UserService.Repositories;
@@ -6,7 +7,7 @@ using AutoMapper;
 
 namespace Aloha.UserService.Services
 {
-    public class UserService(IUserRepository userRepository, IMapper mapper) : IUserService
+    public class UserService(IUserRepository userRepository, IMapper mapper, ICloudinaryService cloudinaryService) : IUserService
     {
 
         public async Task<User> CreateUserAsync(CreateUserRequest request)
@@ -73,6 +74,18 @@ namespace Aloha.UserService.Services
             existingUser.UpdatedAt = DateTime.UtcNow; // Update the timestamp
             existingUser.IsActive = true; // Ensure the user is active
             existingUser.IsVerify = true; // Ensure the user is verified
+            return await userRepository.UpdateUserAsync(existingUser);
+        }
+
+        public async Task<User> UploadUserAvatar(Guid userId, IFormFile avatarFile)
+        {
+            var existingUser = await GetUserByIdAsync(userId);
+            var avatarUrl = await cloudinaryService.UploadImageAsync(avatarFile);
+            if (string.IsNullOrEmpty(avatarUrl))
+            {
+                throw new InvalidOperationException("Failed to upload avatar image.");
+            }
+            existingUser.AvatarUrl = avatarUrl;
             return await userRepository.UpdateUserAsync(existingUser);
         }
 

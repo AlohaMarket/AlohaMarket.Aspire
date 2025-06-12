@@ -50,11 +50,12 @@ namespace Aloha.UserService.Controllers
                 ApiResponseBuilder.BuildResponse(message: "Create User Successfully", data: user));
         }
 
-        [HttpPut]
-        [ValidateModelAttribute]
+        [HttpPut("profile/update")]
+        [ValidateModel]
         [Authorize(Roles = "ALOHA_ADMIN, ALOHA_USER")]
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest request)
         {
+            request.Id = Guid.Parse(User.GetUserId());
             var user = await userService.UpdateUserAsync(request);
             return Ok(ApiResponseBuilder.BuildResponse(message: "Update User Successfully", data: user));
         }
@@ -79,6 +80,16 @@ namespace Aloha.UserService.Controllers
             var userId = Guid.Parse(User.GetUserId());
             var user = await userService.GetUserByIdAsync(userId);
             return Ok(ApiResponseBuilder.BuildResponse(data: user, message: "Get User Profile Successfully"));
+        }
+
+        [HttpPatch("profile/avatar")]
+        [ValidateFile]
+        [Authorize(Roles = "ALOHA_ADMIN, ALOHA_USER")]
+        public async Task<IActionResult> UpdateUser([FromForm] IFormFile file)
+        {
+            var userId = Guid.Parse(User.GetUserId());
+            var user = await userService.UploadUserAvatar(userId, file);
+            return Ok(ApiResponseBuilder.BuildResponse(message: "Update User Avatar Successfully", data: user));
         }
     }
 }
