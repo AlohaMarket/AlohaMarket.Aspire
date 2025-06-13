@@ -31,15 +31,6 @@ namespace Aloha.UserService.Controllers
         [Authorize] // Add this attribute to require authentication
         public async Task<IActionResult> CreateUser()
         {
-            logger.LogInformation("Log from the CreateUser method in UserController");
-            logger.LogInformation("---- JWT TOKEN DEBUGGING ----");
-            logger.LogInformation("Is authenticated: {IsAuthenticated}", User?.Identity?.IsAuthenticated);
-            logger.LogInformation("Claims count: {ClaimsCount}", User?.Claims?.Count());
-            foreach (var claim in User?.Claims)
-            {
-                logger.LogInformation("CLAIM: {Type} = {Value}", claim.Type, claim.Value);
-            }
-
             var request = new CreateUserRequest
             {
                 Id = Guid.Parse(User.GetUserId()),
@@ -85,7 +76,8 @@ namespace Aloha.UserService.Controllers
         [HttpPatch("profile/avatar")]
         [ValidateFile]
         [Authorize(Roles = "ALOHA_ADMIN, ALOHA_USER")]
-        public async Task<IActionResult> UpdateUser([FromForm] IFormFile file)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateUserAvatar([FromForm] IFormFile file)
         {
             var userId = Guid.Parse(User.GetUserId());
             var user = await userService.UploadUserAvatar(userId, file);

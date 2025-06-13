@@ -92,18 +92,6 @@ app.MapReverseProxy(proxyPipeline =>
     proxyPipeline.UseMiddleware<AuthenticatedRequestForwardingMiddleware>();
 }).RequireAuthorization();
 
-// Swagger
-app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/merged.json", "Unified Aloha API v1");
-    c.RoutePrefix = "";
-    c.DocumentTitle = "Aloha API Gateway";
-    c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.List);
-    c.DisplayRequestDuration();
-    c.DisplayOperationId();
-    c.EnableFilter();
-});
 
 app.Run();
 

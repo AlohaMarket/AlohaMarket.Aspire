@@ -37,6 +37,12 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
         {
+            c.MapType<IFormFile>(() => new OpenApiSchema
+            {
+                Type = "string",
+                Format = "binary"
+            });
+
             c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
             {
                 Title = "Aloha User Service API",
@@ -79,8 +85,7 @@ public class Program
         });
 
         DotEnv.Load(options: new DotEnvOptions(
-    envFilePaths: new[] { Path.Combine(Directory.GetCurrentDirectory(), "..", ".env") }
-));
+        envFilePaths: new[] { Path.Combine(Directory.GetCurrentDirectory(), "..", ".env") }));
 
         // Add Cloudinary config from environment
         builder.Services.Configure<CloudinarySettings>(options =>
