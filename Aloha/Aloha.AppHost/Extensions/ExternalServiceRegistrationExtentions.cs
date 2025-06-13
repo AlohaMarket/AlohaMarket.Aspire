@@ -13,25 +13,22 @@ public static class ApplicationServiceExtensions
             kafka = kafka.WithLifetime(ContainerLifetime.Persistent).WithDataVolume().WithKafkaUI();
         }
 
-        var userService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_User>();
+        var userService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_User>()
+            .WithReference(kafka);
 
         var postService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Post>()
-            .WithReference(userService);
-
-        var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>();
-
-        var eventBus = builder.AddProjectWithPostfix<Projects.Aloha_EventBus>();
+            .WithReference(userService)
+            .WithReference(kafka);
 
         var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>();
 
         var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Category>();
 
-        var userService = builder.AddProjectWithPostfix<Projects.Aloha_UserService>();
-
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
             .WithReference(userService)
             .WithReference(locationService)
-            .WithReference(categoryService).WithReference(userService);
+            .WithReference(postService)
+            .WithReference(categoryService);
 
         return builder;
     }
