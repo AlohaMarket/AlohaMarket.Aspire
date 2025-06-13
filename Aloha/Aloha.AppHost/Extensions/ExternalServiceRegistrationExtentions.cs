@@ -6,42 +6,32 @@ public static class ApplicationServiceExtensions
 {
     public static IDistributedApplicationBuilder AddApplicationServices(this IDistributedApplicationBuilder builder)
     {
-        var postgres = builder.AddPostgres("postgres");
         var kafka = builder.AddKafka("kafka");
 
         if (!builder.Configuration.GetValue("IsTest", false))
         {
-            postgres = postgres.WithLifetime(ContainerLifetime.Persistent)
-                .WithVolume("postgres-db", "var/lib/postgresql/data")
-                .WithPgAdmin(pgBuilder =>
-                {
-                    pgBuilder.WithImageTag("latest");
-                });
-
             kafka = kafka.WithLifetime(ContainerLifetime.Persistent).WithDataVolume().WithKafkaUI();
         }
 
-        // Add application services using helper methods
-        var alohaDb = postgres.AddDefaultDatabase<Projects.Aloha_API>();
+        var userService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_User>();
 
-        var apiService = builder.AddProjectWithPostfix<Projects.Aloha_API>()
-            .WithReference(postgres)
-            .WithReference(alohaDb, "DefaultConnection");
+        var postService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Post>()
+            .WithReference(userService);
 
+        var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>();
 
         var eventBus = builder.AddProjectWithPostfix<Projects.Aloha_EventBus>();
 
-        var locationService = builder.AddProjectWithPostfix<Projects.Aloha_LocationService>();
+        var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>();
 
-        var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_CategoryService>();
+        var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Category>();
 
         var userService = builder.AddProjectWithPostfix<Projects.Aloha_UserService>();
 
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
-            .WithReference(apiService)
+            .WithReference(userService)
             .WithReference(locationService)
-            .WithReference(categoryService)
-            .WithReference(userService);
+            .WithReference(categoryService).WithReference(userService);
 
         return builder;
     }

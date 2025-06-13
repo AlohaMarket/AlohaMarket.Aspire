@@ -29,6 +29,7 @@ public class Program
         });
 
         // Add services to the container.
+
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
@@ -60,8 +61,8 @@ public class Program
                         TokenUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/token"),
                         Scopes = new Dictionary<string, string>
                         {
-                                { "openid", "OpenID" },
-                                { "profile", "Profile" }
+                            { "openid", "OpenID" },
+                            { "profile", "Profile" }
                         }
                     }
                 }
@@ -70,17 +71,17 @@ public class Program
             // Add security requirement for all operations
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
+                {
+                    new OpenApiSecurityScheme
                     {
-                        new OpenApiSecurityScheme
+                        Reference = new OpenApiReference
                         {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "oauth2"
-                            }
-                        },
-                        new[] { "openid", "profile" }
-                    }
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "oauth2"
+                        }
+                    },
+                    new[] { "openid", "profile" }
+                }
             });
         });
 
