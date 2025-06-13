@@ -7,13 +7,13 @@ namespace Aloha.MicroService.Post
     {
         public PostDbContext DbContext { get; set; }
         public IEventPublisher EventPublisher { get; set; }
-        public ILogger Logger { get; set; }
+        public ILogger<ApiServices> Logger { get; set; }
 
-        public ApiServices(PostDbContext dbContext, IEventPublisher eventPublisher, ILogger<ApiServices> logger)
+        public ApiServices(PostDbContext DbContext, IEventPublisher EventPublisher, ILogger<ApiServices> Logger)
         {
-            DbContext = dbContext;
-            EventPublisher = eventPublisher;
-            Logger = logger;
+            this.DbContext = DbContext;
+            this.EventPublisher = EventPublisher;
+            this.Logger = Logger;
         }
     }
 }

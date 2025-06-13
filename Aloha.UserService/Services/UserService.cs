@@ -1,4 +1,5 @@
-﻿using Aloha.ServiceDefaults.Exceptions;
+﻿using Aloha.ServiceDefaults.Cloudinary;
+using Aloha.ServiceDefaults.Exceptions;
 using Aloha.UserService.Models.Entities;
 using Aloha.UserService.Models.Requests;
 using Aloha.UserService.Repositories;
@@ -6,7 +7,7 @@ using AutoMapper;
 
 namespace Aloha.UserService.Services
 {
-    public class UserService(IUserRepository userRepository, IMapper mapper) : IUserService
+    public class UserService(IUserRepository userRepository, IMapper mapper, ICloudinaryService cloudinaryService) : IUserService
     {
 
         public async Task<User> CreateUserAsync(CreateUserRequest request)
@@ -15,8 +16,9 @@ namespace Aloha.UserService.Services
             var isExist = await userRepository.UserExistsAsync(user.Id);
             if (isExist)
             {
-                throw new InvalidOperationException("User already exists.");
+                return await userRepository.GetUserByIdAsync(request.Id);
             }
+            user.IsVerify = false;
             return await userRepository.CreateUserAsync(user);
         }
 
@@ -55,7 +57,7 @@ namespace Aloha.UserService.Services
                 throw new NotFoundException($"User with id {request.Id} not found.");
             }
 
-            // Check if phone number has changed
+            // Check if phone has changed
             if (request.PhoneNumber != existingUser.PhoneNumber)
             {
                 var userWithSamePhone = await userRepository.UserExistsByPhoneNumberAsync(request.PhoneNumber);
@@ -71,6 +73,19 @@ namespace Aloha.UserService.Services
             mapper.Map(request, existingUser);
             existingUser.UpdatedAt = DateTime.UtcNow; // Update the timestamp
             existingUser.IsActive = true; // Ensure the user is active
+            existingUser.IsVerify = true; // Ensure the user is verified
+            return await userRepository.UpdateUserAsync(existingUser);
+        }
+
+        public async Task<User> UploadUserAvatar(Guid userId, IFormFile avatarFile)
+        {
+            var existingUser = await GetUserByIdAsync(userId);
+            var avatarUrl = await cloudinaryService.UploadImageAsync(avatarFile);
+            if (string.IsNullOrEmpty(avatarUrl))
+            {
+                throw new InvalidOperationException("Failed to upload avatar image.");
+            }
+            existingUser.AvatarUrl = avatarUrl;
             return await userRepository.UpdateUserAsync(existingUser);
         }
 

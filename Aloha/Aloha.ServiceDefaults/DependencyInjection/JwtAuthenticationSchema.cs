@@ -27,11 +27,13 @@ namespace Aloha.ServiceDefaults.DependencyInjection
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
-                        ValidAudience = audience,
-                        ValidateAudience = true,
+                        ValidateAudience = false, // Don't validate audience 
                         ValidateIssuerSigningKey = true,
                         ValidateLifetime = true
                     };
+
+                    // Add save token option to preserve the token
+                    options.SaveToken = true;
                 });
 
             return services;
