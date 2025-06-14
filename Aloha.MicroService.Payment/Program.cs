@@ -2,6 +2,13 @@ namespace Aloha.MicroService.Payment;
 
 public class Program
 {
+    /// <summary>
+    /// Entry point for the Aloha Payment microservice application.
+    /// </summary>
+    /// <param name="args">Command-line arguments for application configuration.</param>
+    /// <remarks>
+    /// Configures and runs the web application, including service registration, middleware setup, MongoDB seeding, CORS, Swagger/OpenAPI with OAuth2 security, and controller endpoint mapping.
+    /// </remarks>
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
