@@ -22,6 +22,7 @@
     <ProjectReference Include="..\..\Aloha.ApiGateway\Aloha.ApiGateway.csproj" />
     <ProjectReference Include="..\..\Aloha.CategoryService\Aloha.MicroService.Category.csproj" />
     <ProjectReference Include="..\..\Aloha.LocationService\Aloha.MicroService.Location.csproj" />
+    <ProjectReference Include="..\..\Aloha.MicroService.Payment\Aloha.MicroService.Payment.csproj" />
     <ProjectReference Include="..\..\Aloha.MicroService.Post\Aloha.MicroService.Post.csproj" />
     <ProjectReference Include="..\..\Aloha.UserService\Aloha.MicroService.User.csproj" />
   </ItemGroup>
