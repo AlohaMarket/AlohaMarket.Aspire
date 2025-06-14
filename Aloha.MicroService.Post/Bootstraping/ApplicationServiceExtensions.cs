@@ -92,5 +92,7 @@ namespace Aloha.MicroService.Post.Bootstraping
             builder.Services.AddDbContext<PostDbContext>(options =>
                 options.UseNpgsql(connectionString));
         }
+
+
     }
 }
