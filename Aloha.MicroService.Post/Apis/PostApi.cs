@@ -1,5 +1,3 @@
-using Aloha.MicroService.Post.Infrastructure.Entity;
-
 namespace Aloha.MicroService.Post.Apis
 {
     public static class PostApi

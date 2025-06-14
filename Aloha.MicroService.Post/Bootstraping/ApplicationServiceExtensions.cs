@@ -1,10 +1,6 @@
-using Aloha.EventBus;
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
 using Aloha.MicroService.Post.Infrastructure.Data;
-using Aloha.ServiceDefaults.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
 
 namespace Aloha.MicroService.Post.Bootstraping
 {
