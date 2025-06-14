@@ -1,10 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace Aloha.AppHost.Extensions;
 
 public static class ApplicationServiceExtensions
 {
-
     private static class Consts
     {
         public const string Env_EventPublishingTopics = "EVENT_PUBLISHING_TOPICS";
@@ -47,6 +46,10 @@ public static class ApplicationServiceExtensions
         var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>();
 
         var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Category>();
+
+        var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
+            .WithReference(userService);
+            //.WithReference(planservice);
 
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
             .WithReference(userService)
