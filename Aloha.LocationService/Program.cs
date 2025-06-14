@@ -4,6 +4,7 @@ using Aloha.LocationService.Services;
 using Aloha.LocationService.Settings;
 using Aloha.ServiceDefaults.Hosting;
 using Aloha.ServiceDefaults.Middlewares;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
@@ -40,39 +41,29 @@ public class Program
                 Version = "v1"
             });
 
-            c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+            c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
             {
-                Type = SecuritySchemeType.OAuth2,
-                Flows = new OpenApiOAuthFlows
-                {
-                    Implicit = new OpenApiOAuthFlow
-                    {
-                        AuthorizationUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/auth"),
-                        TokenUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/token"),
-                        Scopes = new Dictionary<string, string>
-                        {
-                            { "openid", "OpenID" },
-                            { "profile", "Profile" }
-                        }
-                    }
-                }
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token:"
             });
-
-            // Add security requirement for all operations
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
             {
+                Reference = new OpenApiReference
                 {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "oauth2"
-                        }
-                    },
-                    new[] { "openid", "profile" }
+                    Type = ReferenceType.SecurityScheme,
+                    Id = JwtBearerDefaults.AuthenticationScheme
                 }
-            });
+            },
+            new List<string>()
+        }
+    });
 
         });
 
@@ -136,11 +127,11 @@ public class Program
 
         // After configuring Kafka
         var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
-        logger.LogInformation("Kafka configured with bootstrap servers: {servers}", 
+        logger.LogInformation("Kafka configured with bootstrap servers: {servers}",
             builder.Configuration.GetValue<string>("Kafka:BootstrapServers"));
-        logger.LogInformation("Publishing to topic: {topic}", 
+        logger.LogInformation("Publishing to topic: {topic}",
             builder.Configuration.GetValue<string>("EventBus:PublishingTopics"));
-        logger.LogInformation("Subscribing to topics: {topics}", 
+        logger.LogInformation("Subscribing to topics: {topics}",
             builder.Configuration.GetValue<string>("EventBus:ConsumingTopics"));
     }
 }

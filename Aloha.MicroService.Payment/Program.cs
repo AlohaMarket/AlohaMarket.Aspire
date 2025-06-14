@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace Aloha.MicroService.Payment;
 
@@ -37,8 +38,7 @@ public class Program
         builder.Services.AddScoped<PaymentService>();
         builder.Services.AddScoped<IVNPayService, VNPayService>();
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
         builder.Services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -47,26 +47,15 @@ public class Program
                 Version = "v1"
             });
 
-            c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+            c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
             {
-                Type = SecuritySchemeType.OAuth2,
-                Flows = new OpenApiOAuthFlows
-                {
-                    Implicit = new OpenApiOAuthFlow
-                    {
-                        AuthorizationUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/auth"),
-                        TokenUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/token"),
-                        Scopes = new Dictionary<string, string>
-                        {
-                            { "openid", "OpenID" },
-                            { "profile", "Profile" }
-                        }
-                    }
-                }
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token:"
             });
-            c.IncludeXmlComments(xmlPath);
-
-            // Add security requirement for all operations
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
@@ -75,10 +64,10 @@ public class Program
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.SecurityScheme,
-                            Id = "oauth2"
+                            Id = JwtBearerDefaults.AuthenticationScheme
                         }
                     },
-                    new[] { "openid", "profile" }
+                    new List<string>()
                 }
             });
 
