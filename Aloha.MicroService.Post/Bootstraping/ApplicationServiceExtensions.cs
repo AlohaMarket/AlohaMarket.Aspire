@@ -20,6 +20,7 @@ namespace Aloha.MicroService.Post.Bootstraping
         public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
         {
             builder.AddServiceDefaults();
+            builder.Services.AddAuthorization();
             builder.Services.AddDbContext<PostDbContext>(options =>
             {
                 var connectionString = Environment.GetEnvironmentVariable(Consts.Env_DatabaseConnection) 

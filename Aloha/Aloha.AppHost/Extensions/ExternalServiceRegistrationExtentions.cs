@@ -10,7 +10,9 @@ public static class ApplicationServiceExtensions
 
         if (!builder.Configuration.GetValue("IsTest", false))
         {
-            kafka = kafka.WithLifetime(ContainerLifetime.Persistent).WithDataVolume().WithKafkaUI();
+            kafka = kafka.WithLifetime(ContainerLifetime.Persistent)
+                        .WithDataVolume()
+                        .WithKafkaUI();
         }
 
         var userService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_User>();
