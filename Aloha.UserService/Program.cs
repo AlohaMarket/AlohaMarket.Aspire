@@ -1,6 +1,8 @@
 using Aloha.EventBus;
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
+using Aloha.EventBus.Models;
+using Aloha.MicroService.User.EventHandler;
 using Aloha.ServiceDefaults.Cloudinary;
 using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.ServiceDefaults.Hosting;
@@ -9,6 +11,8 @@ using Aloha.UserService.Data;
 using Aloha.UserService.Repositories;
 using Aloha.UserService.Services;
 using dotenv.net;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 
 namespace Aloha.UserService;
@@ -51,25 +55,15 @@ public class Program
                 Version = "v1"
             });
 
-            c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
+            c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
             {
-                Type = SecuritySchemeType.OAuth2,
-                Flows = new OpenApiOAuthFlows
-                {
-                    Implicit = new OpenApiOAuthFlow
-                    {
-                        AuthorizationUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/auth"),
-                        TokenUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/token"),
-                        Scopes = new Dictionary<string, string>
-                        {
-                            { "openid", "OpenID" },
-                            { "profile", "Profile" }
-                        }
-                    }
-                }
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token:"
             });
-
-            // Add security requirement for all operations
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
@@ -78,10 +72,10 @@ public class Program
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.SecurityScheme,
-                            Id = "oauth2"
+                            Id = JwtBearerDefaults.AuthenticationScheme
                         }
                     },
-                    new[] { "openid", "profile" }
+                    new List<string>()
                 }
             });
         });
@@ -116,7 +110,23 @@ public class Program
             builder.Services.AddTransient<IEventPublisher, NullEventPublisher>();
         }
 
-        // Register Kafka event consumer
+        //// Register Kafka event consumer
+        //var publishTopics = builder.Configuration["EVENT_PUBLISHING_TOPICS"];
+        //var consumeTopics = builder.Configuration["EVENT_CONSUMING_TOPICS"];
+
+        //if (!string.IsNullOrWhiteSpace(publishTopics))
+        //    builder.AddKafkaEventPublisher(publishTopics.Split(',')[0]); // support multi later
+
+        //if (!string.IsNullOrWhiteSpace(consumeTopics))
+        //{
+        //    builder.AddKafkaEventConsumer(options =>
+        //    {
+        //        options.ServiceName = "UserService";
+        //        options.KafkaGroupId = "aloha-user-service";
+        //        options.Topics.AddRange(consumeTopics.Split(','));
+        //    });
+        //}
+
         var kafkaConsumeTopic = builder.Configuration["Kafka:Topics:UserEvents:Consume"];
         if (!string.IsNullOrWhiteSpace(kafkaConsumeTopic))
         {
@@ -147,6 +157,7 @@ public class Program
         builder.Services.AddScoped<IUserService, Services.UserService>();
         builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
         builder.Services.AddAutoMapper(typeof(Program).Assembly);
+        builder.Services.AddTransient<IRequestHandler<TestSendEventModel>, TestSendEventHandler>();
 
         // Replace the JWT auth configuration with the simplified extension
         builder.Services.AddKeycloakJwtAuthentication(builder.Configuration);

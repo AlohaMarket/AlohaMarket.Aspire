@@ -1,5 +1,3 @@
-using Aloha.MicroService.Post.Infrastructure.Entity;
-
 namespace Aloha.MicroService.Post.Apis
 {
     public static class PostApi
@@ -11,6 +9,12 @@ namespace Aloha.MicroService.Post.Apis
                   .WithTags("Post Api");
 
             return builder;
+        }
+
+        public class TestSendEventRequest
+        {
+            public string Message { get; set; } = default!;
+            public string ToService { get; set; } = "UserService";
         }
 
         public static RouteGroupBuilder MapPostEndpoints(this RouteGroupBuilder group)
@@ -31,6 +35,27 @@ namespace Aloha.MicroService.Post.Apis
             group.MapPut("posts/{id:guid}/activate", ActivatePost);
             group.MapPut("posts/{id:guid}/push", PushPost);
             group.MapDelete("posts/{id:guid}", DeletePost);
+            group.MapPost("events/test-send", async (
+                [AsParameters] ApiServices services,
+                TestSendEventRequest request) =>
+            {
+                var @event = new TestSendEventModel
+                {
+                    Message = request.Message,
+                    FromService = "PostService",
+                    ToService = request.ToService
+                };
+
+                var result = await services.EventPublisher.PublishAsync(@event);
+
+                services.Logger.LogInformation("TestSendEvent sent to Kafka: {@event}, result: {result}", @event, result);
+
+                return TypedResults.Ok(new
+                {
+                    Success = result,
+                    SentEvent = @event
+                });
+            });
 
             return group;
         }
