@@ -47,9 +47,8 @@ public static class ApplicationServiceExtensions
 
         var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Category>();
 
-        var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
-            .WithReference(userService);
-            //.WithReference(planservice);
+        //var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
+        //    .WithReference(userService);
 
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
             .WithReference(userService)

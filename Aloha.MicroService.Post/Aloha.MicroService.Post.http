@@ -1,6 +1,15 @@
-@Aloha.MicroService.Post_HostAddress = http://localhost:5208
+@Aloha.MicroService.Post_HostAddress = http://localhost:7005
 
-GET {{Aloha.MicroService.Post_HostAddress}}/weatherforecast/
-Accept: application/json
+### Test publish message
+POST {{Aloha.MicroService.Post_HostAddress}}/api/v1/test/publish?testNums=17&testName=DuyKhiem
+Content-Type: application/json
 
-###
+### Alternatively with JSON body
+POST {{Aloha.MicroService.Post_HostAddress}}/api/v1/test/publish
+Content-Type: application/json
+
+{
+  "testNums": 17,
+  "testName": "DuyKhiem"
+}
+

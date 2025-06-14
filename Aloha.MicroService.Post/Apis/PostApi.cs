@@ -30,6 +30,8 @@ namespace Aloha.MicroService.Post.Apis
             group.MapPut("posts/{id:guid}/push", PushPost);
             group.MapDelete("posts/{id:guid}", DeletePost);
 
+            group.MapPost("test/publish", TestPublishMessage);
+
             return group;
         }
 
@@ -209,5 +211,23 @@ namespace Aloha.MicroService.Post.Apis
 
             return TypedResults.Ok();
         }
+
+        private static async Task<Results<Ok, BadRequest>> TestPublishMessage([AsParameters] ApiServices services, int testNums, string testName)
+        {
+            await services.EventPublisher.PublishAsync(new TestIntegrationEvent
+            {
+
+                EventNums = testNums,
+                EventName = testName
+            }); 
+
+            return TypedResults.Ok();
+        }
+    }
+
+    public class TestIntegrationEvent : Aloha.EventBus.Events.IntegrationEvent
+    {
+        public int EventNums { get; set; } = 0;
+        public string EventName { get; set; } = "notChanged";
     }
 }
