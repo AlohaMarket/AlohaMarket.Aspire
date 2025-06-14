@@ -1,3 +1,6 @@
+using Aloha.EventBus;
+using Aloha.EventBus.Abstractions;
+using Aloha.EventBus.Kafka;
 using Aloha.ServiceDefaults.Cloudinary;
 using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.ServiceDefaults.Hosting;
@@ -33,8 +36,6 @@ public class Program
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
-
-
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
         {
@@ -85,6 +86,51 @@ public class Program
             });
         });
 
+        builder.Services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+        });
+
+        // Read Kafka connection string and override bootstrap if needed
+        var kafkaConnectionString = builder.Configuration.GetConnectionString("Kafka");
+        if (!string.IsNullOrEmpty(kafkaConnectionString))
+        {
+            builder.Configuration["Kafka:BootstrapServers"] = kafkaConnectionString;
+        }
+        else
+        {
+            throw new InvalidOperationException("Kafka connection string is missing from configuration.");
+        }
+
+        // Register Kafka producer
+        builder.AddKafkaProducer("Kafka");
+
+        // Register Kafka event publisher
+        var kafkaPublishTopic = builder.Configuration["Kafka:Topics:UserEvents:Publish"];
+        if (!string.IsNullOrWhiteSpace(kafkaPublishTopic))
+        {
+            builder.AddKafkaEventPublisher(kafkaPublishTopic);
+        }
+        else
+        {
+            builder.Services.AddTransient<IEventPublisher, NullEventPublisher>();
+        }
+
+        // Register Kafka event consumer
+        var kafkaConsumeTopic = builder.Configuration["Kafka:Topics:UserEvents:Consume"];
+        if (!string.IsNullOrWhiteSpace(kafkaConsumeTopic))
+        {
+            builder.AddKafkaEventConsumer(options =>
+            {
+                options.ServiceName = "UserService";
+                options.KafkaGroupId = "aloha-user-service";
+                options.Topics.AddRange(kafkaConsumeTopic.Split(','));
+                // Optional: event type filtering
+                // options.IntegrationEventFactory = IntegrationEventFactory<PostCreatedIntegrationEvent>.Instance;
+                // options.AcceptEvent = e => e.IsEvent<...>();
+            });
+        }
+
         DotEnv.Load(options: new DotEnvOptions(
         envFilePaths: new[] { Path.Combine(Directory.GetCurrentDirectory(), "..", ".env") }));
 
@@ -121,22 +167,6 @@ public class Program
             });
         }
 
-        // Add detailed logger for auth debugging
-        app.Use(async (context, next) =>
-        {
-            var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-
-            logger.LogInformation("Request path: {Path}", context.Request.Path);
-            logger.LogInformation("Request to User Service");
-            foreach (var header in context.Request.Headers)
-            {
-
-                logger.LogInformation("Header: {Key} = {Value}", header.Key, header.Value);
-            }
-
-            await next();
-        });
-
         // Add CORS middleware - place it before other middleware
         app.UseCors("AllowAll");
 
@@ -144,38 +174,7 @@ public class Program
 
         // Make sure Authentication is before Authorization
         app.UseAuthentication();
-        app.Use(async (context, next) =>
-        {
-            var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-            var user = context.User;
-
-            logger.LogInformation("IsAuthenticated: {IsAuthenticated}", user.Identity?.IsAuthenticated);
-            logger.LogInformation("Authentication Type: {AuthType}", user.Identity?.AuthenticationType ?? "none");
-
-            // JWT specific debugging
-            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(authHeader))
-            {
-                logger.LogInformation("Auth header present: {Length} chars", authHeader.Length);
-
-                // Check if bearer token
-                if (authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-                {
-                    logger.LogInformation("Bearer token found");
-                }
-            }
-
-            // Log all claims
-            logger.LogInformation("Claims count: {Count}", user.Claims?.Count() ?? 0);
-            foreach (var claim in user.Claims)
-            {
-                logger.LogInformation("Claim: {Type} = {Value}", claim.Type, claim.Value);
-            }
-
-            await next();
-        });
         app.UseAuthorization();
-
         app.MapControllers();
 
         app.Run();

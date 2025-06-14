@@ -133,5 +133,14 @@ public class Program
         app.MapControllers();
 
         app.Run();
+
+        // After configuring Kafka
+        var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
+        logger.LogInformation("Kafka configured with bootstrap servers: {servers}", 
+            builder.Configuration.GetValue<string>("Kafka:BootstrapServers"));
+        logger.LogInformation("Publishing to topic: {topic}", 
+            builder.Configuration.GetValue<string>("EventBus:PublishingTopics"));
+        logger.LogInformation("Subscribing to topics: {topics}", 
+            builder.Configuration.GetValue<string>("EventBus:ConsumingTopics"));
     }
 }
