@@ -1,4 +1,5 @@
 using Aloha.MicroService.Post.Infrastructure.Entity;
+using System.Text.Json;
 
 namespace Aloha.MicroService.Post.Infrastructure.Data
 {
@@ -21,8 +22,11 @@ namespace Aloha.MicroService.Post.Infrastructure.Data
                 entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
                 entity.Property(e => e.IsActive).HasDefaultValue(false);
                 entity.Property(e => e.Status).HasConversion<string>();
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()");
-                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("NOW()");
+                entity.Property(e => e.CategoryPath)
+                      .HasConversion(
+                          v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                          v => JsonSerializer.Deserialize<List<int>>(v, new JsonSerializerOptions()) ?? new List<int>())
+                      .HasColumnType("jsonb");
             });
 
             base.OnModelCreating(modelBuilder);

@@ -9,7 +9,9 @@ namespace Aloha.UserService.Repositories
 
         public async Task<User> CreateUserAsync(User user)
         {
-            return (await context.Users.AddAsync(user)).Entity;
+            await context.Users.AddAsync(user);
+            await context.SaveChangesAsync();
+            return user;
         }
 
         public async Task<bool> DeleteUserAsync(Guid userId)

@@ -15,10 +15,12 @@ public static class ApplicationServiceExtensions
                         .WithKafkaUI();
         }
 
-        var userService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_User>();
+        var userService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_User>()
+            .WithReference(kafka);
 
         var postService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Post>()
-            .WithReference(userService);
+            .WithReference(userService)
+            .WithReference(kafka);
 
         var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>();
 
@@ -27,6 +29,7 @@ public static class ApplicationServiceExtensions
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
             .WithReference(userService)
             .WithReference(locationService)
+            .WithReference(postService)
             .WithReference(categoryService);
 
         return builder;

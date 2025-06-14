@@ -10,14 +10,14 @@ namespace Aloha.MicroService.Post.Infrastructure.Entity
         public decimal Price { get; set; }
         public int CategoryId { get; set; }
         public List<int> CategoryPath { get; set; } = [];
-        public JsonDocument LocationPath { get; set; } = default!;
+        public JsonDocument? LocationPath { get; set; }
         public bool IsActive { get; set; }
         public PostStatus Status { get; set; }
         public int Priority { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public DateTime? PushedAt { get; set; }
-        public JsonDocument Attributes { get; set; } = default!;
+        public JsonDocument? Attributes { get; set; }
         public string? StatusMessage { get; set; }
     }
 }

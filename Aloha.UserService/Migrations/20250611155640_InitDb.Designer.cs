@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Aloha.UserService.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20250605095747_InitDb")]
+    [Migration("20250611155640_InitDb")]
     partial class InitDb
     {
         /// <inheritdoc />
@@ -33,7 +33,6 @@ namespace Aloha.UserService.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("AvatarUrl")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
@@ -46,8 +45,10 @@ namespace Aloha.UserService.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsVerify")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
