@@ -1,4 +1,3 @@
-﻿
 namespace Aloha.MicroService.Payment.Services
 {
     public class VNPayLibrary
@@ -6,6 +5,12 @@ namespace Aloha.MicroService.Payment.Services
         private readonly SortedList<string, string> _requestData = new SortedList<string, string>(new VnPayCompare());
         private readonly SortedList<string, string> _responseData = new SortedList<string, string>(new VnPayCompare());
 
+        /// <summary>
+        /// Handles VNPay Instant Payment Notification (IPN) requests by validating the signature and returning a response indicating the confirmation status.
+        /// </summary>
+        /// <param name="collection">The query collection containing VNPay IPN parameters.</param>
+        /// <param name="hashSecret">The secret key used to validate the VNPay signature.</param>
+        /// <returns>An <see cref="ErrorViewModel"/> indicating the result of the IPN confirmation, with response codes for success, already confirmed, or invalid input.</returns>
         public ErrorViewModel IpnHandler(IQueryCollection collection, string hashSecret)
         {
             var vnPay = new VNPayLibrary();
@@ -72,6 +77,14 @@ namespace Aloha.MicroService.Payment.Services
             };
         }
 
+        /// <summary>
+        /// Extracts VNPay payment response data from the provided query collection, validates the signature, and returns a populated <see cref="PaymentResponseModel"/>.
+        /// </summary>
+        /// <param name="collection">The query collection containing VNPay response parameters.</param>
+        /// <param name="hashSecret">The secret key used to validate the VNPay signature.</param>
+        /// <returns>
+        /// A <see cref="PaymentResponseModel"/> with payment details if the signature is valid; otherwise, a model with <c>Success = false</c>.
+        /// </returns>
         public PaymentResponseModel GetFullResponseData(IQueryCollection collection, string hashSecret)
         {
             var vnPay = new VNPayLibrary();
@@ -111,6 +124,11 @@ namespace Aloha.MicroService.Payment.Services
                 VnPayResponseCode = vnpResponseCode
             };
         }
+        /// <summary>
+        /// Retrieves the client's IP address from the provided HTTP context, resolving IPv6 to IPv4 if possible.
+        /// </summary>
+        /// <param name="context">The HTTP context containing connection information.</param>
+        /// <returns>The client's IP address as a string, or "127.0.0.1" if unavailable. Returns the exception message if an error occurs.</returns>
         public string GetIpAddress(HttpContext context)
         {
             var ipAddress = string.Empty;
@@ -137,6 +155,11 @@ namespace Aloha.MicroService.Payment.Services
 
             return "127.0.0.1";
         }
+        /// <summary>
+        /// Adds a key-value pair to the request data if the value is not null or empty.
+        /// </summary>
+        /// <param name="key">The key to add to the request data.</param>
+        /// <param name="value">The value associated with the key.</param>
         public void AddRequestData(string key, string value)
         {
             if (!string.IsNullOrEmpty(value))
@@ -145,6 +168,11 @@ namespace Aloha.MicroService.Payment.Services
             }
         }
 
+        /// <summary>
+        /// Adds a key-value pair to the response data collection if the value is not null or empty.
+        /// </summary>
+        /// <param name="key">The key to add to the response data.</param>
+        /// <param name="value">The value associated with the key.</param>
         public void AddResponseData(string key, string value)
         {
             if (!string.IsNullOrEmpty(value))
@@ -153,11 +181,22 @@ namespace Aloha.MicroService.Payment.Services
             }
         }
 
+        /// <summary>
+        /// Retrieves the value associated with the specified key from the response data.
+        /// </summary>
+        /// <param name="key">The key to look up in the response data.</param>
+        /// <returns>The value for the specified key, or an empty string if the key is not found.</returns>
         public string GetResponseData(string key)
         {
             return _responseData.TryGetValue(key, out var retValue) ? retValue : string.Empty;
         }
 
+        /// <summary>
+        /// Constructs a VNPay request URL with encoded parameters and an appended HMAC-SHA512 signature.
+        /// </summary>
+        /// <param name="baseUrl">The base URL to which the query parameters will be appended.</param>
+        /// <param name="vnpHashSecret">The secret key used to generate the secure hash signature.</param>
+        /// <returns>The full request URL containing all parameters and the computed secure hash.</returns>
         public string CreateRequestUrl(string baseUrl, string vnpHashSecret)
         {
             var data = new StringBuilder();
@@ -182,6 +221,12 @@ namespace Aloha.MicroService.Payment.Services
             return baseUrl;
         }
 
+        /// <summary>
+        /// Validates the provided signature by comparing it to an HMAC-SHA512 hash of the response data using the given secret key.
+        /// </summary>
+        /// <param name="inputHash">The signature to validate against.</param>
+        /// <param name="secretKey">The secret key used for hashing.</param>
+        /// <returns>True if the signature is valid; otherwise, false.</returns>
         public bool ValidateSignature(string inputHash, string secretKey)
         {
             var rspRaw = GetResponseData();
@@ -189,6 +234,12 @@ namespace Aloha.MicroService.Payment.Services
             return myChecksum.Equals(inputHash, StringComparison.InvariantCultureIgnoreCase);
         }
 
+        /// <summary>
+        /// Computes an HMAC SHA-512 hash of the input data using the specified key and returns the result as a lowercase hexadecimal string.
+        /// </summary>
+        /// <param name="key">The secret key used for hashing.</param>
+        /// <param name="inputData">The data to be hashed.</param>
+        /// <returns>The HMAC SHA-512 hash as a lowercase hexadecimal string.</returns>
         private string HmacSha512(string key, string inputData)
         {
             var hash = new StringBuilder();
@@ -206,6 +257,10 @@ namespace Aloha.MicroService.Payment.Services
             return hash.ToString();
         }
 
+        /// <summary>
+        /// Serializes the response data into a URL-encoded query string, excluding signature-related fields.
+        /// </summary>
+        /// <returns>A URL-encoded string of response parameters, excluding "vnp_SecureHashType" and "vnp_SecureHash".</returns>
         private string GetResponseData()
         {
             var data = new StringBuilder();
@@ -236,6 +291,14 @@ namespace Aloha.MicroService.Payment.Services
 
 public class VnPayCompare : IComparer<string>
 {
+    /// <summary>
+    /// Compares two strings using ordinal comparison with the "en-US" culture.
+    /// </summary>
+    /// <param name="x">The first string to compare.</param>
+    /// <param name="y">The second string to compare.</param>
+    /// <returns>
+    /// 0 if the strings are equal; -1 if <paramref name="x"/> is less than <paramref name="y"/>; 1 if <paramref name="x"/> is greater than <paramref name="y"/>.
+    /// </returns>
     public int Compare(string x, string y)
     {
         if (x == y) return 0;
