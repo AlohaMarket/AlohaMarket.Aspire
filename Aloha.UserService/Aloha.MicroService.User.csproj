@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Aloha.EventBus.Kafka\Aloha.EventBus.Kafka.csproj" />
+    <ProjectReference Include="..\Aloha.EventBus.Models\Aloha.EventBus.Models.csproj" />
+    <ProjectReference Include="..\Aloha.EventBus\Aloha.EventBus.csproj" />
     <ProjectReference Include="..\Aloha\Aloha.ServiceDefaults\Aloha.ServiceDefaults.csproj" />
   </ItemGroup>
 
