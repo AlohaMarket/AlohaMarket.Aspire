@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Aloha.MicroService.Payment;
 
 public class Program
@@ -35,6 +37,8 @@ public class Program
         builder.Services.AddScoped<PaymentService>();
         builder.Services.AddScoped<IVNPayService, VNPayService>();
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
         builder.Services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -60,7 +64,7 @@ public class Program
                     }
                 }
             });
-
+            c.IncludeXmlComments(xmlPath);
 
             // Add security requirement for all operations
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
