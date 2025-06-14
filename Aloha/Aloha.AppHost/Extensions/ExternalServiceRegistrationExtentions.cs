@@ -4,11 +4,12 @@ namespace Aloha.AppHost.Extensions;
 
 public static class ApplicationServiceExtensions
 {
-    /// <summary>
-    /// Registers and configures core application services, including Kafka and multiple microservices, to the distributed application builder.
-    /// </summary>
-    /// <param name="builder">The distributed application builder to configure.</param>
-    /// <returns>The updated distributed application builder with all services registered.</returns>
+    private static class Consts
+    {
+        public const string Env_EventPublishingTopics = "EVENT_PUBLISHING_TOPICS";
+        public const string Env_EventConsumingTopics = "EVENT_CONSUMING_TOPICS";
+    }
+
     public static IDistributedApplicationBuilder AddApplicationServices(this IDistributedApplicationBuilder builder)
     {
         var kafka = builder.AddKafka("kafka")
@@ -21,11 +22,23 @@ public static class ApplicationServiceExtensions
                         .WithKafkaUI();
         }
 
+        builder.Eventing.Subscribe<ResourceReadyEvent>(kafka.Resource, async (@event, ct) =>
+{
+    await CreateKafkaTopics(@event, kafka.Resource, ct);
+});
+
+
         var userService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_User>()
             .WithReference(kafka)
             .WaitFor(kafka);
 
         var postService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Post>()
+        .WithEnvironment(Consts.Env_EventPublishingTopics, GetTopicName<Projects.Aloha_MicroService_Post>())
+            .WithEnvironment(Consts.Env_EventConsumingTopics,
+                string.Join(',',
+                    GetTopicName<Projects.Aloha_MicroService_User>(),
+                    GetTopicName<Projects.Aloha_MicroService_Location>()
+                ))
             .WithReference(userService)
             .WithReference(kafka)
             .WaitFor(kafka);
@@ -46,4 +59,34 @@ public static class ApplicationServiceExtensions
 
         return builder;
     }
+
+    private static async Task CreateKafkaTopics(ResourceReadyEvent @event, KafkaServerResource kafkaResource, CancellationToken ct)
+    {
+        var logger = @event.Services.GetRequiredService<ILogger<Program>>();
+
+        TopicSpecification[] topics = [
+            new() { Name = GetTopicName<Projects.Aloha_MicroService_Post>(), NumPartitions = 1, ReplicationFactor = 1 },
+            new() { Name = GetTopicName<Projects.Aloha_MicroService_User>(), NumPartitions = 1, ReplicationFactor = 1 },
+        ];
+
+        logger.LogInformation("Creating topics: {topics} ...", string.Join(", ", topics.Select(t => t.Name).ToArray()));
+
+        var connectionString = await kafkaResource.ConnectionStringExpression.GetValueAsync(ct);
+        using var adminClient = new AdminClientBuilder(new AdminClientConfig()
+        {
+            BootstrapServers = connectionString,
+        }).Build();
+        try
+        {
+            await adminClient.CreateTopicsAsync(topics, new CreateTopicsOptions() { });
+        }
+        catch (CreateTopicsException ex)
+        {
+            logger.LogError(ex, "An error occurred creating topics");
+        }
+    }
+
+    private static string GetTopicName<TProject>(string postfix = "") => $"{typeof(TProject).Name.Replace('_', '-')}{(string.IsNullOrEmpty(postfix) ? "" : $"-{postfix}")}";
+
+
 }

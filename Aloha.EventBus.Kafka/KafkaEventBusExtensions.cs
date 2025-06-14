@@ -42,7 +42,7 @@ public static class KafkaEventBusExtensions
         {
             settings.Config.GroupId = groupId;
             settings.Config.AutoOffsetReset = AutoOffsetReset.Earliest;
-            settings.Config.SecurityProtocol = SecurityProtocol.Plaintext; // Explicitly use non-SSL
+            //settings.Config.SecurityProtocol = SecurityProtocol.Plaintext; // Explicitly use non-SSL
         },
         configureBuilder: (builder) =>
         {
