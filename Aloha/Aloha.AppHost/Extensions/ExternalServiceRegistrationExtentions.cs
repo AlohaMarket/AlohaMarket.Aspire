@@ -1,9 +1,14 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace Aloha.AppHost.Extensions;
 
 public static class ApplicationServiceExtensions
 {
+    /// <summary>
+    /// Registers and configures core application services, including Kafka and multiple microservices, to the distributed application builder.
+    /// </summary>
+    /// <param name="builder">The distributed application builder to configure.</param>
+    /// <returns>The updated distributed application builder with all services registered.</returns>
     public static IDistributedApplicationBuilder AddApplicationServices(this IDistributedApplicationBuilder builder)
     {
         var kafka = builder.AddKafka("kafka");

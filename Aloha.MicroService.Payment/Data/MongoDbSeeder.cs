@@ -1,7 +1,14 @@
-﻿namespace Aloha.MicroService.Payment.Data
+namespace Aloha.MicroService.Payment.Data
 {
     public static class MongoDbSeeder
     {
+        /// <summary>
+        /// Seeds the payments collection with initial data if it is empty.
+        /// </summary>
+        /// <param name="collection">The MongoDB collection to seed with payment records.</param>
+        /// <remarks>
+        /// Inserts two sample payment records if the collection contains no documents. If data already exists, no changes are made.
+        /// </remarks>
         public static async Task Seed(IMongoCollection<Payments> collection)
         {
             var count = await collection.CountDocumentsAsync(_ => true);
