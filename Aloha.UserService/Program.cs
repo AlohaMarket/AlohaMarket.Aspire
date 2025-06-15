@@ -2,16 +2,15 @@ using Aloha.EventBus;
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
 using Aloha.EventBus.Models;
-using Aloha.MicroService.User.EventHandler;
 using Aloha.ServiceDefaults.Cloudinary;
 using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.ServiceDefaults.Hosting;
 using Aloha.ServiceDefaults.Middlewares;
 using Aloha.UserService.Data;
+using Aloha.UserService.EventHandler;
 using Aloha.UserService.Repositories;
 using Aloha.UserService.Services;
 using dotenv.net;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 
@@ -49,7 +48,7 @@ public class Program
                 Format = "binary"
             });
 
-            c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+            c.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "Aloha User Service API",
                 Version = "v1"
@@ -110,23 +109,6 @@ public class Program
             builder.Services.AddTransient<IEventPublisher, NullEventPublisher>();
         }
 
-        //// Register Kafka event consumer
-        //var publishTopics = builder.Configuration["EVENT_PUBLISHING_TOPICS"];
-        //var consumeTopics = builder.Configuration["EVENT_CONSUMING_TOPICS"];
-
-        //if (!string.IsNullOrWhiteSpace(publishTopics))
-        //    builder.AddKafkaEventPublisher(publishTopics.Split(',')[0]); // support multi later
-
-        //if (!string.IsNullOrWhiteSpace(consumeTopics))
-        //{
-        //    builder.AddKafkaEventConsumer(options =>
-        //    {
-        //        options.ServiceName = "UserService";
-        //        options.KafkaGroupId = "aloha-user-service";
-        //        options.Topics.AddRange(consumeTopics.Split(','));
-        //    });
-        //}
-
         var kafkaConsumeTopic = builder.Configuration["Kafka:Topics:UserEvents:Consume"];
         if (!string.IsNullOrWhiteSpace(kafkaConsumeTopic))
         {
@@ -135,9 +117,8 @@ public class Program
                 options.ServiceName = "UserService";
                 options.KafkaGroupId = "aloha-user-service";
                 options.Topics.AddRange(kafkaConsumeTopic.Split(','));
-                // Optional: event type filtering
-                // options.IntegrationEventFactory = IntegrationEventFactory<PostCreatedIntegrationEvent>.Instance;
-                // options.AcceptEvent = e => e.IsEvent<...>();
+                options.IntegrationEventFactory = IntegrationEventFactory<TestSendEventModel>.Instance;
+                options.AcceptEvent = e => e.IsEvent<TestSendEventModel>();  // Change to TestSendEventModel
             });
         }
 
@@ -154,10 +135,9 @@ public class Program
 
         builder.Services.AddSharedServices<UserDbContext>(builder.Configuration);
         builder.Services.AddScoped<IUserRepository, UserRepository>();
-        builder.Services.AddScoped<IUserService, Services.UserService>();
+        builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
         builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
         builder.Services.AddAutoMapper(typeof(Program).Assembly);
-        builder.Services.AddTransient<IRequestHandler<TestSendEventModel>, TestSendEventHandler>();
 
         // Replace the JWT auth configuration with the simplified extension
         builder.Services.AddKeycloakJwtAuthentication(builder.Configuration);
