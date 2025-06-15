@@ -1,13 +1,13 @@
-using Aloha.ServiceDefaults.Meta;
-
 namespace Aloha.MicroService.Payment.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PaymentController(PaymentService paymentService, IVNPayService vnPayService, IMapper mapper) : ControllerBase
+    public class PaymentController(PaymentService paymentService, IVNPayService vnPayService,IMomoService momoService, IConfiguration configuration , IMapper mapper) : ControllerBase
     {
         private readonly PaymentService _paymentService = paymentService;
         private readonly IVNPayService _vnPayService = vnPayService;
+        private readonly IMomoService _momoService = momoService;
+        private readonly IConfiguration _configuration = configuration;
         private readonly IMapper _mapper = mapper;
 
         /// <summary>
@@ -100,15 +100,16 @@ namespace Aloha.MicroService.Payment.Controllers
             {
                 var response = _vnPayService.PaymentExecute(Request.Query);
                 var amount = Request.Query["vnp_Amount"]; 
-                var actualAmount = int.Parse(amount) / 100; 
-
+                var actualAmount = int.Parse(amount) / 100;
+                var successUrl = configuration["FrontendRedirect:SuccessUrl"];
+                var failedUrl = configuration["FrontendRedirect:FailedUrl"];
                 if (Request.Query["vnp_ResponseCode"] == "00")
                 {
-                    return Redirect($"http://localhost:3000/payment/success?status=success&amount={actualAmount}");
+                    return Redirect($"{successUrl}?status=success&amount={actualAmount}");
                 }
                 else
                 {
-                    return Redirect($"http://localhost:3000/payment/failed?status=failed&amount={actualAmount}");
+                    return Redirect($"{failedUrl}?status=failed&amount={actualAmount}");
                 }
             }
             catch (Exception ex)
@@ -116,5 +117,48 @@ namespace Aloha.MicroService.Payment.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        ///// <summary>
+        ///// Creates a Momo payment URL based on the provided payment information.
+        ///// </summary>
+        ///// <param name="model">The payment information used to create the Momo payment URL.</param>
+        ///// <returns>A 200 OK response with the generated Momo payment URL if successful; otherwise, a 400 Bad Request response.</returns>
+        //[HttpPost("momo-payment-url")]
+        //public async Task<IActionResult> CreateMomoPaymentUrl([FromBody] MomoClientRequestModel model)
+        //{
+        //    var response = await _momoService.CreatePaymentAsync(model);
+        //    if (response == null || string.IsNullOrEmpty(response.PayUrl))
+        //        return BadRequest(ApiResponseBuilder.BuildResponse<string>("Failed to create Momo payment URL.", null));
+
+        //    return Ok(ApiResponseBuilder.BuildResponse("Momo payment URL created successfully!", response.PayUrl));
+        //}
+        ///// <summary>
+        ///// Handles Momo payment callback, processes the payment result, and redirects the user to a success or failure page.
+        ///// </summary>
+        ///// <returns>A redirect to the appropriate payment result page, or a bad request if an error occurs.</returns>
+        //[HttpGet("momo-callback")]
+        //public IActionResult MomoCallback()
+        //{
+        //    try
+        //    {
+        //        var result = _momoService.PaymentExecuteAsync(Request.Query);
+        //        var amount = Request.Query["amount"];
+        //        var orderId = Request.Query["orderId"];
+        //        var errorCode = Request.Query["errorCode"];
+
+        //        // Momo: errorCode == "0" là thành công
+        //        if (errorCode == "0")
+        //        {
+        //            return Redirect($"http://localhost:3000/payment/success?status=success&amount={amount}&orderId={orderId}");
+        //        }
+        //        else
+        //        {
+        //            return Redirect($"http://localhost:3000/payment/failed?status=failed&amount={amount}&orderId={orderId}");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
     }
 }

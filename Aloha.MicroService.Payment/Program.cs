@@ -1,3 +1,4 @@
+using Aloha.MicroService.Payment.Endpoints;
 using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
@@ -37,6 +38,8 @@ public class Program
         builder.Services.AddSingleton<IPaymentRepository, PaymentRepository>();
         builder.Services.AddScoped<PaymentService>();
         builder.Services.AddScoped<IVNPayService, VNPayService>();
+        builder.Services.AddScoped<IMomoService, MomoService>();
+        builder.Services.AddHttpClient();
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         builder.Services.AddSwaggerGen(c =>
@@ -86,7 +89,7 @@ public class Program
             await MongoDbSeeder.Seed(collection);
         }
         app.MapDefaultEndpoints();
-
+        app.MapPaymentEndpoints();
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
