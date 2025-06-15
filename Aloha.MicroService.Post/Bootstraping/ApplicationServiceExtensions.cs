@@ -5,6 +5,7 @@ using Aloha.ServiceDefaults.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 
+
 namespace Aloha.MicroService.Post.Bootstraping
 {
     public static class ApplicationServiceExtensions

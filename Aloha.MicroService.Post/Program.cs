@@ -1,9 +1,3 @@
-using Aloha.MicroService.Post.Apis;
-using Aloha.MicroService.Post.Bootstraping;
-using Aloha.ServiceDefaults.DependencyInjection;
-using Aloha.ServiceDefaults.Hosting;
-using Aloha.ServiceDefaults.Middlewares;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddApplicationServices();
