@@ -1,6 +1,10 @@
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
 using Aloha.MicroService.Post.Infrastructure.Data;
+using Aloha.ServiceDefaults.Hosting;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
+
 
 namespace Aloha.MicroService.Post.Bootstraping
 {
@@ -22,6 +26,45 @@ namespace Aloha.MicroService.Post.Bootstraping
             builder.AddServiceDefaults();
             builder.Services.AddAuthorization();
             builder.Services.AddOpenApi();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.MapType<IFormFile>(() => new OpenApiSchema
+                {
+                    Type = "string",
+                    Format = "binary"
+                });
+
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Title = "Aloha Post Service API",
+                    Version = "v1"
+                });
+
+                c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token:"
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = JwtBearerDefaults.AuthenticationScheme
+                            }
+                        },
+                        new List<string>()
+                    }
+                });
+            });
 
             // Configure database with secure credentials
             ConfigureDatabaseConnection(builder);
@@ -61,11 +104,9 @@ namespace Aloha.MicroService.Post.Bootstraping
                     options.ServiceName = "PostService";
                     options.KafkaGroupId = "aloha-post-service";
                     options.Topics.AddRange(eventConsumingTopics.Split(','));
-                    options.IntegrationEventFactory = IntegrationEventFactory<PostCreatedIntegrationEvent>.Instance;
+                    options.IntegrationEventFactory = IntegrationEventFactory<TestSendEventModel>.Instance;
                     options.AcceptEvent = e => e.IsEvent<
-                        PostStatusChangedIntegrationEvent,
-                        PostActivationChangedIntegrationEvent,
-                        PostPushedIntegrationEvent>();
+                        TestReceiveEventModel>();
                 });
             }
 

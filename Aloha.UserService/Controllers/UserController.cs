@@ -77,7 +77,7 @@ namespace Aloha.UserService.Controllers
         [ValidateFile]
         [Authorize(Roles = "ALOHA_ADMIN, ALOHA_USER")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UpdateUserAvatar([FromForm] IFormFile file)
+        public async Task<IActionResult> UpdateUserAvatar(IFormFile file)
         {
             var userId = Guid.Parse(User.GetUserId());
             var user = await userService.UploadUserAvatar(userId, file);

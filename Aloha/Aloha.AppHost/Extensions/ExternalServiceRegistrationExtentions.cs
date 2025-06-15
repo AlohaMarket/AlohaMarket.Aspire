@@ -29,6 +29,12 @@ public static class ApplicationServiceExtensions
 
 
         var userService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_User>()
+            .WithEnvironment(Consts.Env_EventPublishingTopics, GetTopicName<Projects.Aloha_MicroService_User>())
+            .WithEnvironment(Consts.Env_EventConsumingTopics,
+                string.Join(',',
+                    GetTopicName<Projects.Aloha_MicroService_Post>(),
+                    GetTopicName<Projects.Aloha_MicroService_Location>()
+                ))
             .WithReference(kafka)
             .WaitFor(kafka);
 

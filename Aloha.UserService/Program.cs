@@ -1,14 +1,17 @@
 using Aloha.EventBus;
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
+using Aloha.EventBus.Models;
 using Aloha.ServiceDefaults.Cloudinary;
 using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.ServiceDefaults.Hosting;
 using Aloha.ServiceDefaults.Middlewares;
 using Aloha.UserService.Data;
+using Aloha.UserService.EventHandler;
 using Aloha.UserService.Repositories;
 using Aloha.UserService.Services;
 using dotenv.net;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 
 namespace Aloha.UserService;
@@ -45,31 +48,21 @@ public class Program
                 Format = "binary"
             });
 
-            c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+            c.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "Aloha User Service API",
                 Version = "v1"
             });
 
-            c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
+            c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
             {
-                Type = SecuritySchemeType.OAuth2,
-                Flows = new OpenApiOAuthFlows
-                {
-                    Implicit = new OpenApiOAuthFlow
-                    {
-                        AuthorizationUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/auth"),
-                        TokenUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/token"),
-                        Scopes = new Dictionary<string, string>
-                        {
-                            { "openid", "OpenID" },
-                            { "profile", "Profile" }
-                        }
-                    }
-                }
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token:"
             });
-
-            // Add security requirement for all operations
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
@@ -78,10 +71,10 @@ public class Program
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.SecurityScheme,
-                            Id = "oauth2"
+                            Id = JwtBearerDefaults.AuthenticationScheme
                         }
                     },
-                    new[] { "openid", "profile" }
+                    new List<string>()
                 }
             });
         });
@@ -116,7 +109,6 @@ public class Program
             builder.Services.AddTransient<IEventPublisher, NullEventPublisher>();
         }
 
-        // Register Kafka event consumer
         var kafkaConsumeTopic = builder.Configuration["Kafka:Topics:UserEvents:Consume"];
         if (!string.IsNullOrWhiteSpace(kafkaConsumeTopic))
         {
@@ -125,9 +117,8 @@ public class Program
                 options.ServiceName = "UserService";
                 options.KafkaGroupId = "aloha-user-service";
                 options.Topics.AddRange(kafkaConsumeTopic.Split(','));
-                // Optional: event type filtering
-                // options.IntegrationEventFactory = IntegrationEventFactory<PostCreatedIntegrationEvent>.Instance;
-                // options.AcceptEvent = e => e.IsEvent<...>();
+                options.IntegrationEventFactory = IntegrationEventFactory<TestSendEventModel>.Instance;
+                options.AcceptEvent = e => e.IsEvent<TestSendEventModel>();  // Change to TestSendEventModel
             });
         }
 
@@ -144,7 +135,7 @@ public class Program
 
         builder.Services.AddSharedServices<UserDbContext>(builder.Configuration);
         builder.Services.AddScoped<IUserRepository, UserRepository>();
-        builder.Services.AddScoped<IUserService, Services.UserService>();
+        builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
         builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
         builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
