@@ -25,3 +25,7 @@ global using System.Text;
 global using Microsoft.AspNetCore.Mvc;
 
 global using AutoMapper;
+
+
+global using Aloha.MicroService.Payment.DTOs.Momo;
+global using Aloha.ServiceDefaults.Meta;
