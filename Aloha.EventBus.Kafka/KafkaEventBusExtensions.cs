@@ -1,12 +1,14 @@
 using Aloha.EventBus.Events;
 
 namespace Aloha.EventBus.Kafka;
+
 public static class KafkaEventBusExtensions
 {
     public static IHostApplicationBuilder AddKafkaProducer(this IHostApplicationBuilder builder, string connectionName)
     {
         builder.AddKafkaProducer<string, MessageEnvelop>(connectionName,
-            configureSettings: (settings) => { 
+            configureSettings: (settings) =>
+            {
             },
             configureBuilder: (builder) =>
             {
@@ -36,9 +38,11 @@ public static class KafkaEventBusExtensions
 
     public static IHostApplicationBuilder AddKafkaMessageEnvelopConsumer(this IHostApplicationBuilder builder, string groupId, string connectionName = "kafka")
     {
-        builder.AddKafkaConsumer<string, MessageEnvelop>(connectionName, configureSettings: (settings) => {
+        builder.AddKafkaConsumer<string, MessageEnvelop>(connectionName, configureSettings: (settings) =>
+        {
             settings.Config.GroupId = groupId;
             settings.Config.AutoOffsetReset = AutoOffsetReset.Earliest;
+            //settings.Config.SecurityProtocol = SecurityProtocol.Plaintext; // Explicitly use non-SSL
         },
         configureBuilder: (builder) =>
         {
@@ -65,7 +69,7 @@ public static class KafkaEventBusExtensions
     {
         return @event.GetType() == typeof(T1);
     }
-    
+
     public static bool IsEvent<T1, T2>(this IntegrationEvent @event)
     {
         return @event.GetType() == typeof(T1) || @event.GetType() == typeof(T2);

@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aloha.MicroService.Post", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.MicroService.Plan", "Aloha.MicroService.Plan\Aloha.MicroService.Plan.csproj", "{9D9F54CF-C925-4C7B-81CE-B21CF538966F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.MicroService.Payment", "Aloha.MicroService.Payment\Aloha.MicroService.Payment.csproj", "{C958556E-FC8A-49D2-BFE9-6C048CCBCC4B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{9D9F54CF-C925-4C7B-81CE-B21CF538966F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D9F54CF-C925-4C7B-81CE-B21CF538966F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9D9F54CF-C925-4C7B-81CE-B21CF538966F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C958556E-FC8A-49D2-BFE9-6C048CCBCC4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C958556E-FC8A-49D2-BFE9-6C048CCBCC4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C958556E-FC8A-49D2-BFE9-6C048CCBCC4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C958556E-FC8A-49D2-BFE9-6C048CCBCC4B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

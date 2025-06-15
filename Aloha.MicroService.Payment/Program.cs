@@ -1,18 +1,17 @@
-using Aloha.LocationService.Data;
-using Aloha.LocationService.Repositories;
-using Aloha.LocationService.Services;
-using Aloha.LocationService.Settings;
-using Aloha.ServiceDefaults.Hosting;
-using Aloha.ServiceDefaults.Middlewares;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
-using MongoDB.Driver;
+using System.Reflection;
 
-namespace Aloha.LocationService;
+namespace Aloha.MicroService.Payment;
 
 public class Program
 {
-    public static void Main(string[] args)
+    /// <summary>
+    /// Entry point for the Aloha Payment microservice application.
+    /// </summary>
+    /// <param name="args">Command-line arguments for application configuration.</param>
+    /// <remarks>
+    /// Configures and runs the web application, including service registration, middleware setup, MongoDB seeding, CORS, Swagger/OpenAPI with OAuth2 security, and controller endpoint mapping.
+    /// </remarks>
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
         builder.AddServiceDefaults();
@@ -23,20 +22,28 @@ public class Program
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
         builder.Services.AddEndpointsApiExplorer();
+        builder.Services.Configure<MongoSettings>(
+        builder.Configuration.GetSection("MongoSettings"));
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowAll", policy =>
             {
                 policy.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader();
+                      .AllowAnyHeader()
+                      .AllowAnyMethod();
             });
         });
+        builder.Services.AddSingleton<IPaymentRepository, PaymentRepository>();
+        builder.Services.AddScoped<PaymentService>();
+        builder.Services.AddScoped<IVNPayService, VNPayService>();
+        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
         builder.Services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
             {
-                Title = "Aloha Location Service API",
+                Title = "Aloha Payment Service API",
                 Version = "v1"
             });
 
@@ -57,6 +64,7 @@ public class Program
                     }
                 }
             });
+            c.IncludeXmlComments(xmlPath);
 
             // Add security requirement for all operations
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -76,34 +84,18 @@ public class Program
 
         });
 
-        builder.Services.Configure<MongoSettings>(
-            builder.Configuration.GetSection("MongoSettings")
-        );
-
-        builder.Services.AddSingleton<IMongoClient>(s =>
-        {
-            var settings = s.GetRequiredService<IOptions<MongoSettings>>().Value;
-            return new MongoClient(settings.ConnectionString);
-        });
-
-        builder.Services.AddTransient<DataSeeder>();
-
-        builder.Services.AddSingleton<MongoContext>();
-
-        builder.Services.AddScoped<ILocationRepository, LocationRepository>();
-
-        builder.Services.AddScoped<ILocationService, Services.LocationService>();
-
-        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
         var app = builder.Build();
-
+        // Gọi seeder
         using (var scope = app.Services.CreateScope())
         {
-            var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
-            seeder.SeedAsync();
-        }
+            var options = scope.ServiceProvider.GetRequiredService<IOptions<MongoSettings>>();
+            var mongoSettings = options.Value;
+            var mongoClient = new MongoClient(mongoSettings.ConnectionString);
+            var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
+            var collection = database.GetCollection<Payments>(mongoSettings.CollectionName);
 
+            await MongoDbSeeder.Seed(collection);
+        }
         app.MapDefaultEndpoints();
 
         // Configure the HTTP request pipeline.
@@ -113,34 +105,24 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Aloha Location Service API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Aloha Payment Service API V1");
                 c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
             });
 
         }
+        app.UseRouting();
         app.UseCors("AllowAll");
-
         // Use the exception handler middleware
         app.UseMiddleware<ApiExceptionHandlerMiddleware>();
-
         // Optional - add status code pages if needed
         app.UseStatusCodePages();
-
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
 
+
         app.MapControllers();
 
         app.Run();
-
-        // After configuring Kafka
-        var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
-        logger.LogInformation("Kafka configured with bootstrap servers: {servers}", 
-            builder.Configuration.GetValue<string>("Kafka:BootstrapServers"));
-        logger.LogInformation("Publishing to topic: {topic}", 
-            builder.Configuration.GetValue<string>("EventBus:PublishingTopics"));
-        logger.LogInformation("Subscribing to topics: {topics}", 
-            builder.Configuration.GetValue<string>("EventBus:ConsumingTopics"));
     }
 }

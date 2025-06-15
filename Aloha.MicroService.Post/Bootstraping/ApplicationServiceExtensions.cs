@@ -1,8 +1,6 @@
-using Aloha.EventBus;
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
 using Aloha.MicroService.Post.Infrastructure.Data;
-using Aloha.ServiceDefaults.Hosting;
 
 namespace Aloha.MicroService.Post.Bootstraping
 {
@@ -16,11 +14,13 @@ namespace Aloha.MicroService.Post.Bootstraping
             public const string Env_DbUsername = "DB_USERNAME";
             public const string Env_DbPassword = "DB_PASSWORD";
             public const string KafkaConfigSection = "Kafka";
+            public const string Env_DatabaseConnection = "Aloha_PostDB_ConnectionString";
         }
 
         public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
         {
             builder.AddServiceDefaults();
+            builder.Services.AddAuthorization();
             builder.Services.AddOpenApi();
 
             // Configure database with secure credentials
@@ -69,20 +69,26 @@ namespace Aloha.MicroService.Post.Bootstraping
                 });
             }
 
+            builder.Logging.AddFilter("Confluent.Kafka", LogLevel.Debug);
+
             return builder;
         }
         private static void ConfigureDatabaseConnection(IHostApplicationBuilder builder)
         {
-            var connectionStringTemplate = builder.Configuration.GetConnectionString(Consts.DefaultDatabase);
+            //var connectionStringTemplate = builder.Configuration.GetConnectionString(Consts.DefaultDatabase);
+            var connectionString = Environment.GetEnvironmentVariable(Consts.Env_DatabaseConnection)
+                                   ?? builder.Configuration.GetConnectionString(Consts.DefaultDatabase);
             var dbUsername = Environment.GetEnvironmentVariable(Consts.Env_DbUsername) ?? "postgres";
             var dbPassword = Environment.GetEnvironmentVariable(Consts.Env_DbPassword) ?? "postgres";
 
             // Format connection string with secure credentials
-            var connectionString = string.Format(connectionStringTemplate!, dbUsername, dbPassword);
+            //var connectionString = string.Format(connectionStringTemplate!, dbUsername, dbPassword);
 
             // Configure PostgreSQL DbContext with secure connection string
             builder.Services.AddDbContext<PostDbContext>(options =>
                 options.UseNpgsql(connectionString));
         }
+
+
     }
 }
