@@ -5,6 +5,7 @@ using Aloha.ServiceDefaults.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 
+
 namespace Aloha.MicroService.Post.Bootstraping
 {
     public static class ApplicationServiceExtensions
@@ -103,11 +104,9 @@ namespace Aloha.MicroService.Post.Bootstraping
                     options.ServiceName = "PostService";
                     options.KafkaGroupId = "aloha-post-service";
                     options.Topics.AddRange(eventConsumingTopics.Split(','));
-                    options.IntegrationEventFactory = IntegrationEventFactory<PostCreatedIntegrationEvent>.Instance;
+                    options.IntegrationEventFactory = IntegrationEventFactory<TestSendEventModel>.Instance;
                     options.AcceptEvent = e => e.IsEvent<
-                        PostStatusChangedIntegrationEvent,
-                        PostActivationChangedIntegrationEvent,
-                        PostPushedIntegrationEvent>();
+                        TestReceiveEventModel>();
                 });
             }
 

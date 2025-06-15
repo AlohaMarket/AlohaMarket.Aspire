@@ -1,6 +1,3 @@
-using Aloha.MicroService.Post.Infrastructure.Entity;
-using System.Text.Json;
-
 namespace Aloha.MicroService.Post.Infrastructure.Data
 {
     public class PostDbContext : DbContext
