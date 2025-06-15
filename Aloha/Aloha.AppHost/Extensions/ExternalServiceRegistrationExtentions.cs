@@ -4,12 +4,15 @@ namespace Aloha.AppHost.Extensions;
 
 public static class ApplicationServiceExtensions
 {
+#region Constants
     private static class Consts
     {
         public const string Env_EventPublishingTopics = "EVENT_PUBLISHING_TOPICS";
         public const string Env_EventConsumingTopics = "EVENT_CONSUMING_TOPICS";
     }
+#endregion
 
+#region External Service Registration
     public static IDistributedApplicationBuilder AddApplicationServices(this IDistributedApplicationBuilder builder)
     {
         var kafka = builder.AddKafka("kafka")
@@ -18,50 +21,53 @@ public static class ApplicationServiceExtensions
         if (!builder.Configuration.GetValue("IsTest", false))
         {
             kafka = kafka.WithLifetime(ContainerLifetime.Persistent)
-                        .WithDataVolume()
-                        .WithKafkaUI();
+                         .WithDataVolume()
+                         .WithKafkaUI();
         }
+#endregion
 
+#region Create Kafka Topic
         builder.Eventing.Subscribe<ResourceReadyEvent>(kafka.Resource, async (@event, ct) =>
-{
-    await CreateKafkaTopics(@event, kafka.Resource, ct);
-});
+        {
+            await CreateKafkaTopics(@event, kafka.Resource, ct);
+        });
+#endregion
 
-
+#region Project References
         var userService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_User>()
-            .WithEnvironment(Consts.Env_EventPublishingTopics, GetTopicName<Projects.Aloha_MicroService_User>())
-            .WithEnvironment(Consts.Env_EventConsumingTopics,
-                string.Join(',',
-                    GetTopicName<Projects.Aloha_MicroService_Post>(),
-                    GetTopicName<Projects.Aloha_MicroService_Location>()
-                ))
-            .WithReference(kafka)
-            .WaitFor(kafka);
+            .SetupKafka<Projects.Aloha_MicroService_User>(
+                kafka,
+                GetTopicName<Projects.Aloha_MicroService_Post>(),
+                GetTopicName<Projects.Aloha_MicroService_Location>());
 
         var postService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Post>()
-        .WithEnvironment(Consts.Env_EventPublishingTopics, GetTopicName<Projects.Aloha_MicroService_Post>())
-            .WithEnvironment(Consts.Env_EventConsumingTopics,
-                string.Join(',',
-                    GetTopicName<Projects.Aloha_MicroService_User>(),
-                    GetTopicName<Projects.Aloha_MicroService_Location>()
-                ))
+            .SetupKafka<Projects.Aloha_MicroService_Post>(
+                kafka,
+                GetTopicName<Projects.Aloha_MicroService_User>(),
+                GetTopicName<Projects.Aloha_MicroService_Location>()
+            );
+
+        var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>()
+            .SetupKafka<Projects.Aloha_MicroService_Location>(
+                kafka);
+
+        var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Category>()
+            .SetupKafka<Projects.Aloha_MicroService_Category>(
+                kafka);
+
+        var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
             .WithReference(userService)
-            .WithReference(kafka)
-            .WaitFor(kafka);
-
-        var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>();
-
-        var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Category>();
-
-        //var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
-        //    .WithReference(userService);
-        //    //.WithReference(planservice);
+            //.WithReference(planservice);
+            .SetupKafka<Projects.Aloha_MicroService_Payment>(
+                kafka);
 
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
             .WithReference(userService)
-            .WithReference(locationService)
             .WithReference(postService)
-            .WithReference(categoryService);
+            .WithReference(locationService)
+            .WithReference(categoryService)
+            .WithReference(paymentService);
+#endregion
 
         return builder;
     }
@@ -94,5 +100,25 @@ public static class ApplicationServiceExtensions
 
     private static string GetTopicName<TProject>(string postfix = "") => $"{typeof(TProject).Name.Replace('_', '-')}{(string.IsNullOrEmpty(postfix) ? "" : $"-{postfix}")}";
 
+    /// <summary>
+    /// Cau hinh Kafka cho cac microservice - them tham chieu, dependencies, dang ky cac Publisher va Consumer cho cac topic.
+    /// </summary>
+    /// <typeparam name="TProject">Xac dinh service su dung Extension Method nay</typeparam>
+    /// <param name="serviceBuilder">Builder cua service can cau hinh</param>
+    /// <param name="kafkaResource">Builder cua Kafka Server Resource</param>
+    /// <param name="consumingFromServices">Danh sach cac service se tieu thu topic</param>
+    /// <returns>Builder da duoc cau hinh voi cac tham so can thiet</returns>
+    private static IResourceBuilder<ProjectResource> SetupKafka<TProject>(
+        this IResourceBuilder<ProjectResource> serviceBuilder,
+        IResourceBuilder<KafkaServerResource> kafkaResource,
+        params string[] consumingFromServices)
+    {
+        var topicNames = consumingFromServices.Select(s => s.Replace("_", "-")).ToArray();
 
+        return serviceBuilder
+        .WithEnvironment(Consts.Env_EventPublishingTopics, GetTopicName<TProject>())
+        .WithEnvironment(Consts.Env_EventConsumingTopics, string.Join(',', topicNames))
+        .WithReference(kafkaResource)
+        .WaitFor(kafkaResource);
+    }
 }
