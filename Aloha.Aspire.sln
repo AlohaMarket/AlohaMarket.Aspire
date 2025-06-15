@@ -3,25 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36109.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.AppHost", "Aloha\Aloha.AppHost\Aloha.AppHost.csproj", "{79ADF085-B081-4C80-A21D-32B26AED93A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aloha.AppHost", "Aloha\Aloha.AppHost\Aloha.AppHost.csproj", "{79ADF085-B081-4C80-A21D-32B26AED93A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.ServiceDefaults", "Aloha\Aloha.ServiceDefaults\Aloha.ServiceDefaults.csproj", "{543C54EB-2A61-BE17-E078-B4A9CAA4744E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aloha.ServiceDefaults", "Aloha\Aloha.ServiceDefaults\Aloha.ServiceDefaults.csproj", "{543C54EB-2A61-BE17-E078-B4A9CAA4744E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.ApiGateway", "Aloha.ApiGateway\Aloha.ApiGateway.csproj", "{867395F9-EFB0-5ABE-BF42-C4C4DCF7E8B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aloha.ApiGateway", "Aloha.ApiGateway\Aloha.ApiGateway.csproj", "{867395F9-EFB0-5ABE-BF42-C4C4DCF7E8B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.MicroService.Location", "Aloha.LocationService\Aloha.MicroService.Location.csproj", "{133BF00F-5608-458A-BD8D-67EF2A53659B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aloha.MicroService.Location", "Aloha.LocationService\Aloha.MicroService.Location.csproj", "{133BF00F-5608-458A-BD8D-67EF2A53659B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.EventBus", "Aloha.EventBus\Aloha.EventBus.csproj", "{7798B006-D1A2-D171-D504-6EEC2CEF54E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aloha.EventBus", "Aloha.EventBus\Aloha.EventBus.csproj", "{7798B006-D1A2-D171-D504-6EEC2CEF54E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.MicroService.Category", "Aloha.CategoryService\Aloha.MicroService.Category.csproj", "{E9894953-3AC7-43D3-9A70-D50A4946E15B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aloha.MicroService.Category", "Aloha.CategoryService\Aloha.MicroService.Category.csproj", "{E9894953-3AC7-43D3-9A70-D50A4946E15B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.EventBus.Kafka", "Aloha.EventBus.Kafka\Aloha.EventBus.Kafka.csproj", "{498955B6-711F-CC01-543E-C63B036F60EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aloha.EventBus.Kafka", "Aloha.EventBus.Kafka\Aloha.EventBus.Kafka.csproj", "{498955B6-711F-CC01-543E-C63B036F60EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.MicroService.User", "Aloha.UserService\Aloha.MicroService.User.csproj", "{D712C3F8-99F8-4817-BC19-5B0F27663D6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aloha.MicroService.User", "Aloha.UserService\Aloha.MicroService.User.csproj", "{D712C3F8-99F8-4817-BC19-5B0F27663D6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.EventBus.Models", "Aloha.EventBus.Models\Aloha.EventBus.Models.csproj", "{CD99019B-FD1C-4C80-8F0A-6F44CB28165E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aloha.EventBus.Models", "Aloha.EventBus.Models\Aloha.EventBus.Models.csproj", "{CD99019B-FD1C-4C80-8F0A-6F44CB28165E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.MicroService.Post", "Aloha.MicroService.Post\Aloha.MicroService.Post.csproj", "{AC0A3917-2C28-A548-087A-8C1BDA5260DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Aloha.MicroService.Post", "Aloha.MicroService.Post\Aloha.MicroService.Post.csproj", "{AC0A3917-2C28-A548-087A-8C1BDA5260DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aloha.MicroService.Plan", "Aloha.MicroService.Plan\Aloha.MicroService.Plan.csproj", "{9D9F54CF-C925-4C7B-81CE-B21CF538966F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,10 @@ Global
 		{AC0A3917-2C28-A548-087A-8C1BDA5260DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC0A3917-2C28-A548-087A-8C1BDA5260DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC0A3917-2C28-A548-087A-8C1BDA5260DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D9F54CF-C925-4C7B-81CE-B21CF538966F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D9F54CF-C925-4C7B-81CE-B21CF538966F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D9F54CF-C925-4C7B-81CE-B21CF538966F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D9F54CF-C925-4C7B-81CE-B21CF538966F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
