@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Aloha.ServiceDefaults.Exceptions
+namespace Aloha.Shared.Exceptions
 {
     public class ApiException : Exception
     {

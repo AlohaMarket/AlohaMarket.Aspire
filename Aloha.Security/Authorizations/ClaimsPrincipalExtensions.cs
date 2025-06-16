@@ -1,6 +1,6 @@
 using System.Security.Claims;
 
-namespace Aloha.ServiceDefaults.Extensions
+namespace Aloha.Security.Authorizations
 {
     public static class ClaimsPrincipalExtensions
     {
@@ -12,8 +12,8 @@ namespace Aloha.ServiceDefaults.Extensions
             if (principal == null)
                 throw new ArgumentNullException(nameof(principal), "ClaimsPrincipal cannot be null");
 
-            return principal?.FindFirstValue("userId") 
-                ?? principal?.FindFirstValue("sub") 
+            return principal?.FindFirstValue("userId")
+                ?? principal?.FindFirstValue("sub")
                 ?? principal?.FindFirstValue(ClaimTypes.NameIdentifier)
                 ?? throw new InvalidOperationException("User ID not found in token");
         }
@@ -51,8 +51,8 @@ namespace Aloha.ServiceDefaults.Extensions
         // get UserName from claims
         public static string GetUserName(this ClaimsPrincipal principal)
         {
-            return principal?.FindFirstValue("userName") 
-                ?? principal?.FindFirstValue("preferred_username") 
+            return principal?.FindFirstValue("userName")
+                ?? principal?.FindFirstValue("preferred_username")
                 ?? principal?.FindFirstValue(ClaimTypes.Name)
                 ?? throw new InvalidOperationException("Username not found in token");
         }

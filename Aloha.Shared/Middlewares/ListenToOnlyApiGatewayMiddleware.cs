@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
-namespace Aloha.ServiceDefaults.Middlewares
+namespace Aloha.Shared.Middlewares
 {
     public class ListenToOnlyApiGatewayMiddleware(RequestDelegate next)
     {

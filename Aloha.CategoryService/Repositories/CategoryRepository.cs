@@ -1,6 +1,6 @@
 ﻿using Aloha.CategoryService.Data;
 using Aloha.CategoryService.Models.Entities;
-using Aloha.ServiceDefaults.Exceptions;
+using Aloha.Shared.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Aloha.CategoryService.Repositories

@@ -1,4 +1,4 @@
-﻿namespace Aloha.ServiceDefaults.Meta
+﻿namespace Aloha.Shared.Meta
 {
     public class ApiResponseBuilder
     {

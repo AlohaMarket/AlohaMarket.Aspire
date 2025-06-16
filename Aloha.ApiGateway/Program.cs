@@ -1,4 +1,4 @@
-using Aloha.ServiceDefaults.DependencyInjection;
+using Aloha.Security.Authentications;
 using Aloha.ServiceDefaults.Hosting;
 using Yarp.ReverseProxy.Transforms;
 

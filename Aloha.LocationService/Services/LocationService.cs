@@ -1,6 +1,6 @@
 ﻿using Aloha.LocationService.Models.Responses;
 using Aloha.LocationService.Repositories;
-using Aloha.ServiceDefaults.Exceptions;
+using Aloha.Shared.Exceptions;
 using AutoMapper;
 
 namespace Aloha.LocationService.Services

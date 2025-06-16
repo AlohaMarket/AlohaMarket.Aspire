@@ -1,3 +1,5 @@
+using Aloha.Security.Authentications;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddApplicationServices();

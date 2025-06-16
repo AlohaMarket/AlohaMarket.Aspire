@@ -1,9 +1,9 @@
-﻿using Aloha.ServiceDefaults.Meta;
+﻿using Aloha.Shared.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace Aloha.ServiceDefaults.Extensions
+namespace Aloha.Shared.Validators
 {
     public class ValidateModelAttribute : ActionFilterAttribute
     {

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Aloha.ServiceDefaults.Meta
+namespace Aloha.Shared.Meta
 {
     public class ApiResponse<T>
     {

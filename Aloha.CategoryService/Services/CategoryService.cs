@@ -2,7 +2,7 @@
 using Aloha.CategoryService.Models.Requests;
 using Aloha.CategoryService.Models.Responses;
 using Aloha.CategoryService.Repositories;
-using Aloha.ServiceDefaults.Exceptions;
+using Aloha.Shared.Exceptions;
 using AutoMapper;
 
 namespace Aloha.CategoryService.Services

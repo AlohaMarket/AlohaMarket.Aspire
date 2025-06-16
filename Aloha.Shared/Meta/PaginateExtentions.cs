@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Aloha.ServiceDefaults.Meta
+namespace Aloha.Shared.Meta
 {
     public static class PaginateExtensions
     {

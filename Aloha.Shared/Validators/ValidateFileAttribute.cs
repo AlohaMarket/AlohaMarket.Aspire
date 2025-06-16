@@ -1,9 +1,9 @@
-﻿using Aloha.ServiceDefaults.Meta;
+﻿using Aloha.Shared.Meta;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Aloha.ServiceDefaults.Extensions
+namespace Aloha.Shared.Extensions
 {
     public class ValidateFileAttribute : ActionFilterAttribute
     {

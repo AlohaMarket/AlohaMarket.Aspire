@@ -3,7 +3,7 @@ using Aloha.CategoryService.Repositories;
 using Aloha.CategoryService.Services;
 using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.ServiceDefaults.Hosting;
-using Aloha.ServiceDefaults.Middlewares;
+using Aloha.Shared.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 

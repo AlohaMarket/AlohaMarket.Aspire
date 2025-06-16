@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Aloha.ServiceDefaults.Converters
+namespace Aloha.Shared.Converters
 {
     public class GuidNullableConverter : JsonConverter<Guid?>
     {

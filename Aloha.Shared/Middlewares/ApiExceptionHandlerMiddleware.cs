@@ -1,12 +1,12 @@
-﻿using Aloha.ServiceDefaults.Exceptions;
-using Aloha.ServiceDefaults.Meta;
+﻿using Aloha.Shared.Exceptions;
+using Aloha.Shared.Meta;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Net;
 
-namespace Aloha.ServiceDefaults.Middlewares
+namespace Aloha.Shared.Middlewares
 {
     public class ApiExceptionHandlerMiddleware
     {

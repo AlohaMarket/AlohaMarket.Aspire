@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text.Json;
 
-namespace Aloha.ServiceDefaults.DependencyInjection
+namespace Aloha.Security.Authentications
 {
     public static class KeycloakJwtExtensions
     {
@@ -92,7 +92,7 @@ namespace Aloha.ServiceDefaults.DependencyInjection
                 catch (Exception ex)
                 {
                     // Log the exception if you have a logger configured
-                    System.Console.WriteLine($"Error parsing Keycloak realm_access claim: {ex.Message}");
+                    Console.WriteLine($"Error parsing Keycloak realm_access claim: {ex.Message}");
                 }
             }
 
@@ -139,7 +139,7 @@ namespace Aloha.ServiceDefaults.DependencyInjection
                 }
                 catch (Exception ex)
                 {
-                    System.Console.WriteLine($"Error parsing Keycloak resource_access claim: {ex.Message}");
+                    Console.WriteLine($"Error parsing Keycloak resource_access claim: {ex.Message}");
                 }
             }
         }

@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Aloha.Security\Aloha.Security.csproj" />
     <ProjectReference Include="..\Aloha\Aloha.ServiceDefaults\Aloha.ServiceDefaults.csproj" />
   </ItemGroup>
 

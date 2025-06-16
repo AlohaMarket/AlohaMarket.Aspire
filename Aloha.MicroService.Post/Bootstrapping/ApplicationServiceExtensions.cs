@@ -1,12 +1,11 @@
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
 using Aloha.MicroService.Post.Infrastructure.Data;
-using Aloha.ServiceDefaults.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 
 
-namespace Aloha.MicroService.Post.Bootstraping
+namespace Aloha.MicroService.Post.Bootstrapping
 {
     public static class ApplicationServiceExtensions
     {
@@ -35,7 +34,7 @@ namespace Aloha.MicroService.Post.Bootstraping
                     Format = "binary"
                 });
 
-                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "Aloha Post Service API",
                     Version = "v1"
