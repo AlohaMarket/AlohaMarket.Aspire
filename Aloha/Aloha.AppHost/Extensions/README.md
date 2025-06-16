@@ -1,4 +1,4 @@
-# ExternalServiceRegistrationExtentions Guide 🔧
+# ExternalServiceRegistrationExtensions Guide 🔧
 
 > Class tiện ích mở rộng để cấu hình và đăng ký các microservice trong Aloha Market
 
