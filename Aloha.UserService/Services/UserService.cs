@@ -1,5 +1,5 @@
 ﻿using Aloha.ServiceDefaults.Cloudinary;
-using Aloha.ServiceDefaults.Exceptions;
+using Aloha.Shared.Exceptions;
 using Aloha.UserService.Models.Entities;
 using Aloha.UserService.Models.Requests;
 using Aloha.UserService.Repositories;

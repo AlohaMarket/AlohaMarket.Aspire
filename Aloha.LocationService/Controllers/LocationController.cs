@@ -1,5 +1,5 @@
 ﻿using Aloha.LocationService.Services;
-using Aloha.ServiceDefaults.Meta;
+using Aloha.Shared.Meta;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aloha.LocationService.Controllers

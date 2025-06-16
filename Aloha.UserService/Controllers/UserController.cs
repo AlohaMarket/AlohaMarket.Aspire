@@ -1,5 +1,7 @@
-using Aloha.ServiceDefaults.Extensions;
-using Aloha.ServiceDefaults.Meta;
+using Aloha.Security.Authorizations;
+using Aloha.Shared.Extensions;
+using Aloha.Shared.Meta;
+using Aloha.Shared.Validators;
 using Aloha.UserService.Models.Requests;
 using Aloha.UserService.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -27,7 +29,7 @@ namespace Aloha.UserService.Controllers
         }
 
         [HttpPost("register")]
-        [ValidateModelAttribute]
+        [ValidateModel]
         [Authorize] // Add this attribute to require authentication
         public async Task<IActionResult> CreateUser()
         {

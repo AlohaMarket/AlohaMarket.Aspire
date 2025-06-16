@@ -1,6 +1,7 @@
 using Aloha.MicroService.Payment.Endpoints;
 using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Aloha.Shared.Middlewares;
 
 namespace Aloha.MicroService.Payment;
 

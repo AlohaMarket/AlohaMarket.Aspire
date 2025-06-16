@@ -2,7 +2,7 @@ namespace Aloha.MicroService.Payment.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PaymentController(PaymentService paymentService, IVNPayService vnPayService,IMomoService momoService, IConfiguration configuration , IMapper mapper) : ControllerBase
+    public class PaymentController(PaymentService paymentService, IVNPayService vnPayService, IMomoService momoService, IConfiguration configuration, IMapper mapper) : ControllerBase
     {
         private readonly PaymentService _paymentService = paymentService;
         private readonly IVNPayService _vnPayService = vnPayService;
@@ -99,7 +99,7 @@ namespace Aloha.MicroService.Payment.Controllers
             try
             {
                 var response = _vnPayService.PaymentExecute(Request.Query);
-                var amount = Request.Query["vnp_Amount"]; 
+                var amount = Request.Query["vnp_Amount"];
                 var actualAmount = int.Parse(amount) / 100;
                 var successUrl = configuration["FrontendRedirect:SuccessUrl"];
                 var failedUrl = configuration["FrontendRedirect:FailedUrl"];

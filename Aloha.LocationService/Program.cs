@@ -3,7 +3,7 @@ using Aloha.LocationService.Repositories;
 using Aloha.LocationService.Services;
 using Aloha.LocationService.Settings;
 using Aloha.ServiceDefaults.Hosting;
-using Aloha.ServiceDefaults.Middlewares;
+using Aloha.Shared.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;

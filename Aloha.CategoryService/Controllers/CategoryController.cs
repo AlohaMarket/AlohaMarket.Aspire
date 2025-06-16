@@ -1,7 +1,7 @@
 ﻿using Aloha.CategoryService.Models.Requests;
 using Aloha.CategoryService.Services;
-using Aloha.ServiceDefaults.Extensions;
-using Aloha.ServiceDefaults.Meta;
+using Aloha.Shared.Meta;
+using Aloha.Shared.Validators;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aloha.CategoryService.Controllers

@@ -1,6 +1,4 @@
-﻿
-
-namespace Aloha.MicroService.Payment.Endpoints
+﻿namespace Aloha.MicroService.Payment.Endpoints
 {
     public static class PaymentEndpoints
     {
