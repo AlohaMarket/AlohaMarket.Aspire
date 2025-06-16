@@ -7,7 +7,6 @@ using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.ServiceDefaults.Hosting;
 using Aloha.ServiceDefaults.Middlewares;
 using Aloha.UserService.Data;
-using Aloha.UserService.EventHandler;
 using Aloha.UserService.Repositories;
 using Aloha.UserService.Services;
 using dotenv.net;

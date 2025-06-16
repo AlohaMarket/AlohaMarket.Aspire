@@ -4,15 +4,15 @@ namespace Aloha.AppHost.Extensions;
 
 public static class ApplicationServiceExtensions
 {
-#region Constants
+    #region Constants
     private static class Consts
     {
         public const string Env_EventPublishingTopics = "EVENT_PUBLISHING_TOPICS";
         public const string Env_EventConsumingTopics = "EVENT_CONSUMING_TOPICS";
     }
-#endregion
+    #endregion
 
-#region External Service Registration
+    #region External Service Registration
     public static IDistributedApplicationBuilder AddApplicationServices(this IDistributedApplicationBuilder builder)
     {
         var kafka = builder.AddKafka("kafka")
@@ -24,16 +24,16 @@ public static class ApplicationServiceExtensions
                          .WithDataVolume()
                          .WithKafkaUI();
         }
-#endregion
+        #endregion
 
-#region Create Kafka Topic
+        #region Create Kafka Topic
         builder.Eventing.Subscribe<ResourceReadyEvent>(kafka.Resource, async (@event, ct) =>
         {
             await CreateKafkaTopics(@event, kafka.Resource, ct);
         });
-#endregion
+        #endregion
 
-#region Project References
+        #region Project References
         var userService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_User>()
             .SetupKafka<Projects.Aloha_MicroService_User>(
                 kafka,
@@ -60,7 +60,7 @@ public static class ApplicationServiceExtensions
 
         var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
             .WithReference(userService)
-            //.WithReference(planservice);
+            //.WithReference(planService);
             .SetupKafka<Projects.Aloha_MicroService_Payment>(
                 kafka);
 
@@ -70,9 +70,9 @@ public static class ApplicationServiceExtensions
             .WithReference(postService)
             .WithReference(locationService)
             .WithReference(categoryService)
-            .WithReference(paymentService);
+            .WithReference(paymentService)
             .WithReference(planService);
-  #endregion
+        #endregion
         return builder;
     }
 
