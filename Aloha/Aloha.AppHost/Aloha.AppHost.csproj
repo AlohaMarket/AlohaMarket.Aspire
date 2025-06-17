@@ -25,6 +25,7 @@
     <ProjectReference Include="..\..\Aloha.MicroService.Plan\Aloha.MicroService.Plan.csproj" />
     <ProjectReference Include="..\..\Aloha.MicroService.Payment\Aloha.MicroService.Payment.csproj" />
     <ProjectReference Include="..\..\Aloha.MicroService.Post\Aloha.MicroService.Post.csproj" />
+    <ProjectReference Include="..\..\Aloha.Shared\Aloha.Shared.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\..\Aloha.UserService\Aloha.MicroService.User.csproj" />
   </ItemGroup>
 
