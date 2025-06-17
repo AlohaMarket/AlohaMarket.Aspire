@@ -1,11 +1,6 @@
 ﻿namespace Aloha.AppHost.Extensions;
 public static class ResourceExtensions
 {
-    private static class Consts
-    {
-        public const string Env_EventPublishingTopics = "EVENT_PUBLISHING_TOPICS";
-        public const string Env_EventConsumingTopics = "EVENT_CONSUMING_TOPICS";
-    }
     public static IResourceBuilder<PostgresDatabaseResource> AddDefaultDatabase<TProject>(this IResourceBuilder<PostgresServerResource> builder)
     {
         return builder.AddDatabase($"{typeof(TProject).Name.Replace('_', '-')}-db");
