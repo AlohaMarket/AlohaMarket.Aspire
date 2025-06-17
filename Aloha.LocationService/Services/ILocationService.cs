@@ -6,7 +6,6 @@ namespace Aloha.LocationService.Services
     {
         Task<IEnumerable<ProvinceResponse>> GetAllProvincesAsync();
         Task<ProvinceResponse> GetProvinceByCodeAsync(int code);
-        //Task<IEnumerable<District>> GetDistrictsByProvinceCodeAsync(int provinceCode);
-        //Task<IEnumerable<Ward>> GetWardsByDistrictCodeAsync(int districtCode);
+        Task<bool> IsValidLocationPath(List<int> locationPath);
     }
 }
