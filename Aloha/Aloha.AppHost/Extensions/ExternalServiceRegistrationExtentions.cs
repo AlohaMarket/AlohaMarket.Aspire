@@ -37,16 +37,19 @@ public static class ApplicationServiceExtensions
             .SetupKafka<Projects.Aloha_MicroService_Post>(
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_User>(),
-                GetTopicName<Projects.Aloha_MicroService_Location>()
+                GetTopicName<Projects.Aloha_MicroService_Location>(),
+                GetTopicName<Projects.Aloha_MicroService_Category>()
             );
 
         var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>()
             .SetupKafka<Projects.Aloha_MicroService_Location>(
-                kafka);
+                kafka,
+                GetTopicName<Projects.Aloha_MicroService_Post>());
 
         var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Category>()
             .SetupKafka<Projects.Aloha_MicroService_Category>(
-                kafka);
+                kafka,
+                GetTopicName<Projects.Aloha_MicroService_Post>());
 
         //var planService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Plan>()
         //    .WithReference(userService);
