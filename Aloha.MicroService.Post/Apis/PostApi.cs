@@ -82,19 +82,9 @@ namespace Aloha.MicroService.Post.Apis
                 PostId = post.Id,
                 UserId = post.UserId,
                 UserPlanId = post.UserPlanId,
-                Title = post.Title,
-                Description = post.Description,
-                Price = post.Price,
                 CategoryId = post.CategoryId,
                 CategoryPath = post.CategoryPath,
-                LocationPath = post.LocationPath,
-                IsActive = post.IsActive,
-                Status = post.Status,
-                Priority = post.Priority,
-                CreatedAt = post.CreatedAt,
-                UpdatedAt = post.UpdatedAt,
-                PushedAt = post.PushedAt,
-                Attributes = post.Attributes
+                LocationPath = post.LocationPath
             });
 
             return TypedResults.Ok(post);
