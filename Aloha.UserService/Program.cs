@@ -6,6 +6,7 @@ using Aloha.Security.Authentications;
 using Aloha.ServiceDefaults.Cloudinary;
 using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.ServiceDefaults.Hosting;
+using Aloha.Shared;
 using Aloha.Shared.Middlewares;
 using Aloha.UserService.Data;
 using Aloha.UserService.Repositories;
@@ -99,7 +100,7 @@ public class Program
         builder.AddKafkaProducer("Kafka");
 
         // Register Kafka event publisher
-        var kafkaPublishTopic = builder.Configuration["Kafka:Topics:UserEvents:Publish"];
+        var kafkaPublishTopic = builder.Configuration.GetValue<string>(Consts.Env_EventPublishingTopics);
         if (!string.IsNullOrWhiteSpace(kafkaPublishTopic))
         {
             builder.AddKafkaEventPublisher(kafkaPublishTopic);
@@ -109,7 +110,7 @@ public class Program
             builder.Services.AddTransient<IEventPublisher, NullEventPublisher>();
         }
 
-        var kafkaConsumeTopic = builder.Configuration["Kafka:Topics:UserEvents:Consume"];
+        var kafkaConsumeTopic = builder.Configuration.GetValue<string>(Consts.Env_EventConsumingTopics);
         if (!string.IsNullOrWhiteSpace(kafkaConsumeTopic))
         {
             builder.AddKafkaEventConsumer(options =>
