@@ -1,6 +1,7 @@
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
 using Aloha.MicroService.Post.Infrastructure.Data;
+using Aloha.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 
@@ -9,14 +10,11 @@ namespace Aloha.MicroService.Post.Bootstrapping
 {
     public static class ApplicationServiceExtensions
     {
-        private static class Consts
+        private static class AppConsts
         {
             public const string DefaultDatabase = "PostDatabase";
-            public const string Env_EventPublishingTopics = "EventBus:PublishingTopics";
-            public const string Env_EventConsumingTopics = "EventBus:ConsumingTopics";
             public const string Env_DbUsername = "DB_USERNAME";
             public const string Env_DbPassword = "DB_PASSWORD";
-            public const string KafkaConfigSection = "Kafka";
             public const string Env_DatabaseConnection = "Aloha_PostDB_ConnectionString";
         }
 
@@ -74,15 +72,7 @@ namespace Aloha.MicroService.Post.Bootstrapping
             });
 
             // Kafka event bus configuration
-            builder.AddKafkaProducer(Consts.KafkaConfigSection);
-
-            // Make sure bootstrap server is in the config
-            var bootstrapServers = builder.Configuration.GetValue<string>($"{Consts.KafkaConfigSection}:BootstrapServers");
-            if (string.IsNullOrEmpty(bootstrapServers))
-            {
-                // Fallback to using a local server if not configured
-                builder.Configuration[$"{Consts.KafkaConfigSection}:BootstrapServers"] = "localhost:9092";
-            }
+            builder.AddKafkaProducer("kafka");
 
             // Configure Kafka event publisher
             var kafkaTopic = builder.Configuration.GetValue<string>(Consts.Env_EventPublishingTopics);
@@ -116,10 +106,10 @@ namespace Aloha.MicroService.Post.Bootstrapping
         private static void ConfigureDatabaseConnection(IHostApplicationBuilder builder)
         {
             //var connectionStringTemplate = builder.Configuration.GetConnectionString(Consts.DefaultDatabase);
-            var connectionString = Environment.GetEnvironmentVariable(Consts.Env_DatabaseConnection)
-                                   ?? builder.Configuration.GetConnectionString(Consts.DefaultDatabase);
-            var dbUsername = Environment.GetEnvironmentVariable(Consts.Env_DbUsername) ?? "postgres";
-            var dbPassword = Environment.GetEnvironmentVariable(Consts.Env_DbPassword) ?? "postgres";
+            var connectionString = Environment.GetEnvironmentVariable(AppConsts.Env_DatabaseConnection)
+                                   ?? builder.Configuration.GetConnectionString(AppConsts.DefaultDatabase);
+            var dbUsername = Environment.GetEnvironmentVariable(AppConsts.Env_DbUsername) ?? "postgres";
+            var dbPassword = Environment.GetEnvironmentVariable(AppConsts.Env_DbPassword) ?? "postgres";
 
             // Format connection string with secure credentials
             //var connectionString = string.Format(connectionStringTemplate!, dbUsername, dbPassword);

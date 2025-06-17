@@ -78,6 +78,8 @@ public static class ApplicationServiceExtensions
         TopicSpecification[] topics = [
             new() { Name = GetTopicName<Projects.Aloha_MicroService_Post>(), NumPartitions = 1, ReplicationFactor = 1 },
             new() { Name = GetTopicName<Projects.Aloha_MicroService_User>(), NumPartitions = 1, ReplicationFactor = 1 },
+            new() { Name = GetTopicName<Projects.Aloha_MicroService_Location>(), NumPartitions = 1, ReplicationFactor = 1 },
+            new() { Name = GetTopicName<Projects.Aloha_MicroService_Category>(), NumPartitions = 1, ReplicationFactor = 1 },
         ];
 
         logger.LogInformation("Creating topics: {topics} ...", string.Join(", ", topics.Select(t => t.Name).ToArray()));
