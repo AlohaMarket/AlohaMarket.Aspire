@@ -85,19 +85,8 @@ public class Program
             cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
         });
 
-        // Read Kafka connection string and override bootstrap if needed
-        var kafkaConnectionString = builder.Configuration.GetConnectionString("Kafka");
-        if (!string.IsNullOrEmpty(kafkaConnectionString))
-        {
-            builder.Configuration["Kafka:BootstrapServers"] = kafkaConnectionString;
-        }
-        else
-        {
-            throw new InvalidOperationException("Kafka connection string is missing from configuration.");
-        }
-
         // Register Kafka producer
-        builder.AddKafkaProducer("Kafka");
+        builder.AddKafkaProducer("kafka");
 
         // Register Kafka event publisher
         var kafkaPublishTopic = builder.Configuration.GetValue<string>(Consts.Env_EventPublishingTopics);

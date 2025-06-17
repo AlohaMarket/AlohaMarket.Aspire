@@ -1,8 +1,13 @@
+using Aloha.EventBus;
+using Aloha.EventBus.Abstractions;
+using Aloha.EventBus.Kafka;
+using Aloha.EventBus.Models;
 using Aloha.LocationService.Data;
 using Aloha.LocationService.Repositories;
 using Aloha.LocationService.Services;
 using Aloha.LocationService.Settings;
 using Aloha.ServiceDefaults.Hosting;
+using Aloha.Shared;
 using Aloha.Shared.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
@@ -51,7 +56,7 @@ public class Program
                 Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token:"
             });
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+        {
         {
             new OpenApiSecurityScheme
             {
@@ -62,10 +67,41 @@ public class Program
                 }
             },
             new List<string>()
-        }
-    });
-
+            }
         });
+        });
+
+        builder.Services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+        });
+
+        // Register Kafka producer
+        builder.AddKafkaProducer("kafka");
+
+        // Register Kafka event publisher
+        var kafkaPublishTopic = builder.Configuration.GetValue<string>(Consts.Env_EventPublishingTopics);
+        if (!string.IsNullOrWhiteSpace(kafkaPublishTopic))
+        {
+            builder.AddKafkaEventPublisher(kafkaPublishTopic);
+        }
+        else
+        {
+            builder.Services.AddTransient<IEventPublisher, NullEventPublisher>();
+        }
+
+        var kafkaConsumeTopic = builder.Configuration.GetValue<string>(Consts.Env_EventConsumingTopics);
+        if (!string.IsNullOrWhiteSpace(kafkaConsumeTopic))
+        {
+            builder.AddKafkaEventConsumer(options =>
+            {
+                options.ServiceName = "LocationService";
+                options.KafkaGroupId = "aloha-location-service";
+                options.Topics.AddRange(kafkaConsumeTopic.Split(','));
+                options.IntegrationEventFactory = IntegrationEventFactory<TestSendEventModel>.Instance;
+                options.AcceptEvent = e => e.IsEvent<TestSendEventModel>();  // Change to TestSendEventModel
+            });
+        }
 
         builder.Services.Configure<MongoSettings>(
             builder.Configuration.GetSection("MongoSettings")

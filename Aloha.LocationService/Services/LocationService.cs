@@ -22,5 +22,10 @@ namespace Aloha.LocationService.Services
             }
             return mapper.Map<ProvinceResponse>(province);
         }
+
+        public async Task<bool> IsValidLocationPath(List<int> locationPath)
+        {
+            return true;
+        }
     }
 }
