@@ -13,5 +13,6 @@ namespace Aloha.CategoryService.Services
         Task<bool> DeleteCategoryAsync(int id);
         Task<IEnumerable<Category>> GetCategoriesByParentIdAsync(int parentId);
         Task<IEnumerable<int>> GetCategoryPath(int id);
+        Task<bool> IsValidCategoryPath(List<int> categoryPath);
     }
 }
