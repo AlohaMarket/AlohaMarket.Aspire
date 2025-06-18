@@ -1,15 +1,7 @@
-﻿using System.Text.Json;
-using Aloha.EventBus.Events;
+﻿using Aloha.EventBus.Events;
 
 namespace Aloha.EventBus.Models
 {
-    public enum PostStatus
-    {
-        Draft,
-        Pending,
-        Created
-    }
-
     public class PostCreatedIntegrationEvent : IntegrationEvent
     {
         public Guid PostId { get; set; }
@@ -17,7 +9,9 @@ namespace Aloha.EventBus.Models
         public Guid? UserPlanId { get; set; }
         public int CategoryId { get; set; }
         public List<int> CategoryPath { get; set; } = [];
-        public JsonDocument LocationPath { get; set; } = default!;
+        public int ProvinceCode { get; set; }
+        public int DistrictCode { get; set; }
+        public int WardCode { get; set; }
     }
 
     public class PostUpdatedIntegrationEvent : IntegrationEvent
@@ -30,40 +24,15 @@ namespace Aloha.EventBus.Models
         public decimal Price { get; set; }
         public int CategoryId { get; set; }
         public List<int> CategoryPath { get; set; } = [];
-        public JsonDocument LocationPath { get; set; } = default!;
-        public bool IsActive { get; set; }
-        public PostStatus Status { get; set; }
-        public int Priority { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public DateTime? PushedAt { get; set; }
-        public JsonDocument Attributes { get; set; } = default!;
+        public int ProvinceCode { get; set; }
+        public int DistrictCode { get; set; }
+        public int WardCode { get; set; }
     }
 
-    public class PostStatusChangedIntegrationEvent : IntegrationEvent
-    {
-        public Guid PostId { get; set; }
-        public PostStatus PreviousStatus { get; set; }
-        public PostStatus CurrentStatus { get; set; }
-        public DateTime UpdatedAt { get; set; }
-    }
-
-    public class PostActivationChangedIntegrationEvent : IntegrationEvent
-    {
-        public Guid PostId { get; set; }
-        public bool IsActive { get; set; }
-        public DateTime UpdatedAt { get; set; }
-    }
-
-    public class PostPushedIntegrationEvent : IntegrationEvent
-    {
-        public Guid PostId { get; set; }
-        public DateTime PushedAt { get; set; }
-    }
-
-    public class PostDeletedIntegrationEvent : IntegrationEvent
+    public class PostPushIntegrationEvent : IntegrationEvent
     {
         public Guid PostId { get; set; }
         public Guid UserId { get; set; }
+        public Guid? UserPlanId { get; set; }
     }
-
 }

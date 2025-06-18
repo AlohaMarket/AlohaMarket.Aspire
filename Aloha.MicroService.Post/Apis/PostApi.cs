@@ -1,3 +1,5 @@
+using Aloha.MicroService.Post.Infrastructure.Entity;
+
 namespace Aloha.MicroService.Post.Apis
 {
     public static class PostApi
@@ -70,7 +72,7 @@ namespace Aloha.MicroService.Post.Apis
             if (post.Id == Guid.Empty)
                 post.Id = Guid.NewGuid();
 
-            post.Status = PostStatus.Draft;
+            post.Status = PostStatus.PendingValidation;
             post.CreatedAt = DateTime.UtcNow;
             post.UpdatedAt = DateTime.UtcNow;
 
@@ -84,7 +86,7 @@ namespace Aloha.MicroService.Post.Apis
                 UserPlanId = post.UserPlanId,
                 CategoryId = post.CategoryId,
                 CategoryPath = post.CategoryPath,
-                LocationPath = post.LocationPath
+
             });
 
             return TypedResults.Ok(post);
@@ -109,7 +111,12 @@ namespace Aloha.MicroService.Post.Apis
             post.Price = updatedPost.Price;
             post.CategoryId = updatedPost.CategoryId;
             post.CategoryPath = updatedPost.CategoryPath;
-            post.LocationPath = updatedPost.LocationPath;
+            post.ProvinceCode = updatedPost.ProvinceCode;
+            post.ProvinceText = updatedPost.ProvinceText;
+            post.DistrictCode = updatedPost.DistrictCode;
+            post.DistrictText = updatedPost.DistrictText;
+            post.WardCode = updatedPost.WardCode;
+            post.WardText = updatedPost.WardText;
             post.Attributes = updatedPost.Attributes;
             post.UpdatedAt = DateTime.UtcNow;
 
@@ -125,13 +132,9 @@ namespace Aloha.MicroService.Post.Apis
                 Price = post.Price,
                 CategoryId = post.CategoryId,
                 CategoryPath = post.CategoryPath,
-                LocationPath = post.LocationPath,
-                IsActive = post.IsActive,
-                Status = post.Status,
-                Priority = post.Priority,
-                UpdatedAt = post.UpdatedAt,
-                PushedAt = post.PushedAt,
-                Attributes = post.Attributes
+                ProvinceCode = post.ProvinceCode,
+                DistrictCode = post.DistrictCode,
+                WardCode = post.WardCode
             });
 
             return TypedResults.Ok(post);
@@ -150,15 +153,6 @@ namespace Aloha.MicroService.Post.Apis
             post.UpdatedAt = DateTime.UtcNow;
 
             await services.DbContext.SaveChangesAsync();
-
-            await services.EventPublisher.PublishAsync(new PostStatusChangedIntegrationEvent
-            {
-                PostId = post.Id,
-                PreviousStatus = previousStatus,
-                CurrentStatus = newStatus,
-                UpdatedAt = post.UpdatedAt
-            });
-
             return TypedResults.Ok(post);
         }
 
@@ -174,13 +168,6 @@ namespace Aloha.MicroService.Post.Apis
             post.UpdatedAt = DateTime.UtcNow;
 
             await services.DbContext.SaveChangesAsync();
-
-            await services.EventPublisher.PublishAsync(new PostActivationChangedIntegrationEvent
-            {
-                PostId = post.Id,
-                IsActive = isActive,
-                UpdatedAt = post.UpdatedAt
-            });
 
             return TypedResults.Ok(post);
         }
@@ -198,10 +185,11 @@ namespace Aloha.MicroService.Post.Apis
 
             await services.DbContext.SaveChangesAsync();
 
-            await services.EventPublisher.PublishAsync(new PostPushedIntegrationEvent
+            await services.EventPublisher.PublishAsync(new PostPushIntegrationEvent
             {
                 PostId = post.Id,
-                PushedAt = post.PushedAt.Value
+                UserId = post.UserId,
+                UserPlanId = post.UserPlanId,
             });
 
             return TypedResults.Ok(post);
@@ -217,12 +205,6 @@ namespace Aloha.MicroService.Post.Apis
 
             services.DbContext.Posts.Remove(post);
             await services.DbContext.SaveChangesAsync();
-
-            await services.EventPublisher.PublishAsync(new PostDeletedIntegrationEvent
-            {
-                PostId = post.Id,
-                UserId = post.UserId
-            });
 
             return TypedResults.Ok();
         }
