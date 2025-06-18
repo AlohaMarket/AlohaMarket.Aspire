@@ -20,7 +20,9 @@ namespace Aloha.MicroService.Post.Bootstrapping
 
         public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
         {
-            builder.AddServiceDefaults();
+            builder.AddServiceDefaults()
+                   .AddAlohaPostgreSQL();
+
             builder.Services.AddAuthorization();
             builder.Services.AddOpenApi();
             builder.Services.AddEndpointsApiExplorer();
@@ -101,6 +103,19 @@ namespace Aloha.MicroService.Post.Bootstrapping
 
             builder.Logging.AddFilter("Confluent.Kafka", LogLevel.Debug);
 
+            return builder;
+        }
+
+
+        public static IHostApplicationBuilder AddAlohaPostgreSQL<TDbContext> (
+            this IHostApplicationBuilder builder,
+            string DbConnection,
+            string DbUsername,
+            string DbPassword
+            ) where TDbContext : class
+        {
+            ConfigureDatabaseConnection(builder);
+            builder.Services.AddScoped<TDbContext>();
             return builder;
         }
         private static void ConfigureDatabaseConnection(IHostApplicationBuilder builder)
