@@ -19,9 +19,8 @@ namespace Aloha.MicroService.Post.Bootstrapping
         }
 
         public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
-        {
-            builder.AddServiceDefaults()
-                   .AddAlohaPostgreSQL();
+        {            builder.AddServiceDefaults()
+                   .AddAlohaPostgreSQL<PostDbContext>();
 
             builder.Services.AddAuthorization();
             builder.Services.AddOpenApi();
@@ -63,10 +62,7 @@ namespace Aloha.MicroService.Post.Bootstrapping
                         new List<string>()
                     }
                 });
-            });
-
-            // Configure database with secure credentials
-            ConfigureDatabaseConnection(builder);
+            });            // Database configuration is handled in AddAlohaPostgreSQL
 
             builder.Services.AddMediatR(cfg =>
             {
@@ -104,36 +100,36 @@ namespace Aloha.MicroService.Post.Bootstrapping
             builder.Logging.AddFilter("Confluent.Kafka", LogLevel.Debug);
 
             return builder;
-        }
-
-
-        public static IHostApplicationBuilder AddAlohaPostgreSQL<TDbContext> (
+        }        public static IHostApplicationBuilder AddAlohaPostgreSQL<TContext> (
             this IHostApplicationBuilder builder,
-            string DbConnection,
-            string DbUsername,
-            string DbPassword
-            ) where TDbContext : class
+            string? dbConnection = null,
+            string? dbUsername = null,
+            string? dbPassword = null
+            ) where TContext : DbContext
         {
-            ConfigureDatabaseConnection(builder);
-            builder.Services.AddScoped<TDbContext>();
+            // lay contextion string tu tham so hoac bien moi truong
+            // neu ca bien moi truong khong ton tai thi se su dung gia tri mac dinh
+            var connectionStringTemplate = dbConnection 
+                                        ?? Environment.GetEnvironmentVariable(AppConsts.Env_DatabaseConnection)
+                                        ?? builder.Configuration.GetConnectionString(AppConsts.DefaultDatabase);
+            
+            // tuong tu voi connection string, lay username va password tu tham so hoac bien moi truong hoac gia tri mac dinh
+            var username = dbUsername 
+                        ?? Environment.GetEnvironmentVariable(AppConsts.Env_DbUsername) 
+                        ?? "postgres";
+            
+            var password = dbPassword 
+                        ?? Environment.GetEnvironmentVariable(AppConsts.Env_DbPassword) 
+                        ?? "postgres";
+
+            // ghep connection string voi username va password
+            var connectionString = string.Format(connectionStringTemplate!, username, password);
+
+            // tien hanh dang ky DbContext voi connection string da tao
+            builder.Services.AddDbContext<TContext>(options =>
+                options.UseNpgsql(connectionString));                
+            builder.Services.AddScoped<TContext>();
             return builder;
         }
-        private static void ConfigureDatabaseConnection(IHostApplicationBuilder builder)
-        {
-            //var connectionStringTemplate = builder.Configuration.GetConnectionString(Consts.DefaultDatabase);
-            var connectionString = Environment.GetEnvironmentVariable(AppConsts.Env_DatabaseConnection)
-                                   ?? builder.Configuration.GetConnectionString(AppConsts.DefaultDatabase);
-            var dbUsername = Environment.GetEnvironmentVariable(AppConsts.Env_DbUsername) ?? "postgres";
-            var dbPassword = Environment.GetEnvironmentVariable(AppConsts.Env_DbPassword) ?? "postgres";
-
-            // Format connection string with secure credentials
-            //var connectionString = string.Format(connectionStringTemplate!, dbUsername, dbPassword);
-
-            // Configure PostgreSQL DbContext with secure connection string
-            builder.Services.AddDbContext<PostDbContext>(options =>
-                options.UseNpgsql(connectionString));
-        }
-
-
     }
 }
