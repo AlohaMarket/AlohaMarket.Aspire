@@ -96,8 +96,12 @@ namespace Aloha.MicroService.Post.Bootstrapping
                     options.KafkaGroupId = "aloha-post-service";
                     options.Topics.AddRange(eventConsumingTopics.Split(','));
                     options.IntegrationEventFactory = IntegrationEventFactory<TestSendEventModel>.Instance;
-                    options.AcceptEvent = e => e.IsEvent<
-                        TestReceiveEventModel>();
+                    options.AcceptEvent = e =>
+                        e is TestReceiveEventModel
+                        || e is LocationValidEventModel
+                        || e is LocationInvalidEventModel
+                        || e is CategoryPathValidModel
+                        || e is CategoryPathInvalidModel;
                 });
             }
 

@@ -38,5 +38,29 @@ namespace Aloha.LocationService.Services
 
             return true;
         }
+
+        public async Task<LocationValidationResult> ValidateLocationPathWithText(int provinceCode, int districtCode, int wardCode)
+        {
+            var result = new LocationValidationResult { IsValid = false };
+
+            var province = await repo.GetByCodeAsync(provinceCode);
+            if (province == null)
+                return result;
+
+            var district = province.Districts.FirstOrDefault(d => d.Code == districtCode);
+            if (district == null)
+                return result;
+
+            var ward = district.Wards.FirstOrDefault(w => w.Code == wardCode);
+            if (ward == null)
+                return result;
+
+            result.IsValid = true;
+            result.ProvinceText = province.Name;
+            result.DistrictText = district.Name;
+            result.WardText = ward.Name;
+
+            return result;
+        }
     }
 }

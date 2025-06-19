@@ -8,7 +8,8 @@ namespace Aloha.CategoryService.EventHandlers
     public class CategoryIntegrationEventHandler(
         ILogger<CategoryIntegrationEventHandler> logger,
         IEventPublisher eventPublisher, ICategoryService categoryService) :
-        IRequestHandler<TestSendEventModel>
+        IRequestHandler<TestSendEventModel>,
+        IRequestHandler<PostCreatedIntegrationEvent>
     {
         public Task Handle(TestSendEventModel request, CancellationToken cancellationToken)
         {
@@ -23,5 +24,29 @@ namespace Aloha.CategoryService.EventHandlers
             });
             return Task.CompletedTask;
         }
+
+        public async Task Handle(PostCreatedIntegrationEvent request, CancellationToken cancellationToken)
+        {
+            logger.LogInformation("Validating category path for PostId={PostId}", request.PostId);
+
+            bool isValid = await categoryService.IsValidCategoryPath(request.CategoryPath);
+
+            if (isValid)
+            {
+                await eventPublisher.PublishAsync(new CategoryPathValidModel
+                {
+                    PostId = request.PostId
+                });
+            }
+            else
+            {
+                await eventPublisher.PublishAsync(new CategoryPathInvalidModel
+                {
+                    PostId = request.PostId,
+                    ErrorMessage = "Invalid category path"
+                });
+            }
+        }
+
     }
 }
