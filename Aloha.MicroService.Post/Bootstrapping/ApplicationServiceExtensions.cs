@@ -144,7 +144,7 @@ namespace Aloha.MicroService.Post.Bootstrapping
             // 3. Neu van khong tim thay, su dung gia tri mac dinh va log loi
             if (string.IsNullOrEmpty(connectionString))
             {
-                // Sử dụng giá trị mặc định cho Postgres
+                // Su dung gia tri mac dinh cho Postgres
                 connectionString = "User Id=postgres;Password=postgres;Server=localhost;Port=5432;Database=postgres";
 
                 dbLogger?.LogError(
@@ -159,7 +159,7 @@ namespace Aloha.MicroService.Post.Bootstrapping
             }
 
             #region logging trang thai connection
-            // Ghi log thông tin kết nối (đã được ẩn thông tin nhạy cảm)
+            // ghi log thong tin ket noi (da duoc an password, userId)
             dbLogger?.LogInformation("Configuring database for {ContextType} using section '{ConfigSection}'", 
                 typeof(TContext).Name, configSection);
             dbLogger?.LogDebug("ConnectionString: {ConnectionString}", 
@@ -191,5 +191,6 @@ namespace Aloha.MicroService.Post.Bootstrapping
 
             return builder;
         }
+        
     }
 }
