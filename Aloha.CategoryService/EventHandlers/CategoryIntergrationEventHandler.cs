@@ -1,12 +1,13 @@
+using Aloha.CategoryService.Services;
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Models;
 using MediatR;
 
-namespace Aloha.CategoryService.EventHandler
+namespace Aloha.CategoryService.EventHandlers
 {
     public class CategoryIntegrationEventHandler(
         ILogger<CategoryIntegrationEventHandler> logger,
-        IEventPublisher eventPublisher) :
+        IEventPublisher eventPublisher, ICategoryService categoryService) :
         IRequestHandler<TestSendEventModel>
     {
         public Task Handle(TestSendEventModel request, CancellationToken cancellationToken)

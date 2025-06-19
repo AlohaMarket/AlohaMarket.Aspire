@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
 using Aloha.MicroService.Post.Infrastructure.Data;
+using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
@@ -70,7 +71,7 @@ namespace Aloha.MicroService.Post.Bootstrapping
                         new List<string>()
                     }
                 });
-            });            
+            });
 
             builder.Services.AddMediatR(cfg =>
             {
