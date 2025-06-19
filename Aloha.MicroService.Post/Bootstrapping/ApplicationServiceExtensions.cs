@@ -11,6 +11,8 @@ namespace Aloha.MicroService.Post.Bootstrapping
 {
     public static class ApplicationServiceExtensions
     {
+        private static ILoggerFactory? _loggerFactory;
+        
         private static class AppConsts
         {
             public const string DefaultDatabase = "PostDatabase";
@@ -27,6 +29,8 @@ namespace Aloha.MicroService.Post.Bootstrapping
 
         public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
         {
+            _loggerFactory = builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
+            
             builder.AddServiceDefaults()
                    .AddAlohaPostgreSQL<PostDbContext>();
 
@@ -107,10 +111,17 @@ namespace Aloha.MicroService.Post.Bootstrapping
 
             return builder;
         }
+        
         public static IHostApplicationBuilder AddAlohaPostgreSQL<TContext>(
             this IHostApplicationBuilder builder,
             string? configSection = null) where TContext : DbContext
         {
+            // khoi tao lai loggerFactory trong truong hop chua duoc khoi tao
+            _loggerFactory ??= builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
+
+            // CreateLogger tạo một logger mới với tên "DatabaseConfiguration" giúp dễ dàng phân loại và lọc log khi cần thiết.
+            var dbLogger = _loggerFactory?.CreateLogger("DatabaseConfiguration");
+            
             configSection ??= typeof(TContext).Name.Replace("DbContext", "");
             
             string? connectionString = null;
@@ -134,8 +145,7 @@ namespace Aloha.MicroService.Post.Bootstrapping
                 // Sử dụng giá trị mặc định cho Postgres
                 connectionString = "User Id=postgres;Password=postgres;Server=localhost;Port=5432;Database=postgres";
 
-                var logger = builder.Services.BuildServiceProvider().GetService<ILogger<object>>();
-                logger?.LogError(
+                dbLogger?.LogError(
                     "Không tìm thấy ConnectionString cho {ConfigSection}. Sử dụng connection string mặc định.",
                     configSection);
             }
@@ -155,11 +165,9 @@ namespace Aloha.MicroService.Post.Bootstrapping
                 sanitizedConnectionString = connectionString.Replace(passwordMatch.Value, "Password=*****");
             }
 
-            var connectionLogger = builder.Services.BuildServiceProvider().GetService<ILogger<object>>();
-            connectionLogger?.LogInformation(
-                "Cấu hình cơ sở dữ liệu cho {ContextType} sử dụng phần '{ConfigSection}'", 
+            dbLogger?.LogInformation("Configuring database for {ContextType} using section '{ConfigSection}'", 
                 typeof(TContext).Name, configSection);
-            connectionLogger?.LogDebug("ConnectionString: {ConnectionString}", sanitizedConnectionString);
+            dbLogger?.LogDebug("ConnectionString: {ConnectionString}", sanitizedConnectionString);
             #endregion
 
             #region Add DbContext va retry policy
@@ -172,8 +180,6 @@ namespace Aloha.MicroService.Post.Bootstrapping
                         errorCodesToAdd: null);
                 }));
             #endregion
-
-            builder.Services.AddScoped<TContext>();
             
             return builder;
         }
