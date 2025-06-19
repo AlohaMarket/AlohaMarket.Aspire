@@ -9,6 +9,7 @@
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+		<PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
 		<PackageReference Include="AutoMapper" Version="14.0.0" />
 		<PackageReference Include="CloudinaryDotNet" Version="1.27.5" />
 		<PackageReference Include="dotenv.net" Version="3.2.1" />
