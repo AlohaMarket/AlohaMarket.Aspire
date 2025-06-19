@@ -23,8 +23,19 @@ namespace Aloha.LocationService.Services
             return mapper.Map<ProvinceResponse>(province);
         }
 
-        public async Task<bool> IsValidLocationPath(List<int> locationPath)
+        public async Task<bool> IsValidLocationPath(int provinceCode, int districtCode, int wardCode)
         {
+            var province = await repo.GetByCodeAsync(provinceCode);
+            if (province == null)
+                return false;
+
+            var district = province.Districts.FirstOrDefault(d => d.Code == districtCode);
+            if (district == null)
+                return false;
+            var ward = district.Wards.FirstOrDefault(w => w.Code == wardCode);
+            if (ward == null)
+                return false;
+
             return true;
         }
     }
