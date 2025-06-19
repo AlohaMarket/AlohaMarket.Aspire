@@ -6,7 +6,8 @@ using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
-
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using HealthChecks.NpgSql;
 
 namespace Aloha.MicroService.Post.Bootstrapping
 {
@@ -179,7 +180,15 @@ namespace Aloha.MicroService.Post.Bootstrapping
                         errorCodesToAdd: null);
                 }));
             #endregion
-            
+
+            #region DbHealthCheck
+            builder.Services.AddHealthChecks()
+                .AddNpgSql(
+                    connectionString,
+                    name: "database", 
+                    tags: new[] { "ready", "postgres", configSection.ToLowerInvariant() });
+            #endregion
+
             return builder;
         }
     }
