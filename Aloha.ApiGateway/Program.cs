@@ -30,7 +30,6 @@ builder.Services.AddHttpLogging(options =>
 // Core services
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
-builder.Services.AddSwaggerGen();
 
 // Auth (Keycloak) - IMPORTANT: This must be configured before the reverse proxy
 builder.Services.AddKeycloakJwtAuthentication(builder.Configuration);
