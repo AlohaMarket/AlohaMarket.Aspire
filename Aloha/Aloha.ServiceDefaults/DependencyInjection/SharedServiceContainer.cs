@@ -61,8 +61,8 @@ namespace Aloha.ServiceDefaults.DependencyInjection
             // 2. Kiem tra chuoi ket noi tu appsettings.json neu khong tim thay o moi truong
             if (string.IsNullOrEmpty(connectionString))
             {
-                connectionString = builder.Configuration.GetConnectionString("SupabaseConnection") ??
-                                  builder.Configuration.GetConnectionString($"{configSection}Connection") ??
+                connectionString = builder.Configuration.GetConnectionString($"{configSection}Connection") ??
+                                  builder.Configuration.GetConnectionString("SupabaseConnection") ??
                                   builder.Configuration.GetConnectionString("DefaultConnection");
             }
 
