@@ -90,12 +90,14 @@ namespace Aloha.ServiceDefaults.DependencyInjection
             // ghi log thong tin ket noi (da duoc an password, userId)
             dbLogger?.LogInformation("Configuring database for {ContextType} using section '{ConfigSection}'", 
                 typeof(TContext).Name, configSection);
-            dbLogger?.LogDebug("ConnectionString: {ConnectionString}", 
+            dbLogger?.LogInformation("ConnectionString: {ConnectionString}", 
                 Regex.Replace(
                     connectionString,
-                    @"(Password|pwd|User Id|UserId|Uid)=([^;]*)",
-                    "$1=*****")
+                    @"(Password|pwd|User Id|UserId|Uid|Port|Database)=([^;]*)",
+                    "$1=****")
             );
+
+            //ConnectionString: User Id = *****; Password = *****; Server = aws - 0 - ap - southeast - 1.pooler.supabase.com; Port = 6543; Database = postgres
             #endregion
 
             #region Add DbContext va retry policy
