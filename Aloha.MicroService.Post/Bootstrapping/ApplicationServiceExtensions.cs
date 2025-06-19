@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
 using Aloha.MicroService.Post.Infrastructure.Data;
@@ -12,7 +13,6 @@ namespace Aloha.MicroService.Post.Bootstrapping
     {
         private static class AppConsts
         {
-            // Hang so cu duoc giu lai de dam bao tinh tuong thich nguoc
             public const string DefaultDatabase = "PostDatabase";
             public const string Env_DbUsername = "DB_USERNAME";
             public const string Env_DbPassword = "DB_PASSWORD";
@@ -27,7 +27,7 @@ namespace Aloha.MicroService.Post.Bootstrapping
 
         public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
         {            builder.AddServiceDefaults()
-                   .AddAlohaPostgreSQL<PostDbContext>("Post"); // Dat ten ro rang cho phan cau hinh
+                   .AddAlohaPostgreSQL<PostDbContext>();
 
             builder.Services.AddAuthorization();
             builder.Services.AddOpenApi();
@@ -76,10 +76,8 @@ namespace Aloha.MicroService.Post.Bootstrapping
                 cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
             });
 
-            // Cau hinh event bus Kafka
             builder.AddKafkaProducer("kafka");
 
-            // Cau hinh Kafka event publisher
             var kafkaTopic = builder.Configuration.GetValue<string>(Consts.Env_EventPublishingTopics);
             if (!string.IsNullOrEmpty(kafkaTopic))
             {
@@ -112,64 +110,71 @@ namespace Aloha.MicroService.Post.Bootstrapping
             this IHostApplicationBuilder builder,
             string configSection = null) where TContext : DbContext
         {
-            // Xac dinh phan cau hinh tu kieu context neu khong duoc cung cap
-            // Loai bo hau to "DbContext" tu ten kieu de co ten dich vu sach
+            // Xác định phần cấu hình từ kiểu context nếu không được cung cấp
             configSection ??= typeof(TContext).Name.Replace("DbContext", "");
             
-            // Lay cau hinh co so du lieu tu phan trong appsettings.json
-            var dbConfig = builder.Configuration.GetSection($"Database:{configSection}");
+            // Xác định chuỗi kết nối theo thứ tự ưu tiên
+            string connectionString;
             
-            // Lay chuoi ket noi voi thu tu uu tien:
-            // 1. Bien moi truong voi ten cu the cho dich vu
-            // 2. Cau hinh tu phan Database:ServiceName
-            // 3. Phan ConnectionStrings trong appsettings.json
-            // 4. Gia tri mac dinh (co the gay loi neu tat ca cach tren deu that bai)
-            var connectionStringTemplate = 
-                Environment.GetEnvironmentVariable($"Aloha_{configSection}_ConnectionString") ??
-                dbConfig["ConnectionString"] ??
-                builder.Configuration.GetConnectionString($"{configSection}Database") ??
-                "Host=localhost;Database={0};Username={1};Password={2}";
+            // 1. Kiểm tra chuỗi kết nối hoàn chỉnh từ biến môi trường
+            connectionString = Environment.GetEnvironmentVariable($"Aloha_{configSection}_ConnectionString");
             
-            // Lay ten nguoi dung voi thu tu uu tien:
-            // 1. Bien moi truong voi ten cu the cho dich vu
-            // 2. Cau hinh tu phan Database:ServiceName
-            // 3. Gia tri mac dinh
-            var username = 
-                Environment.GetEnvironmentVariable($"{configSection}_DB_USERNAME") ??
-                dbConfig["Username"] ?? 
-                "postgres";
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                // 2. Kiểm tra chuỗi kết nối từ appsettings.json
+                connectionString = builder.Configuration.GetConnectionString($"{configSection}Connection") ??
+                                  builder.Configuration.GetConnectionString("SupabaseConnection");
+                                  
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    // 3. Lấy cấu hình từ phần Database trong appsettings.json
+                    var dbConfig = builder.Configuration.GetSection($"Database:{configSection}");
+                    
+                    // Lấy chuỗi kết nối template với placeholder [YOUR-PASSWORD]
+                    var connectionStringTemplate = dbConfig["ConnectionStringTemplate"] ??
+                        "User Id=postgres.atdfjkewwxqzwoyizhch;Password=[YOUR-PASSWORD];Server=aws-0-ap-southeast-1.pooler.supabase.com;Port=5432;Database=postgres";
+                    
+                    // Lấy mật khẩu theo thứ tự ưu tiên
+                    var password = Environment.GetEnvironmentVariable($"{configSection}_DB_PASSWORD") ??
+                                  dbConfig["Password"] ?? 
+                                  "postgres";
+                    
+                    // Thay thế [YOUR-PASSWORD] bằng mật khẩu thực tế sử dụng Replace
+                    connectionString = connectionStringTemplate.Replace("[YOUR-PASSWORD]", password);
+                }
+            }
             
-            // Lay mat khau voi thu tu uu tien:
-            // 1. Bien moi truong voi ten cu the cho dich vu
-            // 2. Cau hinh tu phan Database:ServiceName
-            // 3. Gia tri mac dinh
-            var password = 
-                Environment.GetEnvironmentVariable($"{configSection}_DB_PASSWORD") ??
-                dbConfig["Password"] ?? 
-                "postgres";
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException(
+                    $"Không tìm thấy ConnectionString cho {configSection}. " +
+                    $"Vui lòng kiểm tra biến môi trường, phần ConnectionStrings hoặc Database trong appseting.json.");
+            }
             
-            // Lay ten co so du lieu voi thu tu uu tien
-            var database =
-                Environment.GetEnvironmentVariable($"{configSection}_DB_NAME") ??
-                dbConfig["DatabaseName"] ??
-                configSection.ToLowerInvariant();
+            // Ghi log thông tin kết nối (đã được ẩn thông tin nhạy cảm)
+            var sanitizedConnectionString = connectionString.Replace(
+                new Regex("Password=([^;]*)").Match(connectionString).Value,
+                "Password=*****");
             
-            // Dinh dang chuoi ket noi voi thong tin xac thuc
-            // Su dung string.Format de chen ten nguoi dung va mat khau
-            var connectionString = string.Format(connectionStringTemplate, database, username, password);
-            
-            // Ghi log cau hinh dang duoc su dung (da duoc lam sach)
             var logger = builder.Services.BuildServiceProvider().GetService<ILogger<object>>();
             logger?.LogInformation(
-                "Configuring database for {ContextType} using section '{ConfigSection}', " +
-                "database '{Database}', user '{Username}'", 
-                typeof(TContext).Name, configSection, database, username);
+                "Cấu hình cơ sở dữ liệu cho {ContextType} sử dụng phần '{ConfigSection}'", 
+                typeof(TContext).Name, configSection);
             
-            // Cau hinh PostgreSQL DbContext voi chuoi ket noi
+            // Không ghi log chuỗi kết nối đầy đủ để tránh lộ thông tin nhạy cảm
+            logger?.LogDebug("ConnectionString: {ConnectionString}", sanitizedConnectionString);
+            
+            // Cấu hình DbContext với chuỗi kết nối và chính sách retry
             builder.Services.AddDbContext<TContext>(options =>
-                options.UseNpgsql(connectionString));
+                options.UseNpgsql(connectionString, npgsqlOptions =>
+                {
+                    npgsqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorCodesToAdd: null);
+                }));
             
-            // Dang ky DbContext cho dependency injection
+            // Đăng ký DbContext cho dependency injection
             builder.Services.AddScoped<TContext>();
             
             return builder;
