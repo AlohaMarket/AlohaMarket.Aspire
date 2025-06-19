@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Aloha\Aloha.ServiceDefaults\Aloha.ServiceDefaults.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

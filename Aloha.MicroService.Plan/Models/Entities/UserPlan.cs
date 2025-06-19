@@ -14,6 +14,8 @@ namespace Aloha.MicroService.Plan.Models.Entities
         [Required]
         [ForeignKey("Plan")]
         public int PlanId { get; set; }
+
+        [Required]
         public Plans Plan { get; set; }
 
         [Required]
@@ -23,13 +25,10 @@ namespace Aloha.MicroService.Plan.Models.Entities
         public DateTime EndDate { get; set; }
 
         [Required]
-        public int UsedPosts { get; set; } = 0;
+        public int RemainPosts { get; set; }
 
         [Required]
-        public int UsedPushes { get; set; } = 0;
-
-        [Required]
-        public int MaxPush { get; set; }
+        public int RemainPushes { get; set; }
 
         [Required]
         public bool IsActive { get; set; }

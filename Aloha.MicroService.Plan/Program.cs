@@ -4,7 +4,6 @@ using Aloha.MicroService.Plan.Repositories;
 using Aloha.MicroService.Plan.Service;
 using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.ServiceDefaults.Hosting;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,12 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 builder.Services.AddControllers();
-builder.Services.AddSharedServices<PlanDbContext>(builder.Configuration);
+builder.AddAlohaPostgreSQL<PlanDbContext>();
+//builder.Services.AddSharedServices<PlanDbContext>(builder.Configuration);
 
 var configuration = builder.Configuration;
 
-builder.Services.AddDbContext<PlanDbContext>(options =>
-    options.UseNpgsql(configuration.GetConnectionString("PlanConnection")));
+//builder.Services.AddDbContext<PlanDbContext>(options =>
+//    options.UseNpgsql(configuration.GetConnectionString("PlanConnection")));
 builder.Services.AddScoped<IPlanRepository, PlanRepository>();
 builder.Services.AddScoped<IPlanService, PlanService>();
 

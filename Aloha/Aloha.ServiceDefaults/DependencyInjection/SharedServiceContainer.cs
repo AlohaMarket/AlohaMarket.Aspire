@@ -3,10 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using HealthChecks.NpgSql;
 
 namespace Aloha.ServiceDefaults.DependencyInjection
 {
@@ -51,9 +48,9 @@ namespace Aloha.ServiceDefaults.DependencyInjection
             _loggerFactory ??= builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
 
             var dbLogger = _loggerFactory?.CreateLogger("DatabaseConfiguration");
-            
+
             configSection ??= typeof(TContext).Name.Replace("DbContext", "");
-            
+
             string? connectionString = null;
             string? password = null;
 
@@ -64,8 +61,8 @@ namespace Aloha.ServiceDefaults.DependencyInjection
             // 2. Kiem tra chuoi ket noi tu appsettings.json neu khong tim thay o moi truong
             if (string.IsNullOrEmpty(connectionString))
             {
-                connectionString = builder.Configuration.GetConnectionString($"{configSection}Connection") ??
-                                  builder.Configuration.GetConnectionString("SupabaseConnection") ??
+                connectionString = builder.Configuration.GetConnectionString("SupabaseConnection") ??
+                                  builder.Configuration.GetConnectionString($"{configSection}Connection") ??
                                   builder.Configuration.GetConnectionString("DefaultConnection");
             }
 
@@ -88,9 +85,9 @@ namespace Aloha.ServiceDefaults.DependencyInjection
 
             #region logging trang thai connection
             // ghi log thong tin ket noi (da duoc an password, userId)
-            dbLogger?.LogInformation("Configuring database for {ContextType} using section '{ConfigSection}'", 
+            dbLogger?.LogInformation("Configuring database for {ContextType} using section '{ConfigSection}'",
                 typeof(TContext).Name, configSection);
-            dbLogger?.LogInformation("ConnectionString: {ConnectionString}", 
+            dbLogger?.LogInformation("ConnectionString: {ConnectionString}",
                 Regex.Replace(
                     connectionString,
                     @"(Password|pwd|User Id|UserId|Uid|Port|Database)=([^;]*)",
@@ -115,7 +112,7 @@ namespace Aloha.ServiceDefaults.DependencyInjection
             builder.Services.AddHealthChecks()
                 .AddNpgSql(
                     connectionString,
-                    name: "database", 
+                    name: "database",
                     tags: new[] { "ready", "postgres", configSection.ToLowerInvariant() });
             #endregion
 
