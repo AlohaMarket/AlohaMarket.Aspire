@@ -1,6 +1,7 @@
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
 using Aloha.MicroService.Post.Infrastructure.Data;
+using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
@@ -62,9 +63,10 @@ namespace Aloha.MicroService.Post.Bootstrapping
                     }
                 });
             });
+            builder.Services.AddSharedServices<PostDbContext>(builder.Configuration);
 
             // Configure database with secure credentials
-            ConfigureDatabaseConnection(builder);
+            //ConfigureDatabaseConnection(builder);
 
             builder.Services.AddMediatR(cfg =>
             {
