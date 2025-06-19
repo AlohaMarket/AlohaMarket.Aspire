@@ -16,15 +16,8 @@ namespace Aloha.MicroService.Post.Bootstrapping
         private static ILoggerFactory? _loggerFactory;
         
         private static class AppConsts
-        {
-            public const string DefaultDatabase = "PostDatabase";
-            public const string Env_DbUsername = "DB_USERNAME";
-            public const string Env_DbPassword = "DB_PASSWORD";
-            public const string Env_DatabaseConnection = "Aloha_PostDB_ConnectionString";
-            
-            // Cac phuong thuc ho tro dinh dang cho cau hinh dong
+        {   
             public static string GetConnectionStringEnvName(string service) => $"Aloha_{service}_ConnectionString";
-            public static string GetUsernameEnvName(string service) => $"Aloha_{service}_Username";
             public static string GetPasswordEnvName(string service) => $"Aloha_{service}_Password";
             public static string GetDatabaseNameEnvName(string service) => $"Aloha_{service}_Name";
         }
@@ -113,84 +106,5 @@ namespace Aloha.MicroService.Post.Bootstrapping
 
             return builder;
         }
-        
-        public static IHostApplicationBuilder AddAlohaPostgreSQL<TContext>(
-            this IHostApplicationBuilder builder,
-            string? configSection = null) where TContext : DbContext
-        {
-            // khoi tao lai loggerFactory trong truong hop chua duoc khoi tao
-            _loggerFactory ??= builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
-
-            // CreateLogger tạo một logger mới với tên "DatabaseConfiguration" giúp dễ dàng phân loại và lọc log khi cần thiết.
-            var dbLogger = _loggerFactory?.CreateLogger("DatabaseConfiguration");
-            
-            configSection ??= typeof(TContext).Name.Replace("DbContext", "");
-            
-            string? connectionString = null;
-            string? password = null;
-
-            // 1. Truy xuat bien moi truong du vao DbContext duoc truyen vao
-            connectionString = Environment.GetEnvironmentVariable($"Aloha_{configSection}_ConnectionString");
-            password = Environment.GetEnvironmentVariable($"Aloha_{configSection}_Password");
-
-            // 2. Kiem tra chuoi ket noi tu appsettings.json neu khong tim thay o moi truong
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                connectionString = builder.Configuration.GetConnectionString($"{configSection}Connection") ??
-                                  builder.Configuration.GetConnectionString("SupabaseConnection") ??
-                                  builder.Configuration.GetConnectionString("DefaultConnection");
-            }
-
-            // 3. Neu van khong tim thay, su dung gia tri mac dinh va log loi
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                // Su dung gia tri mac dinh cho Postgres
-                connectionString = "User Id=postgres;Password=postgres;Server=localhost;Port=5432;Database=postgres";
-
-                dbLogger?.LogError(
-                    "Không tìm thấy ConnectionString cho {ConfigSection}. Sử dụng connection string mặc định.",
-                    configSection);
-            }
-
-            // Thay the [YOUR-PASSWORD] bang mat khau tu bien moi truong
-            if (!string.IsNullOrEmpty(password) && connectionString.Contains("[YOUR-PASSWORD]"))
-            {
-                connectionString = connectionString.Replace("[YOUR-PASSWORD]", password);
-            }
-
-            #region logging trang thai connection
-            // ghi log thong tin ket noi (da duoc an password, userId)
-            dbLogger?.LogInformation("Configuring database for {ContextType} using section '{ConfigSection}'", 
-                typeof(TContext).Name, configSection);
-            dbLogger?.LogDebug("ConnectionString: {ConnectionString}", 
-                Regex.Replace(
-                    connectionString,
-                    @"(Password|pwd|User Id|UserId|Uid)=([^;]*)",
-                    "$1=*****")
-            );
-            #endregion
-
-            #region Add DbContext va retry policy
-            builder.Services.AddDbContext<TContext>(options =>
-                options.UseNpgsql(connectionString, npgsqlOptions =>
-                {
-                    npgsqlOptions.EnableRetryOnFailure(
-                        maxRetryCount: 5,
-                        maxRetryDelay: TimeSpan.FromSeconds(30),
-                        errorCodesToAdd: null);
-                }));
-            #endregion
-
-            #region DbHealthCheck
-            builder.Services.AddHealthChecks()
-                .AddNpgSql(
-                    connectionString,
-                    name: "database", 
-                    tags: new[] { "ready", "postgres", configSection.ToLowerInvariant() });
-            #endregion
-
-            return builder;
-        }
-        
     }
 }
