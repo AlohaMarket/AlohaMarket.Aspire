@@ -13,7 +13,8 @@ namespace Aloha.MicroService.Plan.Data
         public DbSet<UserPlan> UserPlans { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        { 
+        {
+            modelBuilder.HasDefaultSchema("PlanServiceDB");
             modelBuilder.Entity<Plans>(entity =>
             {
                 entity.HasKey(p => p.Id);
@@ -21,6 +22,10 @@ namespace Aloha.MicroService.Plan.Data
                 entity.Property(p => p.Name).IsRequired().HasMaxLength(255);
                 entity.Property(p => p.Price).HasColumnType("numeric");
                 entity.Property(p => p.CreateAt).HasDefaultValueSql("NOW()");
+                entity.HasMany(p => p.UserPlans)
+                      .WithOne(up => up.Plan)
+                      .HasForeignKey(up => up.PlanId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<UserPlan>(entity =>

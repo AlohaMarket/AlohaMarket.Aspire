@@ -17,6 +17,7 @@ namespace Aloha.MicroService.Plan.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("PlanServiceDB")
                 .HasAnnotation("ProductVersion", "9.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -57,7 +58,7 @@ namespace Aloha.MicroService.Plan.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Plans");
+                    b.ToTable("Plans", "PlanServiceDB");
                 });
 
             modelBuilder.Entity("Aloha.MicroService.Plan.Models.Entities.UserPlan", b =>
@@ -78,20 +79,17 @@ namespace Aloha.MicroService.Plan.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("MaxPush")
+                    b.Property<int>("PlanId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("PlanId")
+                    b.Property<int>("RemainPosts")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RemainPushes")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("UsedPosts")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UsedPushes")
-                        .HasColumnType("integer");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -100,7 +98,7 @@ namespace Aloha.MicroService.Plan.Migrations
 
                     b.HasIndex("PlanId");
 
-                    b.ToTable("UserPlans");
+                    b.ToTable("UserPlans", "PlanServiceDB");
                 });
 
             modelBuilder.Entity("Aloha.MicroService.Plan.Models.Entities.UserPlan", b =>

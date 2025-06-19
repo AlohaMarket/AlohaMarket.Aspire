@@ -6,6 +6,7 @@ namespace Aloha.MicroService.Plan.Models.Entities
     public class Plans
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         [Required]
