@@ -159,16 +159,14 @@ namespace Aloha.MicroService.Post.Bootstrapping
 
             #region logging trang thai connection
             // Ghi log thông tin kết nối (đã được ẩn thông tin nhạy cảm)
-            var sanitizedConnectionString = connectionString;
-            var passwordMatch = new Regex("Password=([^;]*)").Match(connectionString);
-            if (passwordMatch.Success)
-            {
-                sanitizedConnectionString = connectionString.Replace(passwordMatch.Value, "Password=*****");
-            }
-
             dbLogger?.LogInformation("Configuring database for {ContextType} using section '{ConfigSection}'", 
                 typeof(TContext).Name, configSection);
-            dbLogger?.LogDebug("ConnectionString: {ConnectionString}", sanitizedConnectionString);
+            dbLogger?.LogDebug("ConnectionString: {ConnectionString}", 
+                Regex.Replace(
+                    connectionString,
+                    @"(Password|pwd|User Id|UserId|Uid)=([^;]*)",
+                    "$1=*****")
+            );
             #endregion
 
             #region Add DbContext va retry policy
