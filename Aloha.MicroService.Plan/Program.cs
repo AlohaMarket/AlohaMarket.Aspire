@@ -12,7 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 builder.Services.AddControllers();
-builder.Services.AddSharedServices<PlanDbContext>(builder.Configuration);
+builder.AddAlohaPostgreSQL<PlanDbContext>();
+//builder.Services.AddSharedServices<PlanDbContext>(builder.Configuration);
 
 var configuration = builder.Configuration;
 
