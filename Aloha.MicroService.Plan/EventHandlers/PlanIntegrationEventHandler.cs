@@ -1,8 +1,10 @@
 ﻿using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Models;
 using Aloha.MicroService.Plan.Data;
+using Aloha.MicroService.Plan.Models.Entities;
 using Aloha.MicroService.Plan.Repositories;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Aloha.MicroService.Plan.EventHandlers
 {
@@ -25,16 +27,55 @@ namespace Aloha.MicroService.Plan.EventHandlers
 
             try
             {
-                // Insert user_plan (giả lập, thay bằng logic thực tế)
-                var userPlan = await planRepository.(request.UserId, request.PlanId, request.Amount, request.PaymentDate, request.PaymentId);
-                userPlanId = userPlan?.Id;
-                isSuccess = userPlan != null;
-                message = isSuccess ? "User plan provisioned successfully." : "Failed to provision user plan.";
+
+                var plan = await planRepository.GetByIdAsync(request.PlanId);
+                if (plan == null)
+                {
+                    message = "Plan not found.";
+                }
+                else
+                {
+                    // Tạo user plan mới
+                    var now = DateTime.UtcNow;
+                    var userPlan = new UserPlan
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = request.UserId,
+                        PlanId = plan.Id,
+                        StartDate = now,
+                        EndDate = now.AddDays(plan.DurationDays),
+                        RemainPosts = plan.MaxPosts,
+                        RemainPushes = plan.MaxPushes,
+                        IsActive = true,
+                        CreateAt = now,
+                        PaymentId = request.PaymentId
+                    };
+                    logger.LogInformation("Before AddUserPlanAsync");
+                    logger.LogInformation("Insert UserPlan with Id: {Id}", userPlan.Id);
+                    await planRepository.AddUserPlanAsync(userPlan);
+                    logger.LogInformation("After AddUserPlanAsync");
+                    userPlanId = userPlan.Id;
+                    isSuccess = true;
+                    message = "User plan provisioned successfully.";
+                }
+            }
+            catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("duplicate key value violates unique constraint") == true)
+            {
+                // Trùng PK, truy vấn lại UserPlan đã tồn tại
+                var existingUserPlan = await dbContext.UserPlans
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(up =>
+                        up.UserId == request.UserId &&
+                        up.PlanId == request.PlanId);
+
+                userPlanId = existingUserPlan?.Id;
+                isSuccess = true;
+                message = "User plan already exists.";
             }
             catch (Exception ex)
             {
                 message = $"Exception: {ex.Message}";
-                logger.LogError(ex, "Error provisioning user plan for PaymentId={PaymentId}", request.PaymentId);
+                logger.LogError(ex, "Error provisioning user plan for PaymentId={PaymentId}. Inner: {Inner}", request.PaymentId, ex.InnerException?.Message);
             }
 
             // Gửi kết quả về Payment

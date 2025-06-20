@@ -58,8 +58,8 @@ public class Program
                 options.ServiceName = "PaymentService";
                 options.KafkaGroupId = "aloha-payment-service";
                 options.Topics.AddRange(kafkaConsumeTopic.Split(','));
-                options.IntegrationEventFactory = IntegrationEventFactory<TestSendEventModel>.Instance;
-                options.AcceptEvent = e => e.IsEvent<TestSendEventModel>();
+                options.IntegrationEventFactory = IntegrationEventFactory<UserPlanProvisioningResultEvent>.Instance;
+                options.AcceptEvent = e => e.IsEvent<UserPlanProvisioningResultEvent>();
             });
         }
 

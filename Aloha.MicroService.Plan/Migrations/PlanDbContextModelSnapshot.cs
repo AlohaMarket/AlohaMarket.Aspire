@@ -79,6 +79,10 @@ namespace Aloha.MicroService.Plan.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("PaymentId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int>("PlanId")
                         .HasColumnType("integer");
 

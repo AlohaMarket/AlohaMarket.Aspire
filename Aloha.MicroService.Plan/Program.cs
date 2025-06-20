@@ -17,8 +17,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 builder.Services.AddControllers();
-builder.AddAlohaPostgreSQL<PlanDbContext>();
-//builder.Services.AddSharedServices<PlanDbContext>(builder.Configuration);
+//builder.AddAlohaPostgreSQL<PlanDbContext>();
+builder.Services.AddSharedServices<PlanDbContext>(builder.Configuration);
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
@@ -30,7 +30,7 @@ builder.AddKafkaProducer("kafka");
 var kafkaPublishTopic = builder.Configuration.GetValue<string>(Consts.Env_EventPublishingTopics);
 if (!string.IsNullOrWhiteSpace(kafkaPublishTopic))
 {
-    builder.AddKafkaEventPublisher(kafkaPublishTopic);
+    builder.AddKafkaEventPublisher(kafkaPublishTopic);  
 }
 else
 {
@@ -45,12 +45,21 @@ if (!string.IsNullOrWhiteSpace(kafkaConsumeTopic))
         options.ServiceName = "PlanService";
         options.KafkaGroupId = "aloha-plan-service";
         options.Topics.AddRange(kafkaConsumeTopic.Split(','));
-        options.IntegrationEventFactory = IntegrationEventFactory<TestSendEventModel>.Instance;
-        options.AcceptEvent = e => e.IsEvent<TestSendEventModel>();
+        options.IntegrationEventFactory = IntegrationEventFactory<CreateUserPlanCommand>.Instance;
+        options.AcceptEvent = e => e.IsEvent<CreateUserPlanCommand>();
     });
 }
 
 builder.Logging.AddFilter("Confluent.Kafka", LogLevel.Debug);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 var configuration = builder.Configuration;
 
 //builder.Services.AddDbContext<PlanDbContext>(options =>
@@ -65,6 +74,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 app.UseRouting();
+app.UseCors("AllowAll");
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>

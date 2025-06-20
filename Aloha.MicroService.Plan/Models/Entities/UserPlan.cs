@@ -14,9 +14,10 @@ namespace Aloha.MicroService.Plan.Models.Entities
         [Required]
         [ForeignKey("Plan")]
         public int PlanId { get; set; }
+        public Plans Plan { get; set; }
 
         [Required]
-        public Plans Plan { get; set; }
+        public string PaymentId { get; set; }
 
         [Required]
         public DateTime StartDate { get; set; }
