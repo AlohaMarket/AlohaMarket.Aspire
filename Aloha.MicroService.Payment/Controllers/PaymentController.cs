@@ -1,27 +1,55 @@
+using Aloha.EventBus.Abstractions;
+using Aloha.EventBus.Models;
+
 namespace Aloha.MicroService.Payment.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PaymentController(PaymentService paymentService, IVNPayService vnPayService, IMomoService momoService, IConfiguration configuration, IMapper mapper) : ControllerBase
+    public class PaymentController(PaymentService paymentService, IVNPayService vnPayService, IMomoService momoService, IConfiguration configuration, IMapper mapper, IEventPublisher eventPublisher) : ControllerBase
     {
         private readonly PaymentService _paymentService = paymentService;
         private readonly IVNPayService _vnPayService = vnPayService;
         private readonly IMomoService _momoService = momoService;
         private readonly IConfiguration _configuration = configuration;
         private readonly IMapper _mapper = mapper;
+        private readonly IEventPublisher _eventPublisher = eventPublisher;
 
         /// <summary>
         /// Creates a new payment record from the provided payment data.
         /// </summary>
         /// <param name="paymentDto">The payment details to create a new payment.</param>
         /// <returns>A 201 Created response with the created payment data and a route to retrieve it by ID.</returns>
+        //[HttpPost]
+        //public async Task<IActionResult> CreatePayment([FromBody] PaymentCreateDto paymentDto)
+        //{
+        //    var payment = _mapper.Map<Payments>(paymentDto);
+        //    payment.CreatedAt = DateTime.UtcNow;
+
+        //    await _paymentService.CreateAsync(payment);
+
+        //    var response = ApiResponseBuilder.BuildResponse("Payment created successfully!", payment);
+        //    return CreatedAtAction(nameof(GetPaymentById), new { id = payment.Id }, response);
+        //}
         [HttpPost]
         public async Task<IActionResult> CreatePayment([FromBody] PaymentCreateDto paymentDto)
         {
             var payment = _mapper.Map<Payments>(paymentDto);
             payment.CreatedAt = DateTime.UtcNow;
-
+            payment.PlanId = paymentDto.PlanId;
             await _paymentService.CreateAsync(payment);
+
+            var hardcodedUserId = Guid.Parse("5000a152-a3c9-4f47-9127-58ed71c7fc06");
+
+            // Use a new GUID for PaymentId
+            var createUserPlanCommand = new CreateUserPlanCommand
+            {
+                PaymentId = payment.Id, 
+                UserId = hardcodedUserId,
+                PlanId = int.Parse(payment.PlanId),
+                Amount = payment.Price,
+                PaymentDate = payment.CreatedAt
+            };
+            await _eventPublisher.PublishAsync(createUserPlanCommand);
 
             var response = ApiResponseBuilder.BuildResponse("Payment created successfully!", payment);
             return CreatedAtAction(nameof(GetPaymentById), new { id = payment.Id }, response);

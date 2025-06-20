@@ -51,14 +51,16 @@ public static class ApplicationServiceExtensions
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_Post>());
 
-        //var planService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Plan>()
-        //    .WithReference(userService);
+        var planService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Plan>()
+            .WithReference(userService)
+            .SetupKafka<Projects.Aloha_MicroService_Plan>(
+                kafka, GetTopicName<Projects.Aloha_MicroService_Payment>());
 
-        //var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
-        //    .WithReference(userService)
-        //    //.WithReference(planService);
-        //    .SetupKafka<Projects.Aloha_MicroService_Payment>(
-        //        kafka);
+        var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
+            .WithReference(userService)
+            //.WithReference(planService);
+            .SetupKafka<Projects.Aloha_MicroService_Payment>(
+                kafka, GetTopicName<Projects.Aloha_MicroService_Plan>());
 
 
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
@@ -83,6 +85,9 @@ public static class ApplicationServiceExtensions
             new() { Name = GetTopicName<Projects.Aloha_MicroService_User>(), NumPartitions = 1, ReplicationFactor = 1 },
             new() { Name = GetTopicName<Projects.Aloha_MicroService_Location>(), NumPartitions = 1, ReplicationFactor = 1 },
             new() { Name = GetTopicName<Projects.Aloha_MicroService_Category>(), NumPartitions = 1, ReplicationFactor = 1 },
+            new() { Name = GetTopicName<Projects.Aloha_MicroService_Payment>(), NumPartitions = 1, ReplicationFactor = 1 },
+             new() { Name = GetTopicName<Projects.Aloha_MicroService_Plan>(), NumPartitions = 1, ReplicationFactor = 1 },
+
         ];
 
         logger.LogInformation("Creating topics: {topics} ...", string.Join(", ", topics.Select(t => t.Name).ToArray()));

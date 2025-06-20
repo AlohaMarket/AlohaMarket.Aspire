@@ -1,9 +1,14 @@
+using Aloha.EventBus;
+using Aloha.EventBus.Abstractions;
+using Aloha.EventBus.Kafka;
+using Aloha.EventBus.Models;
 using Aloha.MicroService.Plan.Data;
 using Aloha.MicroService.Plan.Mapper;
 using Aloha.MicroService.Plan.Repositories;
 using Aloha.MicroService.Plan.Service;
 using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.ServiceDefaults.Hosting;
+using Aloha.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,9 +17,49 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 builder.Services.AddControllers();
-builder.AddAlohaPostgreSQL<PlanDbContext>();
-//builder.Services.AddSharedServices<PlanDbContext>(builder.Configuration);
+//builder.AddAlohaPostgreSQL<PlanDbContext>();
+builder.Services.AddSharedServices<PlanDbContext>(builder.Configuration);
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+});
 
+builder.AddKafkaProducer("kafka");
+
+// Register Kafka event publisher
+var kafkaPublishTopic = builder.Configuration.GetValue<string>(Consts.Env_EventPublishingTopics);
+if (!string.IsNullOrWhiteSpace(kafkaPublishTopic))
+{
+    builder.AddKafkaEventPublisher(kafkaPublishTopic);  
+}
+else
+{
+    builder.Services.AddTransient<IEventPublisher, NullEventPublisher>();
+}
+
+var kafkaConsumeTopic = builder.Configuration.GetValue<string>(Consts.Env_EventConsumingTopics);
+if (!string.IsNullOrWhiteSpace(kafkaConsumeTopic))
+{
+    builder.AddKafkaEventConsumer(options =>
+    {
+        options.ServiceName = "PlanService";
+        options.KafkaGroupId = "aloha-plan-service";
+        options.Topics.AddRange(kafkaConsumeTopic.Split(','));
+        options.IntegrationEventFactory = IntegrationEventFactory<CreateUserPlanCommand>.Instance;
+        options.AcceptEvent = e => e.IsEvent<CreateUserPlanCommand>();
+    });
+}
+
+builder.Logging.AddFilter("Confluent.Kafka", LogLevel.Debug);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 var configuration = builder.Configuration;
 
 //builder.Services.AddDbContext<PlanDbContext>(options =>
@@ -28,26 +73,8 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-});
 app.UseRouting();
+app.UseCors("AllowAll");
 app.UseAuthorization();
 
 app.UseEndpoints(endpoints =>
@@ -59,8 +86,4 @@ app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
 
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
 
