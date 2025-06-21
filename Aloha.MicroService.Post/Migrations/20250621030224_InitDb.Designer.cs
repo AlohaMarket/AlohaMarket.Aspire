@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Aloha.MicroService.Post.Migrations
 {
     [DbContext(typeof(PostDbContext))]
-    [Migration("20250619033120_InitDb")]
+    [Migration("20250621030224_InitDb")]
     partial class InitDb
     {
         /// <inheritdoc />
@@ -22,7 +22,7 @@ namespace Aloha.MicroService.Post.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("PostServiceDB")
-                .HasAnnotation("ProductVersion", "9.0.1")
+                .HasAnnotation("ProductVersion", "9.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -62,7 +62,6 @@ namespace Aloha.MicroService.Post.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("DistrictText")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
@@ -95,7 +94,6 @@ namespace Aloha.MicroService.Post.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("ProvinceText")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("PushedAt")
@@ -126,7 +124,6 @@ namespace Aloha.MicroService.Post.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("WardText")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
