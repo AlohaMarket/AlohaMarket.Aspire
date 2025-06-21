@@ -2,6 +2,11 @@ using Aloha.MicroService.Payment.Endpoints;
 using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Aloha.Shared.Middlewares;
+using Aloha.EventBus.Kafka;
+using Aloha.EventBus.Abstractions;
+using Aloha.EventBus;
+using Aloha.EventBus.Models;
+using Aloha.Shared;
 
 namespace Aloha.MicroService.Payment;
 
@@ -25,6 +30,40 @@ public class Program
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
         builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddAuthorization();
+
+        builder.Services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+        });
+
+        builder.AddKafkaProducer("kafka");
+
+        // Register Kafka event publisher
+        var kafkaPublishTopic = builder.Configuration.GetValue<string>(Consts.Env_EventPublishingTopics);
+        if (!string.IsNullOrWhiteSpace(kafkaPublishTopic))
+        {
+            builder.AddKafkaEventPublisher(kafkaPublishTopic);
+        }
+        else
+        {
+            builder.Services.AddTransient<IEventPublisher, NullEventPublisher>();
+        }
+
+        var kafkaConsumeTopic = builder.Configuration.GetValue<string>(Consts.Env_EventConsumingTopics);
+        if (!string.IsNullOrWhiteSpace(kafkaConsumeTopic))
+        {
+            builder.AddKafkaEventConsumer(options =>
+            {
+                options.ServiceName = "PaymentService";
+                options.KafkaGroupId = "aloha-payment-service";
+                options.Topics.AddRange(kafkaConsumeTopic.Split(','));
+                options.IntegrationEventFactory = IntegrationEventFactory<UserPlanProvisioningResultEvent>.Instance;
+                options.AcceptEvent = e => e.IsEvent<UserPlanProvisioningResultEvent>();
+            });
+        }
+
+        builder.Logging.AddFilter("Confluent.Kafka", LogLevel.Debug);
         builder.Services.Configure<MongoSettings>(
         builder.Configuration.GetSection("MongoSettings"));
         builder.Services.AddCors(options =>

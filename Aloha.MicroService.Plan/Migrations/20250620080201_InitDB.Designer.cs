@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Aloha.MicroService.Plan.Migrations
 {
     [DbContext(typeof(PlanDbContext))]
-    [Migration("20250619122550_InitDb")]
-    partial class InitDb
+    [Migration("20250620080201_InitDB")]
+    partial class InitDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,6 +81,10 @@ namespace Aloha.MicroService.Plan.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("PaymentId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<int>("PlanId")
                         .HasColumnType("integer");
