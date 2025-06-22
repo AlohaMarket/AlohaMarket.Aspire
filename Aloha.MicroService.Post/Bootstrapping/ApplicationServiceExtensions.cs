@@ -14,9 +14,9 @@ namespace Aloha.MicroService.Post.Bootstrapping
     public static class ApplicationServiceExtensions
     {
         private static ILoggerFactory? _loggerFactory;
-        
+
         private static class AppConsts
-        {   
+        {
             public static string GetConnectionStringEnvName(string service) => $"Aloha_{service}_ConnectionString";
             public static string GetPasswordEnvName(string service) => $"Aloha_{service}_Password";
             public static string GetDatabaseNameEnvName(string service) => $"Aloha_{service}_Name";
@@ -25,7 +25,7 @@ namespace Aloha.MicroService.Post.Bootstrapping
         public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
         {
             _loggerFactory = builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
-            
+
             builder.AddServiceDefaults()
                    .AddAlohaPostgreSQL<PostDbContext>();
 
@@ -96,13 +96,14 @@ namespace Aloha.MicroService.Post.Bootstrapping
                     options.ServiceName = "PostService";
                     options.KafkaGroupId = "aloha-post-service";
                     options.Topics.AddRange(eventConsumingTopics.Split(','));
-                    options.IntegrationEventFactory = IntegrationEventFactory<TestSendEventModel>.Instance;
+                    options.IntegrationEventFactory = IntegrationEventFactory<LocationValidEventModel>.Instance;
                     options.AcceptEvent = e =>
-                        e is TestReceiveEventModel
-                        || e is LocationValidEventModel
+                        e is LocationValidEventModel
                         || e is LocationInvalidEventModel
                         || e is CategoryPathValidModel
-                        || e is CategoryPathInvalidModel;
+                        || e is CategoryPathInvalidModel
+                        || e is UserPlanValidEventModel
+                        || e is UserPlanInvalidEventModel;
                 });
             }
 

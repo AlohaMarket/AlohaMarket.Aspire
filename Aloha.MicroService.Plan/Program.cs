@@ -6,19 +6,73 @@ using Aloha.MicroService.Plan.Data;
 using Aloha.MicroService.Plan.Mapper;
 using Aloha.MicroService.Plan.Repositories;
 using Aloha.MicroService.Plan.Service;
+using Aloha.Security.Authentications;
 using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.ServiceDefaults.Hosting;
 using Aloha.Shared;
+using Aloha.Shared.Middlewares;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.AddServiceDefaults();
+AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+// Add CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
 
 builder.Services.AddControllers();
-//builder.AddAlohaPostgreSQL<PlanDbContext>();
-builder.Services.AddSharedServices<PlanDbContext>(builder.Configuration);
+builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.MapType<IFormFile>(() => new OpenApiSchema
+    {
+        Type = "string",
+        Format = "binary"
+    });
+
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Aloha Plan Service API",
+        Version = "v1"
+    });
+
+    c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token:"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = JwtBearerDefaults.AuthenticationScheme
+                }
+            },
+            new List<string>()
+        }
+    });
+});
+
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
@@ -30,7 +84,7 @@ builder.AddKafkaProducer("kafka");
 var kafkaPublishTopic = builder.Configuration.GetValue<string>(Consts.Env_EventPublishingTopics);
 if (!string.IsNullOrWhiteSpace(kafkaPublishTopic))
 {
-    builder.AddKafkaEventPublisher(kafkaPublishTopic);  
+    builder.AddKafkaEventPublisher(kafkaPublishTopic);
 }
 else
 {
@@ -46,43 +100,44 @@ if (!string.IsNullOrWhiteSpace(kafkaConsumeTopic))
         options.KafkaGroupId = "aloha-plan-service";
         options.Topics.AddRange(kafkaConsumeTopic.Split(','));
         options.IntegrationEventFactory = IntegrationEventFactory<CreateUserPlanCommand>.Instance;
-        options.AcceptEvent = e => e.IsEvent<CreateUserPlanCommand>();
+        options.AcceptEvent = e => e is PostCreatedIntegrationEvent
+                        || e is RollbackPostUsageEventModel || e is CreateUserPlanCommand || e is TestSendEventModel;
     });
 }
 
-builder.Logging.AddFilter("Confluent.Kafka", LogLevel.Debug);
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
-var configuration = builder.Configuration;
-
-//builder.Services.AddDbContext<PlanDbContext>(options =>
-//    options.UseNpgsql(configuration.GetConnectionString("PlanConnection")));
+builder.Services.AddSharedServices<PlanDbContext>(builder.Configuration);
 builder.Services.AddScoped<IPlanRepository, PlanRepository>();
 builder.Services.AddScoped<IPlanService, PlanService>();
-
 builder.Services.AddAutoMapper(typeof(PlanProfile));
 
-var app = builder.Build();
+builder.Services.AddKeycloakJwtAuthentication(builder.Configuration);
 
 // Configure the HTTP request pipeline.
 
-app.UseRouting();
-app.UseCors("AllowAll");
-app.UseAuthorization();
+var app = builder.Build();
 
-app.UseEndpoints(endpoints =>
+app.MapDefaultEndpoints();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
 {
-    endpoints.MapControllers();
-});
-app.UseHttpsRedirection();
+    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Aloha Plan Service API V1");
+        c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+    });
+}
 
+// Add CORS middleware - place it before other middleware
+app.UseCors("AllowAll");
+
+app.UseMiddleware<ApiExceptionHandlerMiddleware>();
+
+// Make sure Authentication is before Authorization
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
 

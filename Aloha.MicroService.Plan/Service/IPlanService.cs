@@ -1,4 +1,5 @@
 ﻿
+using Aloha.MicroService.Plan.Models.Entities;
 using Aloha.MicroService.Plan.Models.Request;
 using Aloha.MicroService.Plan.Models.Response;
 

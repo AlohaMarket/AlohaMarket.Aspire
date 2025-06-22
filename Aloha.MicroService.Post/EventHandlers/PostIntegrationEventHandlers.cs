@@ -7,19 +7,11 @@ namespace Aloha.MicroService.Post.EventHandlers
         PostDbContext dbContext,
         IEventPublisher eventPublisher,
         ILogger<PostIntegrationEventHandlers> logger) :
-        IRequestHandler<TestReceiveEventModel>,
         IRequestHandler<LocationValidEventModel>,
         IRequestHandler<LocationInvalidEventModel>,
         IRequestHandler<CategoryPathValidModel>,
         IRequestHandler<CategoryPathInvalidModel>
     {
-        public Task Handle(TestReceiveEventModel request, CancellationToken cancellationToken)
-        {
-            logger.LogInformation("Received TestReceiveEventModel: Message={Message}, From={From}, To={To}",
-                request.Message, request.FromService, request.ToService);
-            return Task.CompletedTask;
-        }
-
         public async Task Handle(LocationValidEventModel request, CancellationToken cancellationToken)
         {
             logger.LogInformation("Received location validation success for PostId={PostId}", request.PostId);

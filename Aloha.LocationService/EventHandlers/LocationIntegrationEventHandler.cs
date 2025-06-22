@@ -8,23 +8,8 @@ namespace Aloha.LocationService.EventHandlers
     public class LocationIntegrationEventHandler(
         ILogger<LocationIntegrationEventHandler> logger,
         IEventPublisher eventPublisher, ILocationService service) :
-        IRequestHandler<TestSendEventModel>,
         IRequestHandler<PostCreatedIntegrationEvent>
     {
-        public Task Handle(TestSendEventModel request, CancellationToken cancellationToken)
-        {
-            logger.LogInformation("Received TestSendEventModel: Message={Message}, From={From}, To=LocationService",
-                request.Message, request.FromService);
-
-            eventPublisher.PublishAsync(new TestReceiveEventModel
-            {
-                Message = "string 4",
-                FromService = "LocationService",
-                ToService = "PostService"
-            });
-            return Task.CompletedTask;
-        }
-
         public async Task Handle(PostCreatedIntegrationEvent request, CancellationToken cancellationToken)
         {
             logger.LogInformation("Validating location for PostId={PostId}", request.PostId);

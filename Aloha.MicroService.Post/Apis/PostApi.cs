@@ -111,22 +111,22 @@ namespace Aloha.MicroService.Post.Apis
 
                 services.Logger.LogInformation("Created post with ID {PostId}", post.Id);
 
-                // Publish event for validation
-                await services.EventPublisher.PublishAsync(new PostCreatedIntegrationEvent
-                {
-                    PostId = post.Id,
-                    UserId = post.UserId,
-                    UserPlanId = post.UserPlanId,
-                    CategoryId = post.CategoryId,
-                    CategoryPath = post.CategoryPath,
-                    ProvinceCode = post.ProvinceCode,
-                    DistrictCode = post.DistrictCode,
-                    WardCode = post.WardCode
-                });
+                // // Publish event for validation
+                // await services.EventPublisher.PublishAsync(new PostCreatedIntegrationEvent
+                // {
+                //     PostId = post.Id,
+                //     UserId = post.UserId,
+                //     UserPlanId = post.UserPlanId,
+                //     CategoryId = post.CategoryId,
+                //     CategoryPath = post.CategoryPath,
+                //     ProvinceCode = post.ProvinceCode,
+                //     DistrictCode = post.DistrictCode,
+                //     WardCode = post.WardCode
+                // });
 
-                services.Logger.LogInformation(
-                    "Published validation events for post ID {PostId}, location: {Province}/{District}/{Ward}, category path: {CategoryPath}",
-                    post.Id, post.ProvinceCode, post.DistrictCode, post.WardCode, string.Join("/", post.CategoryPath));
+                // services.Logger.LogInformation(
+                //     "Published validation events for post ID {PostId}, location: {Province}/{District}/{Ward}, category path: {CategoryPath}",
+                //     post.Id, post.ProvinceCode, post.DistrictCode, post.WardCode, string.Join("/", post.CategoryPath));
 
                 return TypedResults.Ok(post);
             }

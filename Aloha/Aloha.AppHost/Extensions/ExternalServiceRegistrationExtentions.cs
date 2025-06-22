@@ -38,7 +38,8 @@ public static class ApplicationServiceExtensions
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_User>(),
                 GetTopicName<Projects.Aloha_MicroService_Location>(),
-                GetTopicName<Projects.Aloha_MicroService_Category>()
+                GetTopicName<Projects.Aloha_MicroService_Category>(),
+                GetTopicName<Projects.Aloha_MicroService_Plan>()
             );
 
         var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>()
@@ -54,7 +55,9 @@ public static class ApplicationServiceExtensions
         var planService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Plan>()
             .WithReference(userService)
             .SetupKafka<Projects.Aloha_MicroService_Plan>(
-                kafka, GetTopicName<Projects.Aloha_MicroService_Payment>());
+                kafka,
+                GetTopicName<Projects.Aloha_MicroService_Payment>(),
+                GetTopicName<Projects.Aloha_MicroService_Post>());
 
         var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
             .WithReference(userService)
@@ -69,7 +72,7 @@ public static class ApplicationServiceExtensions
             .WithReference(locationService)
             .WithReference(categoryService)
             //.WithReference(paymentService)
-            //.WithReference(planService)
+            .WithReference(planService)
             ;
         #endregion
         return builder;

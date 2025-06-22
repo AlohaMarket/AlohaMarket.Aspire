@@ -96,8 +96,8 @@ namespace Aloha.CategoryService
                     options.ServiceName = "CategoryService";
                     options.KafkaGroupId = "aloha-category-service";
                     options.Topics.AddRange(kafkaConsumeTopic.Split(','));
-                    options.IntegrationEventFactory = IntegrationEventFactory<TestSendEventModel>.Instance;
-                    options.AcceptEvent = e => e.IsEvent<TestSendEventModel, PostCreatedIntegrationEvent>();
+                    options.IntegrationEventFactory = IntegrationEventFactory<PostCreatedIntegrationEvent>.Instance;
+                    options.AcceptEvent = e => e.IsEvent<PostCreatedIntegrationEvent>();
                 });
             }
 

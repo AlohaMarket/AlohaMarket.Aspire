@@ -107,8 +107,8 @@ public class Program
                 options.ServiceName = "UserService";
                 options.KafkaGroupId = "aloha-user-service";
                 options.Topics.AddRange(kafkaConsumeTopic.Split(','));
-                options.IntegrationEventFactory = IntegrationEventFactory<TestSendEventModel>.Instance;
-                options.AcceptEvent = e => e.IsEvent<TestSendEventModel>();  // Change to TestSendEventModel
+                options.IntegrationEventFactory = IntegrationEventFactory<PostUpdatedIntegrationEvent>.Instance;
+                options.AcceptEvent = e => e.IsEvent<TestSendEventModel>();
             });
         }
 

@@ -98,8 +98,8 @@ public class Program
                 options.ServiceName = "LocationService";
                 options.KafkaGroupId = "aloha-location-service";
                 options.Topics.AddRange(kafkaConsumeTopic.Split(','));
-                options.IntegrationEventFactory = IntegrationEventFactory<TestSendEventModel>.Instance;
-                options.AcceptEvent = e => e.IsEvent<TestSendEventModel, PostCreatedIntegrationEvent>();
+                options.IntegrationEventFactory = IntegrationEventFactory<PostCreatedIntegrationEvent>.Instance;
+                options.AcceptEvent = e => e.IsEvent<PostCreatedIntegrationEvent>();
             });
         }
 
@@ -160,14 +160,5 @@ public class Program
         app.MapControllers();
 
         app.Run();
-
-        // After configuring Kafka
-        var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
-        logger.LogInformation("Kafka configured with bootstrap servers: {servers}",
-            builder.Configuration.GetValue<string>("Kafka:BootstrapServers"));
-        logger.LogInformation("Publishing to topic: {topic}",
-            builder.Configuration.GetValue<string>("EventBus:PublishingTopics"));
-        logger.LogInformation("Subscribing to topics: {topics}",
-            builder.Configuration.GetValue<string>("EventBus:ConsumingTopics"));
     }
 }
