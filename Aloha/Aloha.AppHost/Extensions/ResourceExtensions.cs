@@ -6,6 +6,11 @@ public static class ResourceExtensions
         return builder.AddDatabase($"{typeof(TProject).Name.Replace('_', '-')}-db");
     }
 
+    public static IResourceBuilder<MongoDBDatabaseResource> AddDefaultDatabase<TProject>(this IResourceBuilder<MongoDBServerResource> builder)
+    {
+        return builder.AddDatabase($"{typeof(TProject).Name.Replace('_', '-')}-db");
+    }
+
     public static IResourceBuilder<ProjectResource> AddProjectWithPostfix<TProject>(this IDistributedApplicationBuilder builder, string postfix = "")
         where TProject : IProjectMetadata, new()
     {
