@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using static Aloha.AppHost.Extensions.ResourceExtensions;
+using Aloha.Shared;
 
 namespace Aloha.AppHost.Extensions;
 
@@ -36,37 +37,52 @@ public static class ApplicationServiceExtensions
         #endregion
 
         #region Project References
+        // PostgreSQL services
+        var userDb = postgres.AddDatabase("userdb");
         var userService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_User>()
+            .WithReference(postgres)
+            .WithReference(userDb, "DefaultConnection")
             .SetupKafka<Projects.Aloha_MicroService_User>(
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_Post>(),
-                GetTopicName<Projects.Aloha_MicroService_Location>());
+                GetTopicName<Projects.Aloha_MicroService_Location>())
+            .WaitFor(userDb);
 
+        var postDb = postgres.AddDatabase("postdb");
         var postService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Post>()
+            .WithReference(postgres)
+            .WithReference(postDb, "DefaultConnection")
             .SetupKafka<Projects.Aloha_MicroService_Post>(
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_User>(),
                 GetTopicName<Projects.Aloha_MicroService_Location>(),
                 GetTopicName<Projects.Aloha_MicroService_Category>()
-            );
+            )
+            .WaitFor(postDb);
 
+        var planDb = postgres.AddDatabase("plandb");
+        var planService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Plan>()
+            .WithReference(postgres)
+            .WithReference(planDb, "DefaultConnection")
+            .WaitFor(planDb);
+
+        // MongoDB services
+        var locationDb = mongoDb.AddDatabase("locationdb");
         var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>()
+            .WithReference(mongoDb)
+            .WithReference(locationDb, "DefaultConnection")
             .SetupKafka<Projects.Aloha_MicroService_Location>(
                 kafka,
-                GetTopicName<Projects.Aloha_MicroService_Post>());
+                GetTopicName<Projects.Aloha_MicroService_Post>())
+            .WaitFor(locationDb);
 
+        var categoryDb = mongoDb.AddDatabase("categorydb");
         var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Category>()
+            .WithReference(mongoDb)
+            .WithReference(categoryDb, "DefaultConnection")
             .SetupKafka<Projects.Aloha_MicroService_Category>(
-                kafka,
-                GetTopicName<Projects.Aloha_MicroService_Post>());
-
-        var planService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Plan>()
-            .SetupKafka<Projects.Aloha_MicroService_Plan>(
-                kafka, GetTopicName<Projects.Aloha_MicroService_Payment>());
-
-        var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
-            .SetupKafka<Projects.Aloha_MicroService_Payment>(
-                kafka, GetTopicName<Projects.Aloha_MicroService_Plan>());
+                kafka)
+            .WaitFor(categoryDb);
 
 
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
