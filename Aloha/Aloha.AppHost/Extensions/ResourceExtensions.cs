@@ -1,6 +1,8 @@
 ﻿namespace Aloha.AppHost.Extensions;
 public static class ResourceExtensions
 {
+    private static ILogger<Program>? _logger;
+
     public static IResourceBuilder<PostgresDatabaseResource> AddDefaultDatabase<TProject>(this IResourceBuilder<PostgresServerResource> builder)
     {
         return builder.AddDatabase($"{typeof(TProject).Name.Replace('_', '-')}-db");
@@ -59,6 +61,50 @@ public static class ResourceExtensions
             .WithEnvironment(Consts.Env_EventConsumingTopics, consumingTopics)
             .WithReference(kafkaResource)
             .WaitFor(kafkaResource);
+    }
+    #endregion
+
+    #region setupDatabase
+    public static IResourceBuilder<ProjectResource> SetupPostgresDb<TProject>(
+        this IResourceBuilder<ProjectResource> serviceBuilder,
+        IResourceBuilder<PostgresServerResource> postgres,
+        IResourceBuilder<PostgresDatabaseResource> database)
+    {
+        if (database == null)
+        {
+            _logger?.LogError(
+                "Database resource is null for {ServiceType}. Database configuration might fail.",
+                typeof(TProject).Name);
+            return serviceBuilder;
+        }
+
+        _logger?.LogInformation("Configuring PostgreSQL for {ServiceType}", typeof(TProject).Name);
+
+        return serviceBuilder
+            .WithReference(postgres)
+            .WithReference(database, Consts.DefaultDatabase)
+            .WaitFor(database);
+    }
+
+    public static IResourceBuilder<ProjectResource> SetupMongoDb<TProject>(
+        this IResourceBuilder<ProjectResource> serviceBuilder,
+        IResourceBuilder<MongoDBServerResource> mongodb,
+        IResourceBuilder<MongoDBDatabaseResource> database)
+    {
+        if (database == null)
+        {
+            _logger?.LogError(
+                "Database resource is null for {ServiceType}. Database configuration might fail.",
+                typeof(TProject).Name);
+            return serviceBuilder;
+        }
+
+        _logger?.LogInformation("Configuring MongoDB for {ServiceType}", typeof(TProject).Name);
+
+        return serviceBuilder
+            .WithReference(mongodb)
+            .WithReference(database, Consts.DefaultDatabase)
+            .WaitFor(database);
     }
     #endregion
 }
