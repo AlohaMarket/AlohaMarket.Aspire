@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using static Aloha.AppHost.Extensions.ResourceExtensions;
+using Aloha.Shared;
 
 namespace Aloha.AppHost.Extensions;
 
@@ -9,13 +10,22 @@ public static class ApplicationServiceExtensions
     public static IDistributedApplicationBuilder AddApplicationServices(this IDistributedApplicationBuilder builder)
     {
         var kafka = builder.AddKafka("kafka");
-        //.WithEnvironment("KAFKA_AUTO_CREATE_TOPICS_ENABLE", "true");
+        var mongoDb = builder.AddMongoDB("mongodb");
+        var postgres = builder.AddPostgres("postgresql");
 
         if (!builder.Configuration.GetValue("IsTest", false))
         {
             kafka = kafka.WithLifetime(ContainerLifetime.Persistent)
                          .WithDataVolume()
                          .WithKafkaUI();
+                         
+            mongoDb = mongoDb.WithLifetime(ContainerLifetime.Persistent)
+                            .WithDataVolume()
+                            .WithMongoExpress();
+                            
+            postgres = postgres.WithLifetime(ContainerLifetime.Persistent)
+                             .WithDataVolume()
+                             .WithPgWeb();
         }
         #endregion
 
@@ -27,38 +37,41 @@ public static class ApplicationServiceExtensions
         #endregion
 
         #region Project References
+        // PostgreSQL services
+        var userDb = postgres.AddDefaultDatabase<Projects.Aloha_MicroService_User>();
         var userService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_User>()
+            .SetupPostgresDb<Projects.Aloha_MicroService_User>(postgres, userDb)
             .SetupKafka<Projects.Aloha_MicroService_User>(
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_Post>(),
                 GetTopicName<Projects.Aloha_MicroService_Location>());
 
+        var postDb = postgres.AddDefaultDatabase<Projects.Aloha_MicroService_Post>();
         var postService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Post>()
+            .SetupPostgresDb<Projects.Aloha_MicroService_Post>(postgres, postDb)
             .SetupKafka<Projects.Aloha_MicroService_Post>(
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_User>(),
                 GetTopicName<Projects.Aloha_MicroService_Location>(),
-                GetTopicName<Projects.Aloha_MicroService_Category>()
-            );
+                GetTopicName<Projects.Aloha_MicroService_Category>());
 
+        var planDb = postgres.AddDefaultDatabase<Projects.Aloha_MicroService_Plan>();
+        var planService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Plan>()
+            .SetupPostgresDb<Projects.Aloha_MicroService_Plan>(postgres, planDb);
+
+        // MongoDB services
+        var locationDb = mongoDb.AddDefaultDatabase<Projects.Aloha_MicroService_Location>();
         var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>()
+            .SetupMongoDb<Projects.Aloha_MicroService_Location>(mongoDb, locationDb)
             .SetupKafka<Projects.Aloha_MicroService_Location>(
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_Post>());
 
+        var categoryDb = mongoDb.AddDefaultDatabase<Projects.Aloha_MicroService_Category>();
         var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Category>()
+            .SetupMongoDb<Projects.Aloha_MicroService_Category>(mongoDb, categoryDb)
             .SetupKafka<Projects.Aloha_MicroService_Category>(
-                kafka,
-                GetTopicName<Projects.Aloha_MicroService_Post>());
-
-        var planService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Plan>()
-            .SetupKafka<Projects.Aloha_MicroService_Plan>(
-                kafka, GetTopicName<Projects.Aloha_MicroService_Payment>());
-
-        var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
-            .SetupKafka<Projects.Aloha_MicroService_Payment>(
-                kafka, GetTopicName<Projects.Aloha_MicroService_Plan>());
-
+                kafka);
 
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
             .WithReference(userService)
@@ -83,7 +96,7 @@ public static class ApplicationServiceExtensions
             new() { Name = GetTopicName<Projects.Aloha_MicroService_Location>(), NumPartitions = 1, ReplicationFactor = 1 },
             new() { Name = GetTopicName<Projects.Aloha_MicroService_Category>(), NumPartitions = 1, ReplicationFactor = 1 },
             new() { Name = GetTopicName<Projects.Aloha_MicroService_Payment>(), NumPartitions = 1, ReplicationFactor = 1 },
-             new() { Name = GetTopicName<Projects.Aloha_MicroService_Plan>(), NumPartitions = 1, ReplicationFactor = 1 },
+            new() { Name = GetTopicName<Projects.Aloha_MicroService_Plan>(), NumPartitions = 1, ReplicationFactor = 1 },
 
         ];
 
