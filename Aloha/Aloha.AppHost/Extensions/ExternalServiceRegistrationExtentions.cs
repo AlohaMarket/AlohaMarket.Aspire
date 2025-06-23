@@ -8,8 +8,8 @@ public static class ApplicationServiceExtensions
     #region External Service Registration
     public static IDistributedApplicationBuilder AddApplicationServices(this IDistributedApplicationBuilder builder)
     {
-        var kafka = builder.AddKafka("kafka")
-            .WithEnvironment("KAFKA_AUTO_CREATE_TOPICS_ENABLE", "true");
+        var kafka = builder.AddKafka("kafka");
+        //.WithEnvironment("KAFKA_AUTO_CREATE_TOPICS_ENABLE", "true");
 
         if (!builder.Configuration.GetValue("IsTest", false))
         {
@@ -52,13 +52,10 @@ public static class ApplicationServiceExtensions
                 GetTopicName<Projects.Aloha_MicroService_Post>());
 
         var planService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Plan>()
-            .WithReference(userService)
             .SetupKafka<Projects.Aloha_MicroService_Plan>(
                 kafka, GetTopicName<Projects.Aloha_MicroService_Payment>());
 
         var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
-            .WithReference(userService)
-            //.WithReference(planService);
             .SetupKafka<Projects.Aloha_MicroService_Payment>(
                 kafka, GetTopicName<Projects.Aloha_MicroService_Plan>());
 

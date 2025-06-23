@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
 using Aloha.MicroService.Post.Infrastructure.Data;
@@ -6,17 +5,15 @@ using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using HealthChecks.NpgSql;
 
 namespace Aloha.MicroService.Post.Bootstrapping
 {
     public static class ApplicationServiceExtensions
     {
         private static ILoggerFactory? _loggerFactory;
-        
+
         private static class AppConsts
-        {   
+        {
             public static string GetConnectionStringEnvName(string service) => $"Aloha_{service}_ConnectionString";
             public static string GetPasswordEnvName(string service) => $"Aloha_{service}_Password";
             public static string GetDatabaseNameEnvName(string service) => $"Aloha_{service}_Name";
@@ -25,9 +22,11 @@ namespace Aloha.MicroService.Post.Bootstrapping
         public static IHostApplicationBuilder AddApplicationServices(this IHostApplicationBuilder builder)
         {
             _loggerFactory = builder.Services.BuildServiceProvider().GetService<ILoggerFactory>();
-            
-            builder.AddServiceDefaults()
-                   .AddAlohaPostgreSQL<PostDbContext>();
+
+            builder.AddServiceDefaults();
+            //.AddAlohaPostgreSQL<PostDbContext>();
+
+            builder.Services.AddSharedServicesLocal<PostDbContext>(builder.Configuration);
 
             builder.Services.AddAuthorization();
             builder.Services.AddOpenApi();
@@ -96,13 +95,12 @@ namespace Aloha.MicroService.Post.Bootstrapping
                     options.ServiceName = "PostService";
                     options.KafkaGroupId = "aloha-post-service";
                     options.Topics.AddRange(eventConsumingTopics.Split(','));
-                    options.IntegrationEventFactory = IntegrationEventFactory<TestSendEventModel>.Instance;
+                    options.IntegrationEventFactory = IntegrationEventFactory<PostCreatedIntegrationEvent>.Instance;
                     options.AcceptEvent = e =>
-                        e is TestReceiveEventModel
-                        || e is LocationValidEventModel
-                        || e is LocationInvalidEventModel
-                        || e is CategoryPathValidModel
-                        || e is CategoryPathInvalidModel;
+                                e is LocationValidEventModel
+                                || e is LocationInvalidEventModel
+                                || e is CategoryPathValidModel
+                                || e is CategoryPathInvalidModel;
                 });
             }
 

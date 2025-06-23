@@ -118,5 +118,35 @@ namespace Aloha.ServiceDefaults.DependencyInjection
 
             return builder;
         }
+
+        public static IServiceCollection AddSharedServicesLocal<TContext>
+            (this IServiceCollection services, IConfiguration configuration) where TContext : DbContext
+        {
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+            services.AddDbContext<TContext>(options =>
+                options.UseNpgsql(configuration.GetConnectionString("PostgresConnection"),
+                    npgsqlOptionsAction: sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            errorCodesToAdd: null);
+                    }));
+
+            // CORS
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
+
+            return services;
+        }
     }
 }

@@ -98,8 +98,8 @@ public class Program
                 options.ServiceName = "LocationService";
                 options.KafkaGroupId = "aloha-location-service";
                 options.Topics.AddRange(kafkaConsumeTopic.Split(','));
-                options.IntegrationEventFactory = IntegrationEventFactory<TestSendEventModel>.Instance;
-                options.AcceptEvent = e => e.IsEvent<TestSendEventModel, PostCreatedIntegrationEvent>();
+                options.IntegrationEventFactory = IntegrationEventFactory<PostCreatedIntegrationEvent>.Instance;
+                options.AcceptEvent = e => e.IsEvent<PostCreatedIntegrationEvent>();
             });
         }
 

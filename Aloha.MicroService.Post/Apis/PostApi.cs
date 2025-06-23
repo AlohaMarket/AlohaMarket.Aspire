@@ -1,7 +1,5 @@
-using Aloha.EventBus.Models;
 using Aloha.MicroService.Post.Infrastructure.Entity;
 using Aloha.MicroService.Post.Infrastructure.Request;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Aloha.MicroService.Post.Apis
 {
@@ -197,20 +195,20 @@ namespace Aloha.MicroService.Post.Apis
 
             await services.DbContext.SaveChangesAsync();
 
-            await services.EventPublisher.PublishAsync(new PostUpdatedIntegrationEvent
-            {
-                PostId = post.Id,
-                UserId = post.UserId,
-                UserPlanId = post.UserPlanId,
-                Title = post.Title,
-                Description = post.Description,
-                Price = post.Price,
-                CategoryId = post.CategoryId,
-                CategoryPath = post.CategoryPath,
-                ProvinceCode = post.ProvinceCode,
-                DistrictCode = post.DistrictCode,
-                WardCode = post.WardCode
-            });
+            // await services.EventPublisher.PublishAsync(new PostUpdatedIntegrationEvent
+            // {
+            //     PostId = post.Id,
+            //     UserId = post.UserId,
+            //     UserPlanId = post.UserPlanId,
+            //     Title = post.Title,
+            //     Description = post.Description,
+            //     Price = post.Price,
+            //     CategoryId = post.CategoryId,
+            //     CategoryPath = post.CategoryPath,
+            //     ProvinceCode = post.ProvinceCode,
+            //     DistrictCode = post.DistrictCode,
+            //     WardCode = post.WardCode
+            // });
 
             return TypedResults.Ok(post);
         }

@@ -7,24 +7,16 @@ namespace Aloha.MicroService.Post.EventHandlers
         PostDbContext dbContext,
         IEventPublisher eventPublisher,
         ILogger<PostIntegrationEventHandlers> logger) :
-        IRequestHandler<TestReceiveEventModel>,
         IRequestHandler<LocationValidEventModel>,
         IRequestHandler<LocationInvalidEventModel>,
         IRequestHandler<CategoryPathValidModel>,
         IRequestHandler<CategoryPathInvalidModel>
     {
-        public Task Handle(TestReceiveEventModel request, CancellationToken cancellationToken)
-        {
-            logger.LogInformation("Received TestReceiveEventModel: Message={Message}, From={From}, To={To}",
-                request.Message, request.FromService, request.ToService);
-            return Task.CompletedTask;
-        }
-
         public async Task Handle(LocationValidEventModel request, CancellationToken cancellationToken)
         {
             logger.LogInformation("Received location validation success for PostId={PostId}", request.PostId);
 
-            var post = await dbContext.Posts.FindAsync(request.PostId);
+            var post = await dbContext.Posts.FindAsync(new object?[] { request.PostId }, cancellationToken: cancellationToken);
             if (post != null)
             {
                 post.IsLocationValid = true;
@@ -39,7 +31,7 @@ namespace Aloha.MicroService.Post.EventHandlers
                     post.Status = Infrastructure.Entity.PostStatus.Validated;
                 }
 
-                await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync(cancellationToken);
                 logger.LogInformation("Location information updated for PostId={PostId}", request.PostId);
             }
             else
@@ -53,12 +45,12 @@ namespace Aloha.MicroService.Post.EventHandlers
             logger.LogWarning("Received location validation failure for PostId={PostId}: {ErrorMessage}",
                 request.PostId, request.ErrorMessage);
 
-            var post = await dbContext.Posts.FindAsync(request.PostId);
+            var post = await dbContext.Posts.FindAsync(new object?[] { request.PostId }, cancellationToken: cancellationToken);
             if (post != null)
             {
                 post.IsLocationValid = false;
                 post.LocationValidationMessage = request.ErrorMessage;
-                await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync(cancellationToken);
             }
             else
             {
@@ -70,7 +62,7 @@ namespace Aloha.MicroService.Post.EventHandlers
         {
             logger.LogInformation("Received category validation success for PostId={PostId}", request.PostId);
 
-            var post = await dbContext.Posts.FindAsync(request.PostId);
+            var post = await dbContext.Posts.FindAsync(new object?[] { request.PostId }, cancellationToken: cancellationToken);
             if (post != null)
             {
                 post.IsCategoryValid = true;
@@ -81,7 +73,7 @@ namespace Aloha.MicroService.Post.EventHandlers
                     post.Status = Infrastructure.Entity.PostStatus.Validated;
                 }
 
-                await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync(cancellationToken);
             }
             else
             {
@@ -94,12 +86,12 @@ namespace Aloha.MicroService.Post.EventHandlers
             logger.LogWarning("Received category validation failure for PostId={PostId}: {ErrorMessage}",
                 request.PostId, request.ErrorMessage);
 
-            var post = await dbContext.Posts.FindAsync(request.PostId);
+            var post = await dbContext.Posts.FindAsync(new object?[] { request.PostId }, cancellationToken: cancellationToken);
             if (post != null)
             {
                 post.IsCategoryValid = false;
                 post.CategoryValidationMessage = request.ErrorMessage;
-                await dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync(cancellationToken);
             }
             else
             {
