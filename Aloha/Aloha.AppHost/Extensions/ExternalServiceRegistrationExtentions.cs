@@ -9,13 +9,22 @@ public static class ApplicationServiceExtensions
     public static IDistributedApplicationBuilder AddApplicationServices(this IDistributedApplicationBuilder builder)
     {
         var kafka = builder.AddKafka("kafka");
-        //.WithEnvironment("KAFKA_AUTO_CREATE_TOPICS_ENABLE", "true");
+        var mongoDb = builder.AddMongoDB("mongodb");
+        var postgres = builder.AddPostgres("postgresql");
 
         if (!builder.Configuration.GetValue("IsTest", false))
         {
             kafka = kafka.WithLifetime(ContainerLifetime.Persistent)
                          .WithDataVolume()
                          .WithKafkaUI();
+                         
+            mongoDb = mongoDb.WithLifetime(ContainerLifetime.Persistent)
+                            .WithDataVolume()
+                            .WithMongoExpress();
+                            
+            postgres = postgres.WithLifetime(ContainerLifetime.Persistent)
+                             .WithDataVolume()
+                             .WithPgWeb();
         }
         #endregion
 
