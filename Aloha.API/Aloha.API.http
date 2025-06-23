@@ -1,6 +1,0 @@
-@Aloha.API_HostAddress = http://localhost:5163
-
-GET {{Aloha.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

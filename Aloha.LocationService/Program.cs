@@ -1,9 +1,15 @@
+using Aloha.EventBus;
+using Aloha.EventBus.Abstractions;
+using Aloha.EventBus.Kafka;
+using Aloha.EventBus.Models;
 using Aloha.LocationService.Data;
 using Aloha.LocationService.Repositories;
 using Aloha.LocationService.Services;
 using Aloha.LocationService.Settings;
 using Aloha.ServiceDefaults.Hosting;
-using Aloha.ServiceDefaults.Middlewares;
+using Aloha.Shared;
+using Aloha.Shared.Middlewares;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using MongoDB.Driver;
@@ -23,6 +29,15 @@ public class Program
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
         builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+        });
         builder.Services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -31,41 +46,62 @@ public class Program
                 Version = "v1"
             });
 
-            c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+            c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
             {
-                Type = SecuritySchemeType.OAuth2,
-                Flows = new OpenApiOAuthFlows
-                {
-                    Implicit = new OpenApiOAuthFlow
-                    {
-                        AuthorizationUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/auth"),
-                        TokenUrl = new Uri($"{builder.Configuration["Authentication:Authority"]}/protocol/openid-connect/token"),
-                        Scopes = new Dictionary<string, string>
-                        {
-                            { "openid", "OpenID" },
-                            { "profile", "Profile" }
-                        }
-                    }
-                }
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token:"
             });
-
-            // Add security requirement for all operations
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+        {
+            new OpenApiSecurityScheme
             {
+                Reference = new OpenApiReference
                 {
-                    new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference
-                        {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "oauth2"
-                        }
-                    },
-                    new[] { "openid", "profile" }
+                    Type = ReferenceType.SecurityScheme,
+                    Id = JwtBearerDefaults.AuthenticationScheme
                 }
-            });
-
+            },
+            new List<string>()
+            }
         });
+        });
+
+        builder.Services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+        });
+
+        // Register Kafka producer
+        builder.AddKafkaProducer("kafka");
+
+        // Register Kafka event publisher
+        var kafkaPublishTopic = builder.Configuration.GetValue<string>(Consts.Env_EventPublishingTopics);
+        if (!string.IsNullOrWhiteSpace(kafkaPublishTopic))
+        {
+            builder.AddKafkaEventPublisher(kafkaPublishTopic);
+        }
+        else
+        {
+            builder.Services.AddTransient<IEventPublisher, NullEventPublisher>();
+        }
+
+        var kafkaConsumeTopic = builder.Configuration.GetValue<string>(Consts.Env_EventConsumingTopics);
+        if (!string.IsNullOrWhiteSpace(kafkaConsumeTopic))
+        {
+            builder.AddKafkaEventConsumer(options =>
+            {
+                options.ServiceName = "LocationService";
+                options.KafkaGroupId = "aloha-location-service";
+                options.Topics.AddRange(kafkaConsumeTopic.Split(','));
+                options.IntegrationEventFactory = IntegrationEventFactory<PostCreatedIntegrationEvent>.Instance;
+                options.AcceptEvent = e => e.IsEvent<PostCreatedIntegrationEvent>();
+            });
+        }
 
         builder.Services.Configure<MongoSettings>(
             builder.Configuration.GetSection("MongoSettings")
@@ -109,6 +145,7 @@ public class Program
             });
 
         }
+        app.UseCors("AllowAll");
 
         // Use the exception handler middleware
         app.UseMiddleware<ApiExceptionHandlerMiddleware>();
@@ -123,5 +160,14 @@ public class Program
         app.MapControllers();
 
         app.Run();
+
+        // After configuring Kafka
+        var logger = builder.Services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
+        logger.LogInformation("Kafka configured with bootstrap servers: {servers}",
+            builder.Configuration.GetValue<string>("Kafka:BootstrapServers"));
+        logger.LogInformation("Publishing to topic: {topic}",
+            builder.Configuration.GetValue<string>("EventBus:PublishingTopics"));
+        logger.LogInformation("Subscribing to topics: {topics}",
+            builder.Configuration.GetValue<string>("EventBus:ConsumingTopics"));
     }
 }

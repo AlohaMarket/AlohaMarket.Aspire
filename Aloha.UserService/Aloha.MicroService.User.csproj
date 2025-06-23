@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Aloha.EventBus.Kafka\Aloha.EventBus.Kafka.csproj" />
+    <ProjectReference Include="..\Aloha.EventBus.Models\Aloha.EventBus.Models.csproj" />
+    <ProjectReference Include="..\Aloha.EventBus\Aloha.EventBus.csproj" />
+    <ProjectReference Include="..\Aloha.Security\Aloha.Security.csproj" />
+    <ProjectReference Include="..\Aloha.Shared\Aloha.Shared.csproj" />
+    <ProjectReference Include="..\Aloha\Aloha.ServiceDefaults\Aloha.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\Responses\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

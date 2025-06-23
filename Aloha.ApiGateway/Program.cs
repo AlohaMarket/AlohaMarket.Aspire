@@ -1,6 +1,6 @@
-using Aloha.ApiGateway.Services;
-using Aloha.ServiceDefaults.DependencyInjection;
+using Aloha.Security.Authentications;
 using Aloha.ServiceDefaults.Hosting;
+using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,61 +16,106 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Configure HTTP logging to include headers
+builder.Services.AddHttpLogging(options =>
+{
+    options.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
+    options.RequestHeaders.Add("Authorization");
+    options.RequestHeaders.Add("Api-Gateway");
+    options.MediaTypeOptions.AddText("application/json");
+    options.RequestBodyLogLimit = 4096;
+    options.ResponseBodyLogLimit = 4096;
+});
+
 // Core services
 builder.Services.AddControllers();
-builder.Services.AddSingleton<SwaggerMergeService>();
 builder.Services.AddHttpClient();
-builder.Services.AddSwaggerGen();
 
-// YARP Reverse Proxy
-AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+// Auth (Keycloak) - IMPORTANT: This must be configured before the reverse proxy
+builder.Services.AddKeycloakJwtAuthentication(builder.Configuration);
+
+// Add reverse proxy with both transforms and message handler logging
 builder.Services.AddReverseProxy()
-       .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
+    .AddTransforms(builderContext =>
+    {
+        builderContext.AddRequestTransform(transformContext =>
+        {
+            var httpContext = transformContext.HttpContext;
+            var logger = httpContext.RequestServices.GetRequiredService<ILogger<Program>>();
 
-// Auth (Keycloak)
-builder.Services.AddJwtAuthentication(builder.Configuration);
+            // Forward the Authorization header without any parsing or rewriting
+            if (httpContext.Request.Headers.TryGetValue("Authorization", out var authHeader))
+            {
+                // Clear any pre-existing Authorization header
+                transformContext.ProxyRequest.Headers.Remove("Authorization");
+
+                // Forward it as-is (already includes "Bearer ...")
+                transformContext.ProxyRequest.Headers.Add("Authorization", authHeader.ToString());
+            }
+
+            // Add optional debug/custom header
+            transformContext.ProxyRequest.Headers.Add("Api-Gateway", "true");
+
+            // Log headers
+            logger.LogInformation("Headers being forwarded to microservice (Api Gateway):");
+            logger.LogInformation("Next Microservice: {Service}", transformContext.DestinationPrefix);
+            logger.LogInformation("Forwarded Header:");
+            foreach (var header in transformContext.ProxyRequest.Headers)
+            {
+                logger.LogInformation("{Key} = {Value}", header.Key, string.Join(", ", header.Value));
+            }
+            logger.LogInformation("End Forwarded Header:");
+
+            return ValueTask.CompletedTask;
+        });
+    });
 
 var app = builder.Build();
 
-// CORS and HTTPS
+// Middleware pipeline - ORDER IS IMPORTANT!
+app.UseHttpLogging();
 app.UseCors("AllowAll");
+
+// HTTPS redirection
 app.UseHttpsRedirection();
 
-// Auth middleware
+// Authentication must come before authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Endpoint routing
+// Controllers and reverse proxy
 app.MapControllers();
-app.MapReverseProxy();
-app.UseSwagger();
-
-// Serve merged Swagger JSON
-app.MapGet("/swagger/v1/merged.json", async (SwaggerMergeService merger) =>
+app.MapReverseProxy(proxyPipeline =>
 {
-    var doc = await merger.GetMergedSwaggerAsync();
+    proxyPipeline.UseMiddleware<AuthenticatedRequestForwardingMiddleware>();
+}).RequireAuthorization();
 
-    var stream = new MemoryStream();
-    var writer = new StreamWriter(stream);
-    var openApiWriter = new Microsoft.OpenApi.Writers.OpenApiJsonWriter(writer);
-
-    doc.SerializeAsV3(openApiWriter);
-    await writer.FlushAsync();
-    stream.Position = 0;
-
-    return Results.Stream(stream, "application/json");
-});
-
-// Swagger UI using merged doc only
-app.UseSwaggerUI(c =>
-{
-    c.SwaggerEndpoint("/swagger/v1/merged.json", "Unified Aloha API v1"); // FIXED
-    c.RoutePrefix = ""; // serve at root
-    c.DocumentTitle = "Aloha API Gateway";
-    c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.List);
-    c.DisplayRequestDuration();
-    c.DisplayOperationId();
-    c.EnableFilter();
-});
 
 app.Run();
+
+// Custom middleware to ensure authentication context flows to microservices
+public class AuthenticatedRequestForwardingMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger<AuthenticatedRequestForwardingMiddleware> _logger;
+
+    public AuthenticatedRequestForwardingMiddleware(RequestDelegate next, ILogger<AuthenticatedRequestForwardingMiddleware> logger)
+    {
+        _next = next;
+        _logger = logger;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        // Log all headers
+        _logger.LogInformation("Incoming request Header: (AuthenForwardMiddleware):");
+        foreach (var header in context.Request.Headers)
+        {
+            _logger.LogInformation("{Key} = {Value}", header.Key, header.Value);
+        }
+        _logger.LogInformation("End Incoming request Header (AuthenForwardMiddleware):");
+
+        await _next(context);
+    }
+}

@@ -1,0 +1,39 @@
+networks:
+  postservice_network:
+    driver: bridge
+
+services:
+  postservice.db:
+    container_name: postservice-db
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: Iloveyou3000!
+      POSTGRES_DB: PostServiceDB
+    ports:
+      - "5432:5432"
+    networks:
+      - postservice_network
+    volumes:
+      - postservice.db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U db_user -d PostServiceDB" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    container_name: pgadmin_postservice
+    image: dpage/pgadmin4
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - postservice.db
+    networks:
+      - postservice_network
+
+volumes:
+  postservice.db_data:

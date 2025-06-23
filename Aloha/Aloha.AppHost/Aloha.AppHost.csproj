@@ -22,12 +22,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Aloha.ApiGateway\Aloha.ApiGateway.csproj" />
-    <ProjectReference Include="..\..\Aloha.API\Aloha.API.csproj" />
     <ProjectReference Include="..\..\Aloha.EventBus.Kafka\Aloha.EventBus.Kafka.csproj" />
     <ProjectReference Include="..\..\Aloha.EventBus\Aloha.EventBus.csproj" />
-    <ProjectReference Include="..\..\Aloha.CategoryService\Aloha.CategoryService.csproj" />
-    <ProjectReference Include="..\..\Aloha.LocationService\Aloha.LocationService.csproj" />
     <ProjectReference Include="..\..\Aloha.NotificationService\Aloha.NotificationService.csproj" />
+    <ProjectReference Include="..\..\Aloha.CategoryService\Aloha.MicroService.Category.csproj" />
+    <ProjectReference Include="..\..\Aloha.LocationService\Aloha.MicroService.Location.csproj" />
+    <ProjectReference Include="..\..\Aloha.MicroService.Plan\Aloha.MicroService.Plan.csproj" />
+    <ProjectReference Include="..\..\Aloha.MicroService.Payment\Aloha.MicroService.Payment.csproj" />
+    <ProjectReference Include="..\..\Aloha.MicroService.Post\Aloha.MicroService.Post.csproj" />
+    <ProjectReference Include="..\..\Aloha.Shared\Aloha.Shared.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="..\..\Aloha.UserService\Aloha.MicroService.User.csproj" />
   </ItemGroup>
 
 </Project>

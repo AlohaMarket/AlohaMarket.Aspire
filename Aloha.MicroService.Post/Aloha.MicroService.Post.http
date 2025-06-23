@@ -1,0 +1,6 @@
+@Aloha.MicroService.Post_HostAddress = http://localhost:5208
+
+GET {{Aloha.MicroService.Post_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

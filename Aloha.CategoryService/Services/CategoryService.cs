@@ -2,7 +2,7 @@
 using Aloha.CategoryService.Models.Requests;
 using Aloha.CategoryService.Models.Responses;
 using Aloha.CategoryService.Repositories;
-using Aloha.ServiceDefaults.Exceptions;
+using Aloha.Shared.Exceptions;
 using AutoMapper;
 
 namespace Aloha.CategoryService.Services
@@ -96,6 +96,29 @@ namespace Aloha.CategoryService.Services
             existingCategory = mapper.Map(categoryRequest, existingCategory);
             await repo.UpdateCategoryAsync(existingCategory);
             return existingCategory;
+        }
+
+        public async Task<bool> IsValidCategoryPath(List<int> categoryPath)
+        {
+            for (int i = 0; i < categoryPath.Count; i++)
+            {
+                var category = await repo.GetCategoryByIdAsync(categoryPath[i]);
+                if (category == null || !category.IsActive)
+                {
+                    return false;
+                }
+
+                // Check if the next categoryId in the path is a child of the current category (except for the leaf category)  
+                if (i < categoryPath.Count - 1)
+                {
+                    var nextCategoryId = categoryPath[i + 1];
+                    if (!category.Children.Any(child => child.Id == nextCategoryId))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
     }
 }
