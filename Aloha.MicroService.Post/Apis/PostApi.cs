@@ -1,4 +1,5 @@
 using Aloha.MicroService.Post.Infrastructure.Entity;
+using Aloha.MicroService.Post.Infrastructure.Request;
 
 namespace Aloha.MicroService.Post.Apis
 {
@@ -58,8 +59,80 @@ namespace Aloha.MicroService.Post.Apis
                     SentEvent = @event
                 });
             });
+            group.MapPost("posts/create", CreatePostFromRequest);
 
             return group;
+        }
+
+        private static async Task<Results<Ok<Infrastructure.Entity.Post>, BadRequest<string>>> CreatePostFromRequest(
+            [AsParameters] ApiServices services,
+            PostCreateRequest request)
+        {
+            if (request == null)
+            {
+                return TypedResults.BadRequest("Request cannot be null");
+            }
+
+            // Create new post entity from request
+            var post = new Infrastructure.Entity.Post
+            {
+                Id = Guid.NewGuid(),
+                UserId = request.UserId,
+                UserPlanId = request.UserPlanId,
+                Title = request.Title,
+                Description = request.Description,
+                Price = request.Price,
+                Currency = request.Currency ?? "VND",
+                CategoryId = request.CategoryId,
+                CategoryPath = request.CategoryPath,
+                ProvinceCode = request.ProvinceCode,
+                DistrictCode = request.DistrictCode,
+                WardCode = request.WardCode,
+                Attributes = request.Attributes,
+
+                // Set initial validation flags to false
+                IsLocationValid = false,
+                IsCategoryValid = false,
+                IsUserPlanValid = false,
+                Status = PostStatus.PendingValidation,
+
+                // Set timestamps
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            try
+            {
+                // Save post to database
+                await services.DbContext.Posts.AddAsync(post);
+                await services.DbContext.SaveChangesAsync();
+
+                services.Logger.LogInformation("Created post with ID {PostId}", post.Id);
+
+                // Publish event for validation
+                await services.EventPublisher.PublishAsync(new PostCreatedIntegrationEvent
+                {
+                    PostId = post.Id,
+                    UserId = post.UserId,
+                    UserPlanId = post.UserPlanId,
+                    CategoryId = post.CategoryId,
+                    CategoryPath = post.CategoryPath,
+                    ProvinceCode = post.ProvinceCode,
+                    DistrictCode = post.DistrictCode,
+                    WardCode = post.WardCode
+                });
+
+                services.Logger.LogInformation(
+                    "Published validation events for post ID {PostId}, location: {Province}/{District}/{Ward}, category path: {CategoryPath}",
+                    post.Id, post.ProvinceCode, post.DistrictCode, post.WardCode, string.Join("/", post.CategoryPath));
+
+                return TypedResults.Ok(post);
+            }
+            catch (Exception ex)
+            {
+                services.Logger.LogError(ex, "Error creating post: {ErrorMessage}", ex.Message);
+                return TypedResults.BadRequest($"Error creating post: {ex.Message}");
+            }
         }
 
         private static async Task<Results<Ok<Infrastructure.Entity.Post>, BadRequest>> CreatePost([AsParameters] ApiServices services, Infrastructure.Entity.Post post)
@@ -122,20 +195,20 @@ namespace Aloha.MicroService.Post.Apis
 
             await services.DbContext.SaveChangesAsync();
 
-            await services.EventPublisher.PublishAsync(new PostUpdatedIntegrationEvent
-            {
-                PostId = post.Id,
-                UserId = post.UserId,
-                UserPlanId = post.UserPlanId,
-                Title = post.Title,
-                Description = post.Description,
-                Price = post.Price,
-                CategoryId = post.CategoryId,
-                CategoryPath = post.CategoryPath,
-                ProvinceCode = post.ProvinceCode,
-                DistrictCode = post.DistrictCode,
-                WardCode = post.WardCode
-            });
+            // await services.EventPublisher.PublishAsync(new PostUpdatedIntegrationEvent
+            // {
+            //     PostId = post.Id,
+            //     UserId = post.UserId,
+            //     UserPlanId = post.UserPlanId,
+            //     Title = post.Title,
+            //     Description = post.Description,
+            //     Price = post.Price,
+            //     CategoryId = post.CategoryId,
+            //     CategoryPath = post.CategoryPath,
+            //     ProvinceCode = post.ProvinceCode,
+            //     DistrictCode = post.DistrictCode,
+            //     WardCode = post.WardCode
+            // });
 
             return TypedResults.Ok(post);
         }

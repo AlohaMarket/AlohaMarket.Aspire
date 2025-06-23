@@ -30,11 +30,11 @@ namespace Aloha.MicroService.Post.Infrastructure.Entity
 
         // location information
         public int ProvinceCode { get; set; }
-        public string ProvinceText { get; set; }
+        public string? ProvinceText { get; set; }
         public int DistrictCode { get; set; }
-        public string DistrictText { get; set; }
+        public string? DistrictText { get; set; }
         public int WardCode { get; set; }
-        public string WardText { get; set; }
+        public string? WardText { get; set; }
 
         // post status and attributes
         public bool IsActive { get; set; } = false;

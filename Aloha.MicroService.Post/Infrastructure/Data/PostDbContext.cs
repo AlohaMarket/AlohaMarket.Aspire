@@ -28,6 +28,9 @@ namespace Aloha.MicroService.Post.Infrastructure.Data
                 entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
                 entity.Property(e => e.Currency).IsRequired().HasMaxLength(10);
                 entity.Property(e => e.IsActive).HasDefaultValue(false);
+                entity.Property(e => e.ProvinceText).IsRequired(false);
+                entity.Property(e => e.DistrictText).IsRequired(false);
+                entity.Property(e => e.WardText).IsRequired(false);
 
                 // Enum as string
                 entity.Property(e => e.Status).HasConversion<string>();

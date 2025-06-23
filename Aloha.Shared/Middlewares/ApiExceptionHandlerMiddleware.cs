@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System.Net;
 
 namespace Aloha.Shared.Middlewares
 {
@@ -53,26 +52,6 @@ namespace Aloha.Shared.Middlewares
                     isAuthenticated,
                     context.User?.Identity?.Name ?? "none");
 
-                // Log all headers
-                _logger.LogInformation("Request Headers:");
-                foreach (var header in context.Request.Headers)
-                {
-                    // Mask sensitive data in Authorization header
-                    if (header.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var authValue = header.Value.ToString();
-                        _logger.LogInformation("Header: {Key} = {Value}",
-                            header.Key,
-                            authValue.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
-                                ? "Bearer [token-masked]"
-                                : "[credentials-masked]");
-                    }
-                    else
-                    {
-                        _logger.LogInformation("Header: {Key} = {Value}", header.Key, header.Value);
-                    }
-                }
-
                 await _next(context);
 
                 // Log response status
@@ -82,20 +61,6 @@ namespace Aloha.Shared.Middlewares
                     requestId,
                     context.Response.StatusCode,
                     requestDuration.TotalMilliseconds);
-
-                // Handle error status codes
-                if (context.Response.StatusCode >= 400 && !context.Response.HasStarted)
-                {
-                    _logger.LogWarning(
-                        "Error status code detected - RequestId: {RequestId}, StatusCode: {StatusCode}",
-                        requestId,
-                        context.Response.StatusCode);
-
-                    await HandleExceptionAsync(
-                        context,
-                        requestId,
-                        new ApiException("Upstream error", (HttpStatusCode)context.Response.StatusCode));
-                }
             }
             catch (Exception exception)
             {
