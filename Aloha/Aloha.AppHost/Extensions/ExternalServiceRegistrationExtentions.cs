@@ -65,7 +65,6 @@ public static class ApplicationServiceExtensions
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_Post>());
 
-        var categoryDb = postgres.AddDefaultDatabase<Projects.Aloha_MicroService_Category>();
         var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Category>()
             //.SetupPostgresDb<Projects.Aloha_MicroService_Category>(postgres, categoryDb)
             .SetupKafka<Projects.Aloha_MicroService_Category>(
