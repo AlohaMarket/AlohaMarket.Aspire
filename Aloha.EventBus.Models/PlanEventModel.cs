@@ -17,12 +17,12 @@ namespace Aloha.EventBus.Models
         public Guid? UserPlanId { get; set; }
     }
 
-    public class UserPlanValidModel : IntegrationEvent
+    public class UserPlanValidEventModel : IntegrationEvent
     {
         public Guid PostId { get; set; }
     }
 
-    public class UserPlanInvalidModel : IntegrationEvent
+    public class UserPlanInvalidEventModel : IntegrationEvent
     {
         public Guid PostId { get; set; }
         public string ErrorMessage { get; set; }

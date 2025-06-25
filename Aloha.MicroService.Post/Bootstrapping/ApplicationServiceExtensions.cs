@@ -99,8 +99,8 @@ namespace Aloha.MicroService.Post.Bootstrapping
                     options.AcceptEvent = e =>
                                 e is LocationValidEventModel
                                 || e is LocationInvalidEventModel
-                                || e is CategoryPathValidModel
-                                || e is CategoryPathInvalidModel;
+                                || e is CategoryPathValidEventModel
+                                || e is CategoryPathInvalidEventModel;
                 });
             }
 
