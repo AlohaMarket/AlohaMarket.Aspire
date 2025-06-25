@@ -16,5 +16,7 @@ namespace Aloha.MicroService.Plan.Service
         // UserPlan operations
         Task<List<UserPlanResponse>> GetUserPlansAsync(Guid userId);
         Task<UserPlanResponse> SubscribeUserToPlanAsync(Guid userId, int planId);
+        Task<bool> IsValidUserPlan(Guid? id);
+
     }
 }

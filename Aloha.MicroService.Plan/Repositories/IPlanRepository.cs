@@ -9,10 +9,10 @@ namespace Aloha.MicroService.Plan.Repositories
         Task AddAsync(Plans plan);
         Task UpdateAsync(Plans plan);
         Task DeleteAsync(int id);
-        Task<bool> ExistsAsync(int id);
-
-        
+        Task<bool> ExistsAsync(int id);     
         Task<List<UserPlan>> GetUserPlansAsync(Guid userId);
         Task AddUserPlanAsync(UserPlan userPlan);
+        Task<UserPlan?> GetUserPlanByIdAsync(Guid? id);
+        Task DecrementRemainPostsAsync(Guid userPlanId);
     }
 }
