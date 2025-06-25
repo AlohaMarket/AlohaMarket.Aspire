@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.0" />
+    <PackageReference Include="Aspire.Hosting.Azure.SignalR" Version="9.3.0" />
     <PackageReference Include="Aspire.Hosting.Kafka" Version="9.3.0" />
     <PackageReference Include="Aspire.Hosting.MongoDB" Version="9.3.0" />
     <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="9.3.0" />
@@ -21,6 +22,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Aloha.ApiGateway\Aloha.ApiGateway.csproj" />
+    <ProjectReference Include="..\..\Aloha.EventBus.Kafka\Aloha.EventBus.Kafka.csproj" />
+    <ProjectReference Include="..\..\Aloha.EventBus\Aloha.EventBus.csproj" />
+    <ProjectReference Include="..\..\Aloha.NotificationService\Aloha.NotificationService.csproj" />
     <ProjectReference Include="..\..\Aloha.CategoryService\Aloha.MicroService.Category.csproj" />
     <ProjectReference Include="..\..\Aloha.LocationService\Aloha.MicroService.Location.csproj" />
     <ProjectReference Include="..\..\Aloha.MicroService.Plan\Aloha.MicroService.Plan.csproj" />
