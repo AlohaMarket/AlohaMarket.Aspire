@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Configuration;
 using static Aloha.AppHost.Extensions.ResourceExtensions;
-using Aloha.Shared;
 
 namespace Aloha.AppHost.Extensions;
 
@@ -18,11 +17,11 @@ public static class ApplicationServiceExtensions
             kafka = kafka.WithLifetime(ContainerLifetime.Persistent)
                          .WithDataVolume()
                          .WithKafkaUI();
-                         
+
             mongoDb = mongoDb.WithLifetime(ContainerLifetime.Persistent)
                             .WithDataVolume()
                             .WithMongoExpress();
-                            
+
             postgres = postgres.WithLifetime(ContainerLifetime.Persistent)
                              .WithDataVolume()
                              .WithPgWeb();
@@ -38,40 +37,40 @@ public static class ApplicationServiceExtensions
 
         #region Project References
         // PostgreSQL services
-        var userDb = postgres.AddDefaultDatabase<Projects.Aloha_MicroService_User>();
         var userService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_User>()
-            .SetupPostgresDb<Projects.Aloha_MicroService_User>(postgres, userDb)
+            //.SetupPostgresDb<Projects.Aloha_MicroService_User>(postgres, userDb)
             .SetupKafka<Projects.Aloha_MicroService_User>(
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_Post>(),
                 GetTopicName<Projects.Aloha_MicroService_Location>());
 
-        var postDb = postgres.AddDefaultDatabase<Projects.Aloha_MicroService_Post>();
         var postService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Post>()
-            .SetupPostgresDb<Projects.Aloha_MicroService_Post>(postgres, postDb)
             .SetupKafka<Projects.Aloha_MicroService_Post>(
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_User>(),
                 GetTopicName<Projects.Aloha_MicroService_Location>(),
                 GetTopicName<Projects.Aloha_MicroService_Category>());
 
-        var planDb = postgres.AddDefaultDatabase<Projects.Aloha_MicroService_Plan>();
         var planService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Plan>()
-            .SetupPostgresDb<Projects.Aloha_MicroService_Plan>(postgres, planDb);
+            .SetupKafka<Projects.Aloha_MicroService_Plan>(
+                kafka,
+                GetTopicName<Projects.Aloha_MicroService_User>(),
+                GetTopicName<Projects.Aloha_MicroService_Post>());
 
         // MongoDB services
         var locationDb = mongoDb.AddDefaultDatabase<Projects.Aloha_MicroService_Location>();
         var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>()
-            .SetupMongoDb<Projects.Aloha_MicroService_Location>(mongoDb, locationDb)
+            //.SetupMongoDb<Projects.Aloha_MicroService_Location>(mongoDb, locationDb)
             .SetupKafka<Projects.Aloha_MicroService_Location>(
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_Post>());
 
-        var categoryDb = mongoDb.AddDefaultDatabase<Projects.Aloha_MicroService_Category>();
+        var categoryDb = postgres.AddDefaultDatabase<Projects.Aloha_MicroService_Category>();
         var categoryService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Category>()
-            .SetupMongoDb<Projects.Aloha_MicroService_Category>(mongoDb, categoryDb)
+            //.SetupPostgresDb<Projects.Aloha_MicroService_Category>(postgres, categoryDb)
             .SetupKafka<Projects.Aloha_MicroService_Category>(
-                kafka);
+                kafka,
+                GetTopicName<Projects.Aloha_MicroService_Post>());
 
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
             .WithReference(userService)
@@ -79,7 +78,7 @@ public static class ApplicationServiceExtensions
             .WithReference(locationService)
             .WithReference(categoryService)
             //.WithReference(paymentService)
-            //.WithReference(planService)
+            .WithReference(planService)
             ;
         #endregion
         return builder;

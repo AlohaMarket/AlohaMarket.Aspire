@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Aloha.MicroService.Plan.Migrations
 {
     [DbContext(typeof(PlanDbContext))]
-    [Migration("20250620080201_InitDB")]
-    partial class InitDB
+    [Migration("20250625081631_InitDb")]
+    partial class InitDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
