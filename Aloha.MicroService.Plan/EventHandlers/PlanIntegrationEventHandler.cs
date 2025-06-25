@@ -3,6 +3,7 @@ using Aloha.EventBus.Models;
 using Aloha.MicroService.Plan.Data;
 using Aloha.MicroService.Plan.Models.Entities;
 using Aloha.MicroService.Plan.Repositories;
+using Aloha.MicroService.Plan.Service;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ namespace Aloha.MicroService.Plan.EventHandlers
        ILogger<PlanIntegrationEventHandler> logger,
        IEventPublisher eventPublisher,
        PlanDbContext dbContext,
-       IPlanRepository planRepository
+       IPlanRepository planRepository,
+       IPlanService planService
    ) :
-       IRequestHandler<CreateUserPlanCommand>
+       IRequestHandler<CreateUserPlanCommand>, 
+        IRequestHandler<PostCreatedIntegrationEvent>
     {
         public async Task Handle(CreateUserPlanCommand request, CancellationToken cancellationToken)
         {
@@ -35,7 +38,6 @@ namespace Aloha.MicroService.Plan.EventHandlers
                 }
                 else
                 {
-                    // Tạo user plan mới
                     var now = DateTime.UtcNow;
                     var userPlan = new UserPlan
                     {
@@ -61,7 +63,6 @@ namespace Aloha.MicroService.Plan.EventHandlers
             }
             catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("duplicate key value violates unique constraint") == true)
             {
-                // Trùng PK, truy vấn lại UserPlan đã tồn tại
                 var existingUserPlan = await dbContext.UserPlans
                     .AsNoTracking()
                     .FirstOrDefaultAsync(up =>
@@ -78,7 +79,6 @@ namespace Aloha.MicroService.Plan.EventHandlers
                 logger.LogError(ex, "Error provisioning user plan for PaymentId={PaymentId}. Inner: {Inner}", request.PaymentId, ex.InnerException?.Message);
             }
 
-            // Gửi kết quả về Payment
             await eventPublisher.PublishAsync(new UserPlanProvisioningResultEvent
             {
                 PaymentId = request.PaymentId,
@@ -88,6 +88,29 @@ namespace Aloha.MicroService.Plan.EventHandlers
                 Message = message,
                 UserPlanId = userPlanId
             });
+        }
+
+        public async Task Handle(PostCreatedIntegrationEvent request, CancellationToken cancellationToken)
+        {
+            logger.LogInformation("Validating user plan for PostId={PostId}", request.PostId);
+
+            bool isValid = await planService.IsValidUserPlan(request.UserPlanId);
+
+            if (isValid)
+            {
+                await eventPublisher.PublishAsync(new UserPlanInvalidModel
+                {
+                    PostId = request.PostId
+                });
+            }
+            else
+            {
+                await eventPublisher.PublishAsync(new UserPlanInvalidModel
+                {
+                    PostId = request.PostId,
+                    ErrorMessage = "Invalid user plan"
+                });
+            }
         }
     }
 }
