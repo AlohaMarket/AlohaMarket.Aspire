@@ -16,4 +16,16 @@ namespace Aloha.EventBus.Models
         public string Message { get; set; } = string.Empty;
         public Guid? UserPlanId { get; set; }
     }
+
+    public class UserPlanValidModel : IntegrationEvent
+    {
+        public Guid PostId { get; set; }
+    }
+
+    public class UserPlanInvalidModel : IntegrationEvent
+    {
+        public Guid PostId { get; set; }
+        public string ErrorMessage { get; set; }
+    }
+
 }

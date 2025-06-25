@@ -98,5 +98,46 @@ namespace Aloha.MicroService.Post.EventHandlers
                 logger.LogWarning("Post with ID {PostId} not found for category validation", request.PostId);
             }
         }
+
+        public async Task Handle(UserPlanValidModel request, CancellationToken cancellationToken)
+        {
+            logger.LogInformation("Received user plan validation success for PostId={PostId}", request.PostId);
+
+            var post = await dbContext.Posts.FindAsync(new object?[] { request.PostId }, cancellationToken: cancellationToken);
+            if (post != null)
+            {
+                post.IsUserPlanValid = true;
+                post.UserPlanValidationMessage = null;
+
+                if (post.IsFullyValidated)
+                {
+                    post.Status = Infrastructure.Entity.PostStatus.Validated;
+                }
+
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+            else
+            {
+                logger.LogWarning("Post with ID {PostId} not found for user plan validation", request.PostId);
+            }
+        }
+
+        public async Task Handle(UserPlanInvalidModel request, CancellationToken cancellationToken)
+        {
+            logger.LogWarning("Received user plan validation failure for PostId={PostId}: {ErrorMessage}",
+                request.PostId, request.ErrorMessage);
+
+            var post = await dbContext.Posts.FindAsync(new object?[] { request.PostId }, cancellationToken: cancellationToken);
+            if (post != null)
+            {
+                post.IsUserPlanValid = false;
+                post.UserPlanValidationMessage = request.ErrorMessage;
+                await dbContext.SaveChangesAsync(cancellationToken);
+            }
+            else
+            {
+                logger.LogWarning("Post with ID {PostId} not found for category validation", request.PostId);
+            }
+        }
     }
 }
