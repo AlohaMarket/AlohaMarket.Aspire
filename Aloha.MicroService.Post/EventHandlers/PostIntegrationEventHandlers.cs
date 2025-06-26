@@ -1,9 +1,7 @@
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
-using Aloha.EventBus.Models;
 using Aloha.MicroService.Post.Infrastructure.Data;
 using Aloha.MicroService.Post.Infrastructure.Entity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Aloha.MicroService.Post.EventHandlers
 {
@@ -37,6 +35,9 @@ namespace Aloha.MicroService.Post.EventHandlers
 
                 if (post != null)
                 {
+                    logger.LogInformation("Post entity for validation PostId={PostId} Status={Status} IsLocationValid={IsLocationValid} IsCategoryValid={IsCategoryValid} IsUserPlanValid={IsUserPlanValid}",
+                        post.Id, post.Status, post.IsLocationValid, post.IsCategoryValid, post.IsUserPlanValid);
+
                     // check if other validations have already passed to think about updating the status
                     var nextStatus = DetermineStatus(
                         isLocationValid: true,
@@ -77,12 +78,15 @@ namespace Aloha.MicroService.Post.EventHandlers
 
                 if (post != null)
                 {
+                    logger.LogInformation("Post entity for validation PostId={PostId} Status={Status} IsLocationValid={IsLocationValid} IsCategoryValid={IsCategoryValid} IsUserPlanValid={IsUserPlanValid}",
+                        post.Id, post.Status, post.IsLocationValid, post.IsCategoryValid, post.IsUserPlanValid);
+
                     var nextStatus = DetermineStatus(
                         isLocationValid: false,
                         isCategoryValid: post.IsCategoryValid,
                         isUserPlanValid: post.IsUserPlanValid,
                         currentStatus: post.Status);
-                        
+
                     // Use patch update approach - only update the necessary fields
                     await dbContext.Posts
                         .Where(p => p.Id == request.PostId)
@@ -94,8 +98,8 @@ namespace Aloha.MicroService.Post.EventHandlers
 
                     logger.LogInformation("Updated location validation status for PostId={PostId}", request.PostId);
 
-                    // If the UserPlanValid flag is true, initiate a rollback for the user plan
-                    if (post.IsUserPlanValid)
+                    // Rollback if: UserPlan was valid AND post becomes Invalid AND UserPlanId exists
+                    if (post.IsUserPlanValid && nextStatus == PostStatus.Invalid && post.UserPlanId != Guid.Empty)
                     {
                         await eventPublisher.PublishAsync(new RollbackUserPlanEventModel
                         {
@@ -126,6 +130,9 @@ namespace Aloha.MicroService.Post.EventHandlers
 
                 if (post != null)
                 {
+                    logger.LogInformation("Post entity for validation PostId={PostId} Status={Status} IsLocationValid={IsLocationValid} IsCategoryValid={IsCategoryValid} IsUserPlanValid={IsUserPlanValid}",
+                        post.Id, post.Status, post.IsLocationValid, post.IsCategoryValid, post.IsUserPlanValid);
+
                     var nextStatus = DetermineStatus(
                         isLocationValid: post.IsLocationValid,
                         isCategoryValid: true,
@@ -162,12 +169,15 @@ namespace Aloha.MicroService.Post.EventHandlers
 
                 if (post != null)
                 {
+                    logger.LogInformation("Post entity for validation PostId={PostId} Status={Status} IsLocationValid={IsLocationValid} IsCategoryValid={IsCategoryValid} IsUserPlanValid={IsUserPlanValid}",
+                        post.Id, post.Status, post.IsLocationValid, post.IsCategoryValid, post.IsUserPlanValid);
+
                     var nextStatus = DetermineStatus(
                         isLocationValid: post.IsLocationValid,
                         isCategoryValid: false,
                         isUserPlanValid: post.IsUserPlanValid,
                         currentStatus: post.Status);
-                        
+
                     // Use patch update approach - only update the necessary fields
                     await dbContext.Posts
                         .Where(p => p.Id == request.PostId)
@@ -179,8 +189,8 @@ namespace Aloha.MicroService.Post.EventHandlers
 
                     logger.LogInformation("Updated category validation status for PostId={PostId}", request.PostId);
 
-                    // If the UserPlanValid flag is true, initiate a rollback for the user plan
-                    if (post.IsUserPlanValid)
+                    // Rollback if: UserPlan was valid AND post becomes Invalid AND UserPlanId exists
+                    if (post.IsUserPlanValid && nextStatus == PostStatus.Invalid && post.UserPlanId != Guid.Empty)
                     {
                         await eventPublisher.PublishAsync(new RollbackUserPlanEventModel
                         {
@@ -212,6 +222,9 @@ namespace Aloha.MicroService.Post.EventHandlers
 
                 if (post != null)
                 {
+                    logger.LogInformation("Post entity for validation PostId={PostId} Status={Status} IsLocationValid={IsLocationValid} IsCategoryValid={IsCategoryValid} IsUserPlanValid={IsUserPlanValid}",
+                        post.Id, post.Status, post.IsLocationValid, post.IsCategoryValid, post.IsUserPlanValid);
+
                     var nextStatus = DetermineStatus(
                         isLocationValid: post.IsLocationValid,
                         isCategoryValid: post.IsCategoryValid,
@@ -226,6 +239,19 @@ namespace Aloha.MicroService.Post.EventHandlers
                             .SetProperty(p => p.UserPlanValidationMessage, (string?)null)
                             .SetProperty(p => p.Status, nextStatus),
                             cancellationToken);
+
+                    // rollback the remaining posts in userplan if other validations is failed
+                    // only check the nextStatus is Invalid because if the post is Validated, it means all validations are passed
+                    if (nextStatus == PostStatus.Invalid && post.UserPlanId != Guid.Empty)
+                    {
+                        await eventPublisher.PublishAsync(new RollbackUserPlanEventModel
+                        {
+                            PostId = request.PostId,
+                            UserPlanId = post.UserPlanId
+                        });
+                        logger.LogInformation("Published request to rollback user plan post count for PostId={PostId}",
+                            request.PostId);
+                    }
 
                     logger.LogInformation("User plan information updated for PostId={PostId}", request.PostId);
                 }
@@ -246,15 +272,18 @@ namespace Aloha.MicroService.Post.EventHandlers
                 var post = await dbContext.Posts
                     .AsNoTracking()
                     .FirstOrDefaultAsync(p => p.Id == request.PostId, cancellationToken);
-                
+
                 if (post != null)
                 {
+                    logger.LogInformation("Post entity for validation PostId={PostId} Status={Status} IsLocationValid={IsLocationValid} IsCategoryValid={IsCategoryValid} IsUserPlanValid={IsUserPlanValid}",
+                        post.Id, post.Status, post.IsLocationValid, post.IsCategoryValid, post.IsUserPlanValid);
+
                     var nextStatus = DetermineStatus(
                         isLocationValid: post.IsLocationValid,
                         isCategoryValid: post.IsCategoryValid,
                         isUserPlanValid: false,
                         currentStatus: post.Status);
-                        
+
                     // Use patch update approach - only update the necessary fields
                     await dbContext.Posts
                         .Where(p => p.Id == request.PostId)
@@ -278,13 +307,13 @@ namespace Aloha.MicroService.Post.EventHandlers
             // If all validations pass, set to Validated
             if (isLocationValid && isCategoryValid && isUserPlanValid)
                 return PostStatus.Validated;
-                
+
             // If any validation explicitly fails, set to Invalid
-            if ((!isLocationValid && currentStatus != PostStatus.PendingValidation) || 
+            if ((!isLocationValid && currentStatus != PostStatus.PendingValidation) ||
                 (!isCategoryValid && currentStatus != PostStatus.PendingValidation) ||
                 (!isUserPlanValid && currentStatus != PostStatus.PendingValidation))
                 return PostStatus.Invalid;
-                
+
             // Otherwise, keep the current status (likely PendingValidation)
             return currentStatus;
         }

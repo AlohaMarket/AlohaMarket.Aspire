@@ -26,39 +26,47 @@ namespace Aloha.EventBus.Kafka
 
         protected async Task ExecuteWithTransactionAsync(Func<Task> action, CancellationToken cancellationToken = default)
         {
-            using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
-            try
+            var strategy = dbContext.Database.CreateExecutionStrategy();
+            await strategy.ExecuteAsync(async () =>
             {
-                logger.LogDebug($"Beginning {typeof(TEventHandler).Name} database transaction");
-                await action();
-                await transaction.CommitAsync(cancellationToken);
-                logger.LogDebug($"Transaction committed successfully for {typeof(TEventHandler).Name}");
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, $"Error executing transaction for {typeof(TEventHandler).Name}. Rolling back");
-                await transaction.RollbackAsync(cancellationToken);
-                throw;
-            }
+                using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+                try
+                {
+                    logger.LogDebug($"Beginning {typeof(TEventHandler).Name} database transaction");
+                    await action();
+                    await transaction.CommitAsync(cancellationToken);
+                    logger.LogDebug($"Transaction committed successfully for {typeof(TEventHandler).Name}");
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, $"Error executing transaction for {typeof(TEventHandler).Name}. Rolling back");
+                    await transaction.RollbackAsync(cancellationToken);
+                    throw;
+                }
+            });
         }
 
         protected async Task<TResult> ExecuteWithTransactionAsync<TResult>(Func<Task<TResult>> func, CancellationToken cancellationToken = default)
         {
-            using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
-            try
+            var strategy = dbContext.Database.CreateExecutionStrategy();
+            return await strategy.ExecuteAsync(async () =>
             {
-                logger.LogDebug($"Beginning {typeof(TEventHandler).Name} database transaction");
-                var result = await func();
-                await transaction.CommitAsync(cancellationToken);
-                logger.LogDebug($"Transaction committed successfully for {typeof(TEventHandler).Name}");
-                return result;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, $"Error executing transaction for {typeof(TEventHandler).Name}. Rolling back");
-                await transaction.RollbackAsync(cancellationToken);
-                throw;
-            }
+                using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
+                try
+                {
+                    logger.LogDebug($"Beginning {typeof(TEventHandler).Name} database transaction");
+                    var result = await func();
+                    await transaction.CommitAsync(cancellationToken);
+                    logger.LogDebug($"Transaction committed successfully for {typeof(TEventHandler).Name}");
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, $"Error executing transaction for {typeof(TEventHandler).Name}. Rolling back");
+                    await transaction.RollbackAsync(cancellationToken);
+                    throw;
+                }
+            });
         }
     }
 }

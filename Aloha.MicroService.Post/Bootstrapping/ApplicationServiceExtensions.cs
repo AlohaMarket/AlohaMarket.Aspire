@@ -97,10 +97,12 @@ namespace Aloha.MicroService.Post.Bootstrapping
                     options.Topics.AddRange(eventConsumingTopics.Split(','));
                     options.IntegrationEventFactory = IntegrationEventFactory<PostCreatedIntegrationEvent>.Instance;
                     options.AcceptEvent = e =>
-                                e is LocationValidEventModel
-                                || e is LocationInvalidEventModel
-                                || e is CategoryPathValidEventModel
-                                || e is CategoryPathInvalidEventModel;
+                        e is LocationValidEventModel
+                        || e is LocationInvalidEventModel
+                        || e is CategoryPathValidEventModel
+                        || e is CategoryPathInvalidEventModel
+                        || e is UserPlanInvalidEventModel
+                        || e is UserPlanValidEventModel;
                 });
             }
 

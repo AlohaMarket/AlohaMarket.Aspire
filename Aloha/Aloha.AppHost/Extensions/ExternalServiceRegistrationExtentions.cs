@@ -49,6 +49,7 @@ public static class ApplicationServiceExtensions
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_User>(),
                 GetTopicName<Projects.Aloha_MicroService_Location>(),
+                GetTopicName<Projects.Aloha_MicroService_Plan>(),
                 GetTopicName<Projects.Aloha_MicroService_Category>());
 
         var planService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Plan>()
@@ -58,7 +59,7 @@ public static class ApplicationServiceExtensions
                 GetTopicName<Projects.Aloha_MicroService_Post>());
 
         // MongoDB services
-        var locationDb = mongoDb.AddDefaultDatabase<Projects.Aloha_MicroService_Location>();
+        //var locationDb = mongoDb.AddDefaultDatabase<Projects.Aloha_MicroService_Location>();
         var locationService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Location>()
             //.SetupMongoDb<Projects.Aloha_MicroService_Location>(mongoDb, locationDb)
             .SetupKafka<Projects.Aloha_MicroService_Location>(

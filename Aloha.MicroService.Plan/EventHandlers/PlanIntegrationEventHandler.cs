@@ -83,6 +83,7 @@ namespace Aloha.MicroService.Plan.EventHandlers
 
             bool isValid = false;
             string errorMessage = string.Empty;
+            int remainingPosts = 0;
 
             try
             {
@@ -129,6 +130,8 @@ namespace Aloha.MicroService.Plan.EventHandlers
                         request.PostId, userPlan.Id, userPlan.RemainPosts);
 
                     isValid = true;
+                    // Store remaining posts for the event
+                    remainingPosts = userPlan.RemainPosts;
                 }, cancellationToken);
             }
             catch (Exception ex)
@@ -141,7 +144,8 @@ namespace Aloha.MicroService.Plan.EventHandlers
             {
                 await eventPublisher.PublishAsync(new UserPlanValidEventModel
                 {
-                    PostId = request.PostId
+                    PostId = request.PostId,
+                    RemainingPosts = remainingPosts
                 });
             }
             else
