@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Aloha.MicroService.Post.Migrations
 {
     [DbContext(typeof(PostDbContext))]
-    [Migration("20250621030224_InitDb")]
+    [Migration("20250626125921_InitDb")]
     partial class InitDb
     {
         /// <inheritdoc />
@@ -45,6 +45,9 @@ namespace Aloha.MicroService.Post.Migrations
 
                     b.Property<string>("CategoryValidationMessage")
                         .HasColumnType("text");
+
+                    b.Property<bool>("CategoryValidationReceived")
+                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -84,6 +87,9 @@ namespace Aloha.MicroService.Post.Migrations
                     b.Property<string>("LocationValidationMessage")
                         .HasColumnType("text");
 
+                    b.Property<bool>("LocationValidationReceived")
+                        .HasColumnType("boolean");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18, 2)");
 
@@ -119,6 +125,12 @@ namespace Aloha.MicroService.Post.Migrations
 
                     b.Property<string>("UserPlanValidationMessage")
                         .HasColumnType("text");
+
+                    b.Property<bool>("UserPlanValidationReceived")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("UserPlanWasConsumed")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("WardCode")
                         .HasColumnType("integer");

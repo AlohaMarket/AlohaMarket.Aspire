@@ -49,7 +49,18 @@ namespace Aloha.MicroService.Post.Infrastructure.Entity
         public bool IsLocationValid { get; set; }
         public bool IsCategoryValid { get; set; }
         public bool IsUserPlanValid { get; set; }
+        
+        // Validation tracking fields
+        public bool LocationValidationReceived { get; set; }
+        public bool CategoryValidationReceived { get; set; }
+        public bool UserPlanValidationReceived { get; set; }
+        
+        // Track if user plan was initially valid (for rollback decisions)
+        public bool UserPlanWasConsumed { get; set; }
+        
         public bool IsFullyValidated => IsLocationValid && IsCategoryValid && IsUserPlanValid;
+        public bool AllValidationsReceived => LocationValidationReceived && CategoryValidationReceived && UserPlanValidationReceived;
+        
         public PostStatus Status { get; set; }
         public string? LocationValidationMessage { get; set; }
         public string? CategoryValidationMessage { get; set; }
