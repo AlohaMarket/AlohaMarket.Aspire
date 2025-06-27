@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Configuration;
 using static Aloha.AppHost.Extensions.ResourceExtensions;
 
 namespace Aloha.AppHost.Extensions;
@@ -9,23 +8,23 @@ public static class ApplicationServiceExtensions
     public static IDistributedApplicationBuilder AddApplicationServices(this IDistributedApplicationBuilder builder)
     {
         var kafka = builder.AddKafka("kafka");
-        var mongoDb = builder.AddMongoDB("mongodb");
-        var postgres = builder.AddPostgres("postgresql");
+        //var mongoDb = builder.AddMongoDB("mongodb");
+        //var postgres = builder.AddPostgres("postgresql");
 
-        if (!builder.Configuration.GetValue("IsTest", false))
-        {
-            kafka = kafka.WithLifetime(ContainerLifetime.Persistent)
-                         .WithDataVolume()
-                         .WithKafkaUI();
+        //if (!builder.Configuration.GetValue("IsTest", false))
+        //{
+        //    kafka = kafka.WithLifetime(ContainerLifetime.Persistent)
+        //                 .WithDataVolume()
+        //                 .WithKafkaUI();
 
-            mongoDb = mongoDb.WithLifetime(ContainerLifetime.Persistent)
-                            .WithDataVolume()
-                            .WithMongoExpress();
+        //    mongoDb = mongoDb.WithLifetime(ContainerLifetime.Persistent)
+        //                    .WithDataVolume()
+        //                    .WithMongoExpress();
 
-            postgres = postgres.WithLifetime(ContainerLifetime.Persistent)
-                             .WithDataVolume()
-                             .WithPgWeb();
-        }
+        //    postgres = postgres.WithLifetime(ContainerLifetime.Persistent)
+        //                     .WithDataVolume()
+        //                     .WithPgWeb();
+        //}
         #endregion
 
         #region Create Kafka Topic
