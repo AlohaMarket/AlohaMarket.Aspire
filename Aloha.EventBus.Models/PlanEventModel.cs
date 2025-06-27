@@ -9,7 +9,7 @@ namespace Aloha.EventBus.Models
 {
     public class UserPlanProvisioningResultEvent : IntegrationEvent
     {
-        public string PaymentId { get; set; }
+        public string PaymentId { get; set; } = string.Empty;
         public Guid UserId { get; set; }
         public int PlanId { get; set; }
         public bool IsSuccess { get; set; }
@@ -17,15 +17,16 @@ namespace Aloha.EventBus.Models
         public Guid? UserPlanId { get; set; }
     }
 
-    public class UserPlanValidModel : IntegrationEvent
+    public class UserPlanValidEventModel : IntegrationEvent
     {
         public Guid PostId { get; set; }
+        public int RemainingPosts { get; set; }
     }
 
-    public class UserPlanInvalidModel : IntegrationEvent
+    public class UserPlanInvalidEventModel : IntegrationEvent
     {
         public Guid PostId { get; set; }
-        public string ErrorMessage { get; set; }
+        public string ErrorMessage { get; set; } = string.Empty;
     }
 
 }

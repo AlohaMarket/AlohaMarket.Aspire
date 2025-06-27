@@ -18,14 +18,14 @@ namespace Aloha.CategoryService.EventHandlers
 
             if (isValid)
             {
-                await eventPublisher.PublishAsync(new CategoryPathValidModel
+                await eventPublisher.PublishAsync(new CategoryPathValidEventModel
                 {
                     PostId = request.PostId
                 });
             }
             else
             {
-                await eventPublisher.PublishAsync(new CategoryPathInvalidModel
+                await eventPublisher.PublishAsync(new CategoryPathInvalidEventModel
                 {
                     PostId = request.PostId,
                     ErrorMessage = "Invalid category path"

@@ -101,7 +101,7 @@ if (!string.IsNullOrWhiteSpace(kafkaConsumeTopic))
         options.Topics.AddRange(kafkaConsumeTopic.Split(','));
         options.IntegrationEventFactory = IntegrationEventFactory<CreateUserPlanCommand>.Instance;
         options.AcceptEvent = e => e is PostCreatedIntegrationEvent
-                        || e is RollbackPostUsageEventModel || e is CreateUserPlanCommand || e is TestSendEventModel;
+                        || e is RollbackUserPlanEventModel || e is CreateUserPlanCommand || e is TestSendEventModel;
     });
 }
 

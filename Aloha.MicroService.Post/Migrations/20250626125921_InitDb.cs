@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Aloha.MicroService.Post.Migrations
+namespace Aloha.PostService.Migrations
 {
     /// <inheritdoc />
     public partial class InitDb : Migration
@@ -45,6 +45,10 @@ namespace Aloha.MicroService.Post.Migrations
                     IsLocationValid = table.Column<bool>(type: "boolean", nullable: false),
                     IsCategoryValid = table.Column<bool>(type: "boolean", nullable: false),
                     IsUserPlanValid = table.Column<bool>(type: "boolean", nullable: false),
+                    LocationValidationReceived = table.Column<bool>(type: "boolean", nullable: false),
+                    CategoryValidationReceived = table.Column<bool>(type: "boolean", nullable: false),
+                    UserPlanValidationReceived = table.Column<bool>(type: "boolean", nullable: false),
+                    UserPlanWasConsumed = table.Column<bool>(type: "boolean", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     LocationValidationMessage = table.Column<string>(type: "text", nullable: true),
                     CategoryValidationMessage = table.Column<string>(type: "text", nullable: true),

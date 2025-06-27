@@ -35,4 +35,10 @@ namespace Aloha.EventBus.Models
         public Guid UserId { get; set; }
         public Guid? UserPlanId { get; set; }
     }
+
+    public class RollbackUserPlanEventModel : IntegrationEvent
+    {
+        public Guid PostId { get; set; }
+        public Guid UserPlanId { get; set; }
+    }
 }
