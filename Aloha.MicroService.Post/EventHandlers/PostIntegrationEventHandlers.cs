@@ -1,9 +1,9 @@
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
-using Aloha.MicroService.Post.Infrastructure.Data;
-using Aloha.MicroService.Post.Infrastructure.Entity;
+using Aloha.PostService.Data;
+using Aloha.PostService.Models.Entity;
 
-namespace Aloha.MicroService.Post.EventHandlers
+namespace Aloha.PostService.EventHandlers
 {
     public class PostIntegrationEventHandlers :
     BaseEventHandler<PostDbContext, PostIntegrationEventHandlers>,
@@ -220,7 +220,7 @@ namespace Aloha.MicroService.Post.EventHandlers
             }, cancellationToken);
         }
 
-        private async Task CheckFinalStatusAndHandleRollback(Infrastructure.Entity.Post post, CancellationToken cancellationToken)
+        private async Task CheckFinalStatusAndHandleRollback(Models.Entity.Post post, CancellationToken cancellationToken)
         {
             // Only proceed if all validations have been received
             if (!post.AllValidationsReceived)
@@ -253,18 +253,18 @@ namespace Aloha.MicroService.Post.EventHandlers
             post.Status = finalStatus;
         }
 
-        private async Task HandleRollbackIfNeeded(Infrastructure.Entity.Post post, CancellationToken cancellationToken)
+        private async Task HandleRollbackIfNeeded(Models.Entity.Post post, CancellationToken cancellationToken)
         {
             // Rollback conditions based on your matrix:
             // Rollback if UserPlan was valid/consumed BUT other validations failed
-            var shouldRollback = post.UserPlanWasConsumed && 
-                                post.IsUserPlanValid && 
+            var shouldRollback = post.UserPlanWasConsumed &&
+                                post.IsUserPlanValid &&
                                 (!post.IsLocationValid || !post.IsCategoryValid);
 
             if (shouldRollback)
             {
                 logger.LogInformation("Publishing rollback for PostId={PostId} because UserPlan was consumed but other validations failed", post.Id);
-                
+
                 await eventPublisher.PublishAsync(new RollbackUserPlanEventModel
                 {
                     PostId = post.Id,
