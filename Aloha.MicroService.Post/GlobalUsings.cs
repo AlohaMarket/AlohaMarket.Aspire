@@ -1,9 +1,8 @@
 global using Aloha.EventBus;
 global using Aloha.EventBus.Models;
-global using Aloha.MicroService.Post.Apis;
-global using Aloha.MicroService.Post.Bootstrapping;
 global using Aloha.ServiceDefaults.Hosting;
 global using Aloha.Shared.Middlewares;
+global using AutoMapper;
 global using MediatR;
 global using Microsoft.AspNetCore.Builder;
 global using Microsoft.AspNetCore.Http;
