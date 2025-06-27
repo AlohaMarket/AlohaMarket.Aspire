@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Aloha.MicroService.Post.Migrations
+namespace Aloha.PostService.Migrations
 {
     /// <inheritdoc />
     public partial class InitDb : Migration
