@@ -1,9 +1,12 @@
 using Aloha.EventBus.Abstractions;
 using Aloha.PostService.Models.Entity;
+using Aloha.PostService.Models.Enums;
 using Aloha.PostService.Models.Requests;
 using Aloha.PostService.Models.Responses;
 using Aloha.PostService.Repositories;
 using Aloha.Shared.Exceptions;
+using Aloha.Shared.Meta;
+using AutoMapper;
 using PostEntity = Aloha.PostService.Models.Entity.Post;
 
 namespace Aloha.PostService.Services
@@ -42,28 +45,53 @@ namespace Aloha.PostService.Services
             return _mapper.Map<IEnumerable<PostResponse>>(posts);
         }
 
-        public async Task<IEnumerable<PostResponse>> GetPostsAsync(int page, int pageSize, string? searchTerm = null)
+        public async Task<PagedData<PostResponse>> GetPostsAsync(string? searchTerm = null, int? locationId = null, LocationLevel? locationLevel = null, int? categoryId = null, int page = 1, int pageSize = 10)
         {
-            var pagedPosts = await _postRepository.GetPostsAsync(page, pageSize, searchTerm);
-            return _mapper.Map<IEnumerable<PostResponse>>(pagedPosts);
+            if (page < 1)
+                throw new BadRequestException("Page number must be greater than 0");
+
+            if (locationId.HasValue && locationId < 0)
+                throw new BadRequestException("Location ID must be a positive integer");
+
+            if (locationLevel.HasValue && !Enum.IsDefined(typeof(LocationLevel), locationLevel.Value))
+                throw new BadRequestException("Invalid location level");
+
+            if (categoryId.HasValue && categoryId < 0)
+                throw new BadRequestException("Category ID must be a positive integer");
+
+            var pagedPosts = await _postRepository.GetPostsAsync(searchTerm, locationId, locationLevel, categoryId, page, pageSize);
+
+            return new PagedData<PostResponse>
+            {
+                Items = _mapper.Map<IEnumerable<PostResponse>>(pagedPosts.Items),
+                Meta = pagedPosts.Meta
+            };
         }
 
-        public async Task<IEnumerable<PostResponse>> GetPostsByUserIdAsync(Guid userId)
+        public async Task<PagedData<PostResponse>> GetPostsByUserIdAsync(Guid userId, int page = 1, int pageSize = 10)
         {
-            var posts = await _postRepository.GetPostsByUserIdAsync(userId);
-            return _mapper.Map<IEnumerable<PostResponse>>(posts);
+            var posts = await _postRepository.GetPostsByUserIdAsync(userId, page, pageSize);
+            return new PagedData<PostResponse>
+            {
+                Items = _mapper.Map<IEnumerable<PostResponse>>(posts.Items),
+                Meta = posts.Meta
+            };
         }
 
-        public async Task<IEnumerable<PostResponse>> GetPostsByCategoryIdAsync(int categoryId)
+        public async Task<PagedData<PostResponse>> GetPostsByCategoryIdAsync(int categoryId, int page = 1, int pageSize = 10)
         {
-            var posts = await _postRepository.GetPostsByCategoryIdAsync(categoryId);
-            return _mapper.Map<IEnumerable<PostResponse>>(posts);
+            var posts = await _postRepository.GetPostsByCategoryIdAsync(categoryId, page, pageSize);
+            return new PagedData<PostResponse>
+            {
+                Items = _mapper.Map<IEnumerable<PostResponse>>(posts.Items),
+                Meta = posts.Meta
+            };
         }
 
-        public async Task<IEnumerable<PostResponse>> GetPostsByLocationAsync(int provinceCode, int? districtCode = null, int? wardCode = null)
+        public async Task<PagedData<PostResponse>> GetPostsByLocationAsync(int provinceCode, int? districtCode = null, int? wardCode = null)
         {
             var posts = await _postRepository.GetPostsByLocationAsync(provinceCode, districtCode, wardCode);
-            return _mapper.Map<IEnumerable<PostResponse>>(posts);
+            return _mapper.Map<PagedData<PostResponse>>(posts);
         }
 
         public async Task<PostResponse> CreatePostAsync(PostCreateRequest request)

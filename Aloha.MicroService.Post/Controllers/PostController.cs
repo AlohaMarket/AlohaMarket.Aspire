@@ -1,4 +1,5 @@
 using Aloha.PostService.Models.Entity;
+using Aloha.PostService.Models.Enums;
 using Aloha.PostService.Models.Requests;
 using Aloha.PostService.Services;
 using Aloha.Shared.Meta;
@@ -10,13 +11,19 @@ namespace Aloha.PostService.Controllers
 {
     [Route("api/post")]
     [ApiController]
-    public class PostController(IPostService postService, ILogger<PostController> logger) : ControllerBase
+    public class PostController(IPostService postService) : ControllerBase
     {
 
         [HttpGet]
-        public async Task<IActionResult> GetAllPosts([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? searchTerm = null)
+        public async Task<IActionResult> GetAllPosts(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int? locationId = null,
+            [FromQuery] LocationLevel? locationLevel = null, // Use enum here
+            [FromQuery] int? categoryId = null,
+            [FromQuery] string? searchTerm = null)
         {
-            var posts = await postService.GetPostsAsync(page, pageSize, searchTerm);
+            var posts = await postService.GetPostsAsync(searchTerm, locationId, locationLevel, categoryId, page, pageSize);
             return Ok(ApiResponseBuilder.BuildResponse("Posts retrieved successfully!", posts));
         }
 
@@ -31,16 +38,16 @@ namespace Aloha.PostService.Controllers
         }
 
         [HttpGet("user/{userId:guid}")]
-        public async Task<IActionResult> GetPostsByUserId(Guid userId)
+        public async Task<IActionResult> GetPostsByUserId(Guid userId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var posts = await postService.GetPostsByUserIdAsync(userId);
+            var posts = await postService.GetPostsByUserIdAsync(userId, page, pageSize);
             return Ok(ApiResponseBuilder.BuildResponse("User posts retrieved successfully!", posts));
         }
 
         [HttpGet("category/{categoryId:int}")]
-        public async Task<IActionResult> GetPostsByCategoryId(int categoryId)
+        public async Task<IActionResult> GetPostsByCategoryId(int categoryId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var posts = await postService.GetPostsByCategoryIdAsync(categoryId);
+            var posts = await postService.GetPostsByCategoryIdAsync(categoryId, page, pageSize);
             return Ok(ApiResponseBuilder.BuildResponse("Category posts retrieved successfully!", posts));
         }
 

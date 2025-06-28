@@ -1,5 +1,8 @@
 using Aloha.PostService.Data;
 using Aloha.PostService.Models.Entity;
+using Aloha.PostService.Models.Enums;
+using Aloha.Shared.Exceptions;
+using Aloha.Shared.Meta;
 
 namespace Aloha.PostService.Repositories
 {
@@ -27,41 +30,110 @@ namespace Aloha.PostService.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Post>> GetPostsAsync(int page, int pageSize, string? searchTerm = null)
+        public async Task<PagedData<Post>> GetPostsAsync(string? searchTerm = null,
+            int? locationId = null, LocationLevel? locationLevel = null, int? categoryId = null,
+            int page = 1, int pageSize = 10)
         {
             var query = _context.Posts.Include(p => p.Images).AsQueryable();
 
+            query = query.Where(p => p.IsActive).Where(p => p.Status == PostStatus.Validated);
+
+            if (locationId.HasValue)
+            {
+                query = locationLevel switch
+                {
+                    LocationLevel.Province => query.Where(p => p.ProvinceCode == locationId.Value),
+                    LocationLevel.District => query.Where(p => p.DistrictCode == locationId.Value),
+                    LocationLevel.Ward => query.Where(p => p.WardCode == locationId.Value),
+                    _ => throw new BadRequestException($"Invalid location level {locationLevel}")
+                };
+            }
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                query = query.Where(p => p.Title.Contains(searchTerm) || p.Description.Contains(searchTerm));
+                query = query.Where(p => p.Title.Contains(searchTerm));
             }
 
             var totalCount = await query.CountAsync();
             var posts = await query
-                .OrderByDescending(p => p.CreatedAt)
+                .OrderByDescending(p => p.UpdatedAt)
+                .ThenByDescending(p => p.PushedAt.HasValue ? 1 : 0)
+                .ThenByDescending(p => p.Priority)
+                .ThenByDescending(p => p.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            return posts;
+            return new PagedData<Post>
+            {
+                Items = posts,
+                Meta = new PaginationMeta
+                {
+                    CurrentPage = page,
+                    PageSize = pageSize,
+                    TotalItems = totalCount,
+                    TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+                }
+            };
         }
 
-        public async Task<IEnumerable<Post>> GetPostsByUserIdAsync(Guid userId)
+        public async Task<PagedData<Post>> GetPostsByUserIdAsync(Guid userId, int page = 1, int pageSize = 10)
         {
-            return await _context.Posts
+            var query = _context.Posts
                 .Include(p => p.Images)
-                .Where(p => p.UserId == userId)
-                .OrderByDescending(p => p.CreatedAt)
+                .Where(p => p.UserId == userId);
+
+            var totalCount = await query.CountAsync();
+            var posts = await query
+                .OrderByDescending(p => p.UpdatedAt)
+                .ThenByDescending(p => p.Priority)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            return new PagedData<Post>
+            {
+                Items = posts,
+                Meta = new PaginationMeta
+                {
+                    CurrentPage = page,
+                    PageSize = pageSize,
+                    TotalItems = totalCount,
+                    TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+                }
+            };
         }
 
-        public async Task<IEnumerable<Post>> GetPostsByCategoryIdAsync(int categoryId)
+        public async Task<PagedData<Post>> GetPostsByCategoryIdAsync(int categoryId, int page = 1, int pageSize = 10)
         {
-            return await _context.Posts
+            var query = _context.Posts
                 .Include(p => p.Images)
-                .Where(p => p.CategoryId == categoryId)
-                .OrderByDescending(p => p.CreatedAt)
+                .Where(p => p.CategoryId == categoryId);
+
+            var totalCount = await query.CountAsync();
+            var posts = await query
+                .OrderByDescending(p => p.UpdatedAt)
+                .ThenByDescending(p => p.Priority)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            return new PagedData<Post>
+            {
+                Items = posts,
+                Meta = new PaginationMeta
+                {
+                    CurrentPage = page,
+                    PageSize = pageSize,
+                    TotalItems = totalCount,
+                    TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+                }
+            };
         }
 
         public async Task<IEnumerable<Post>> GetPostsByLocationAsync(int provinceCode, int? districtCode = null, int? wardCode = null)
@@ -77,7 +149,8 @@ namespace Aloha.PostService.Repositories
                 query = query.Where(p => p.WardCode == wardCode.Value);
 
             return await query
-                .OrderByDescending(p => p.CreatedAt)
+                .OrderByDescending(p => p.UpdatedAt)
+                .ThenByDescending(p => p.Priority)
                 .ToListAsync();
         }
 
