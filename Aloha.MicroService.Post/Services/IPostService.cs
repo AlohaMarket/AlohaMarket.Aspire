@@ -1,6 +1,8 @@
 using Aloha.PostService.Models.Entity;
+using Aloha.PostService.Models.Enums;
 using Aloha.PostService.Models.Requests;
 using Aloha.PostService.Models.Responses;
+using Aloha.Shared.Meta;
 
 namespace Aloha.PostService.Services
 {
@@ -8,10 +10,10 @@ namespace Aloha.PostService.Services
     {
         Task<PostResponse?> GetPostByIdAsync(Guid postId);
         Task<IEnumerable<PostResponse>> GetAllPostsAsync();
-        Task<IEnumerable<PostResponse>> GetPostsAsync(int page, int pageSize, string? searchTerm = null);
-        Task<IEnumerable<PostResponse>> GetPostsByUserIdAsync(Guid userId);
-        Task<IEnumerable<PostResponse>> GetPostsByCategoryIdAsync(int categoryId);
-        Task<IEnumerable<PostResponse>> GetPostsByLocationAsync(int provinceCode, int? districtCode = null, int? wardCode = null);
+        Task<PagedData<PostResponse>> GetPostsAsync(string? searchTerm = null, int? locationId = null, LocationLevel? locationLevel = null, int? categoryId = null, int page = 1, int pageSize = 10);
+        Task<PagedData<PostResponse>> GetPostsByUserIdAsync(Guid userId, int page = 1, int pageSize = 10);
+        Task<PagedData<PostResponse>> GetPostsByCategoryIdAsync(int categoryId, int page = 1, int pageSize = 10);
+        Task<PagedData<PostResponse>> GetPostsByLocationAsync(int provinceCode, int? districtCode = null, int? wardCode = null);
         Task<PostResponse> CreatePostAsync(PostCreateRequest request);
         Task<PostResponse> UpdatePostAsync(Guid postId, PostUpdateRequest request);
         Task<bool> DeletePostAsync(Guid postId);
