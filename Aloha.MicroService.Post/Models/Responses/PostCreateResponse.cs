@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace Aloha.PostService.Models.Responses
 {
-    public class PostResponse
+    public class PostCreateResponse
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }

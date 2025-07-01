@@ -19,6 +19,8 @@ namespace Aloha.PostService.Repositories
         {
             return await _context.Posts
                 .Include(p => p.Images)
+                .Where(p => p.IsActive)
+                .Where(p => p.Status == PostStatus.Validated)
                 .FirstOrDefaultAsync(p => p.Id == postId);
         }
 
@@ -34,7 +36,9 @@ namespace Aloha.PostService.Repositories
             int? locationId = null, LocationLevel? locationLevel = null, int? categoryId = null,
             int page = 1, int pageSize = 10)
         {
-            var query = _context.Posts.Include(p => p.Images).AsQueryable();
+            var query = _context.Posts
+                .Include(p => p.Images.Where(img => img.Order == 1))
+                .AsQueryable();
 
             query = query.Where(p => p.IsActive).Where(p => p.Status == PostStatus.Validated);
 
@@ -51,7 +55,7 @@ namespace Aloha.PostService.Repositories
 
             if (categoryId.HasValue)
             {
-                query = query.Where(p => p.CategoryId == categoryId.Value);
+                query = query.Where(p => EF.Functions.JsonContains(p.CategoryPath, categoryId.Value.ToString()));
             }
 
             if (!string.IsNullOrEmpty(searchTerm))

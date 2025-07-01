@@ -2,6 +2,7 @@ using Aloha.PostService.Models.Entity;
 using Aloha.PostService.Models.Enums;
 using Aloha.PostService.Models.Requests;
 using Aloha.PostService.Services;
+using Aloha.Security.Authorizations;
 using Aloha.Shared.Meta;
 using Aloha.Shared.Validators;
 using Microsoft.AspNetCore.Authorization;
@@ -76,9 +77,11 @@ namespace Aloha.PostService.Controllers
         [HttpPost]
         [ValidateModel]
         //[Authorize]
-        public async Task<IActionResult> CreatePost([FromBody] PostCreateRequest request)
+        public async Task<IActionResult> CreatePost([FromForm] PostCreateRequest request)
         {
-            var post = await postService.CreatePostAsync(request);
+            // var userId = Guid.Parse(User.GetUserId());
+            var userId = Guid.NewGuid(); // For testing purposes, replace with actual user ID retrieval logic
+            var post = await postService.CreatePostAsync(userId, request);
             return CreatedAtAction(nameof(GetPostById), new { postId = post.Id },
                 ApiResponseBuilder.BuildResponse("Post created successfully!", post));
         }

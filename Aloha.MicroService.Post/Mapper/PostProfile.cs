@@ -1,3 +1,4 @@
+using Aloha.MicroService.Post.Models.Responses;
 using Aloha.PostService.Models.Entity;
 using Aloha.PostService.Models.Requests;
 using Aloha.PostService.Models.Responses;
@@ -47,8 +48,14 @@ namespace Aloha.PostService.Mapper
                 .ForMember(dest => dest.UserPlanValidationReceived, opt => opt.Ignore());
 
             // Entity to Response mappings
-            CreateMap<Models.Entity.Post, PostResponse>()
+            CreateMap<Models.Entity.Post, PostCreateResponse>()
                 .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
+
+            CreateMap<Models.Entity.Post, PostDetailResponse>()
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
+
+            CreateMap<Models.Entity.Post, PostListResponse>()
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images.FirstOrDefault(img => img.Order == 1)));
 
             CreateMap<PostImage, PostImageResponse>();
         }
