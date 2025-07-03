@@ -1,8 +1,8 @@
+using Aloha.MicroService.Post.Models.Enums;
 using Aloha.PostService.Models.Entity;
 using Aloha.PostService.Models.Enums;
 using Aloha.PostService.Models.Requests;
 using Aloha.PostService.Services;
-using Aloha.Security.Authorizations;
 using Aloha.Shared.Meta;
 using Aloha.Shared.Validators;
 using Microsoft.AspNetCore.Authorization;
@@ -15,29 +15,33 @@ namespace Aloha.PostService.Controllers
     public class PostController(IPostService postService) : ControllerBase
     {
 
+        // This method is used to search posts with various filters
         [HttpGet]
-        public async Task<IActionResult> GetAllPosts(
+        public async Task<IActionResult> GetSearchPosts(
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] int? locationId = null,
-            [FromQuery] LocationLevel? locationLevel = null, // Use enum here
+            [FromQuery] LocationLevel? locationLevel = null,
             [FromQuery] int? categoryId = null,
+            [FromQuery] int? minPrice = null,
+            [FromQuery] int? maxPrice = null,
+            [FromQuery] SortBy? sortBy = null,
+            [FromQuery] SortDirection? order = null,
             [FromQuery] string? searchTerm = null)
         {
-            var posts = await postService.GetPostsAsync(searchTerm, locationId, locationLevel, categoryId, page, pageSize);
+            var posts = await postService.GetSearchPostsAsync(searchTerm, locationId, locationLevel, categoryId, minPrice, maxPrice, sortBy, order, page, pageSize);
             return Ok(ApiResponseBuilder.BuildResponse("Posts retrieved successfully!", posts));
         }
 
+        // This method is used to get post details by post ID
         [HttpGet("{postId:guid}")]
         public async Task<IActionResult> GetPostById(Guid postId)
         {
             var post = await postService.GetPostByIdAsync(postId);
-            if (post == null)
-                return NotFound(ApiResponseBuilder.BuildResponse<object>("Post not found", null));
-
             return Ok(ApiResponseBuilder.BuildResponse("Post retrieved successfully!", post));
         }
 
+        // This method is used to get all posts by user ID
         [HttpGet("user/{userId:guid}")]
         public async Task<IActionResult> GetPostsByUserId(Guid userId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
@@ -45,21 +49,8 @@ namespace Aloha.PostService.Controllers
             return Ok(ApiResponseBuilder.BuildResponse("User posts retrieved successfully!", posts));
         }
 
-        [HttpGet("category/{categoryId:int}")]
-        public async Task<IActionResult> GetPostsByCategoryId(int categoryId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
-        {
-            var posts = await postService.GetPostsByCategoryIdAsync(categoryId, page, pageSize);
-            return Ok(ApiResponseBuilder.BuildResponse("Category posts retrieved successfully!", posts));
-        }
-
-        [HttpGet("location")]
-        public async Task<IActionResult> GetPostsByLocation([FromQuery] int provinceCode, [FromQuery] int? districtCode = null, [FromQuery] int? wardCode = null)
-        {
-            var posts = await postService.GetPostsByLocationAsync(provinceCode, districtCode, wardCode);
-            return Ok(ApiResponseBuilder.BuildResponse("Location posts retrieved successfully!", posts));
-        }
-
         [HttpGet("status/{status}")]
+        [Authorize(Roles = "ALOHA_ADMIN")]
         public async Task<IActionResult> GetPostsByStatus(PostStatus status)
         {
             var posts = await postService.GetPostsByStatusAsync(status);
