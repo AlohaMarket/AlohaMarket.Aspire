@@ -10,11 +10,12 @@ namespace Aloha.LocationService.Repositories
         public async Task<IEnumerable<Province>> GetAllAsync()
         {
             var projection = Builders<Province>.Projection
-                .Exclude(p => p.Districts);
+                //.Exclude(p => p.Districts)
+                ;
 
             return await ctx.Provinces
                 .Find(_ => true)
-                .Project<Province>(projection)
+                //.Project<Province>(projection)
                 .ToListAsync();
         }
 
