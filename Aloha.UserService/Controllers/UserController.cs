@@ -77,7 +77,7 @@ namespace Aloha.UserService.Controllers
             return Ok(ApiResponseBuilder.BuildResponse(data: user, message: "Get User Profile Successfully"));
         }
 
-        [HttpGet("/{id}")]
+        [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetUserInfo([FromQuery] Guid id)
         {
             var user = await userService.GetUserByIdAsync(id);
