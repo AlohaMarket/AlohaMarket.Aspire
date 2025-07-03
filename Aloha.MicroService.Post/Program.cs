@@ -128,6 +128,7 @@ public class Program
         builder.Services.AddSharedServicesLocal<PostDbContext>(builder.Configuration);
         builder.Services.AddScoped<IPostRepository, PostRepository>();
         builder.Services.AddScoped<IPostService, Services.PostService>();
+        builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
         builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
         builder.Services.AddKeycloakJwtAuthentication(builder.Configuration);

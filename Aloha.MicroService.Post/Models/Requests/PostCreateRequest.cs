@@ -2,14 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 
 namespace Aloha.PostService.Models.Requests
 {
     public class PostCreateRequest
     {
-        [Required(ErrorMessage = "UserId is required")]
-        public Guid UserId { get; set; }
-
         [Required(ErrorMessage = "UserPlanId is required")]
         public Guid UserPlanId { get; set; }
 
@@ -49,5 +47,7 @@ namespace Aloha.PostService.Models.Requests
         public int WardCode { get; set; }
 
         public JsonDocument? Attributes { get; set; }
+
+        public List<IFormFile>? Images { get; set; }
     }
 }

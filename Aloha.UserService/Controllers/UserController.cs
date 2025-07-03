@@ -1,9 +1,11 @@
+using Aloha.MicroService.User.Models.Responses;
 using Aloha.Security.Authorizations;
 using Aloha.Shared.Extensions;
 using Aloha.Shared.Meta;
 using Aloha.Shared.Validators;
 using Aloha.UserService.Models.Requests;
 using Aloha.UserService.Services;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +13,7 @@ namespace Aloha.UserService.Controllers
 {
     [Route("api/user")]
     [ApiController]
-    public class UserController(IUserService userService, ILogger<UserController> logger) : ControllerBase
+    public class UserController(IUserService userService, IMapper mapper) : ControllerBase
     {
         [HttpGet]
         [Authorize(Roles = "ALOHA_ADMIN")]
@@ -73,6 +75,13 @@ namespace Aloha.UserService.Controllers
             var userId = Guid.Parse(User.GetUserId());
             var user = await userService.GetUserByIdAsync(userId);
             return Ok(ApiResponseBuilder.BuildResponse(data: user, message: "Get User Profile Successfully"));
+        }
+
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetUserInfo([FromQuery] Guid id)
+        {
+            var user = await userService.GetUserByIdAsync(id);
+            return Ok(ApiResponseBuilder.BuildResponse(data: mapper.Map<UserViewResponse>(user), message: "Get User Info Successfully"));
         }
 
         [HttpPatch("profile/avatar")]

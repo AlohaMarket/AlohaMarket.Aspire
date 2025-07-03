@@ -251,6 +251,7 @@ namespace Aloha.PostService.EventHandlers
 
             // Update the final status
             post.Status = finalStatus;
+            post.IsActive = finalStatus == PostStatus.Validated;
         }
 
         private async Task HandleRollbackIfNeeded(Models.Entity.Post post, CancellationToken cancellationToken)

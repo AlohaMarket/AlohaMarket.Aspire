@@ -10,6 +10,11 @@ namespace Aloha.LocationService.Mapper
         {
             CreateMap<Province, ProvinceResponse>()
                 .ForMember(dest => dest.Districts, opt => opt.MapFrom(src => src.Districts));
+
+            CreateMap<District, DistrictResponse>()
+                .ForMember(dest => dest.Wards, opt => opt.MapFrom(src => src.Wards));
+
+            CreateMap<Ward, WardResponse>();
         }
     }
 }
