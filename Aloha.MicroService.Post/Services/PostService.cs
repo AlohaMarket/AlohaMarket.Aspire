@@ -1,4 +1,5 @@
 using Aloha.EventBus.Abstractions;
+using Aloha.MicroService.Post.Models.Enums;
 using Aloha.MicroService.Post.Models.Responses;
 using Aloha.PostService.Models.Entity;
 using Aloha.PostService.Models.Enums;
@@ -8,7 +9,6 @@ using Aloha.PostService.Repositories;
 using Aloha.ServiceDefaults.Cloudinary;
 using Aloha.Shared.Exceptions;
 using Aloha.Shared.Meta;
-using AutoMapper;
 using PostEntity = Aloha.PostService.Models.Entity.Post;
 
 namespace Aloha.PostService.Services
@@ -44,13 +44,9 @@ namespace Aloha.PostService.Services
             return _mapper.Map<PostDetailResponse>(post);
         }
 
-        public async Task<IEnumerable<PostListResponse>> GetAllPostsAsync()
-        {
-            var posts = await _postRepository.GetAllPostsAsync();
-            return _mapper.Map<IEnumerable<PostListResponse>>(posts);
-        }
-
-        public async Task<PagedData<PostListResponse>> GetPostsAsync(string? searchTerm = null, int? locationId = null, LocationLevel? locationLevel = null, int? categoryId = null, int page = 1, int pageSize = 10)
+        public async Task<PagedData<PostListResponse>> GetSearchPostsAsync(string? searchTerm = null, int? locationId = null,
+            LocationLevel? locationLevel = null, int? categoryId = null, int? minPrice = null, int? maxPrice = null,
+            SortBy? sortBy = null, SortDirection? order = null, int page = 1, int pageSize = 10)
         {
             if (page < 1)
                 throw new BadRequestException("Page number must be greater than 0");
@@ -64,7 +60,23 @@ namespace Aloha.PostService.Services
             if (categoryId.HasValue && categoryId < 0)
                 throw new BadRequestException("Category ID must be a positive integer");
 
-            var pagedPosts = await _postRepository.GetPostsAsync(searchTerm, locationId, locationLevel, categoryId, page, pageSize);
+            if (minPrice.HasValue && minPrice < 0)
+                throw new BadRequestException("Minimum price must be a non-negative integer");
+
+            if (maxPrice.HasValue && maxPrice < 0)
+                throw new BadRequestException("Maximum price must be a non-negative integer");
+
+            if (minPrice.HasValue && maxPrice.HasValue && minPrice > maxPrice)
+                throw new BadRequestException("Minimum price cannot be greater than maximum price");
+
+            // Validate sort parameters
+            if (sortBy.HasValue && !Enum.IsDefined(typeof(SortBy), sortBy.Value))
+                throw new BadRequestException("Invalid sort by option");
+
+            if (order.HasValue && !Enum.IsDefined(typeof(SortDirection), order.Value))
+                throw new BadRequestException("Invalid sort direction");
+
+            var pagedPosts = await _postRepository.GetPostsAsync(searchTerm, locationId, locationLevel, categoryId, minPrice, maxPrice, sortBy, order, page, pageSize);
 
             return new PagedData<PostListResponse>
             {
@@ -81,22 +93,6 @@ namespace Aloha.PostService.Services
                 Items = _mapper.Map<IEnumerable<PostListResponse>>(posts.Items),
                 Meta = posts.Meta
             };
-        }
-
-        public async Task<PagedData<PostListResponse>> GetPostsByCategoryIdAsync(int categoryId, int page = 1, int pageSize = 10)
-        {
-            var posts = await _postRepository.GetPostsByCategoryIdAsync(categoryId, page, pageSize);
-            return new PagedData<PostListResponse>
-            {
-                Items = _mapper.Map<IEnumerable<PostListResponse>>(posts.Items),
-                Meta = posts.Meta
-            };
-        }
-
-        public async Task<PagedData<PostListResponse>> GetPostsByLocationAsync(int provinceCode, int? districtCode = null, int? wardCode = null)
-        {
-            var posts = await _postRepository.GetPostsByLocationAsync(provinceCode, districtCode, wardCode);
-            return _mapper.Map<PagedData<PostListResponse>>(posts);
         }
 
         public async Task<PostCreateResponse> CreatePostAsync(Guid userId, PostCreateRequest request)
@@ -289,6 +285,20 @@ namespace Aloha.PostService.Services
         public async Task<bool> PostExistsAsync(Guid postId)
         {
             return await _postRepository.PostExistsAsync(postId);
+        }
+
+        public async Task<PagedData<PostListResponse>> GetFeaturedPostsAsync(int page = 1, int pageSize = 10)
+        {
+            if (page < 1)
+                throw new BadRequestException("Page number must be greater than 0");
+
+            var posts = await _postRepository.GetPostsAsync(page: page, pageSize: pageSize);
+
+            return new PagedData<PostListResponse>
+            {
+                Items = _mapper.Map<IEnumerable<PostListResponse>>(posts.Items),
+                Meta = posts.Meta
+            };
         }
     }
 }

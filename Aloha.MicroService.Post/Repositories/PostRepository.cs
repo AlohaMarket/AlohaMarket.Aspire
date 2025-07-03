@@ -1,3 +1,4 @@
+using Aloha.MicroService.Post.Models.Enums;
 using Aloha.PostService.Data;
 using Aloha.PostService.Models.Entity;
 using Aloha.PostService.Models.Enums;
@@ -24,16 +25,9 @@ namespace Aloha.PostService.Repositories
                 .FirstOrDefaultAsync(p => p.Id == postId);
         }
 
-        public async Task<IEnumerable<Post>> GetAllPostsAsync()
-        {
-            return await _context.Posts
-                .Include(p => p.Images)
-                .OrderByDescending(p => p.CreatedAt)
-                .ToListAsync();
-        }
-
         public async Task<PagedData<Post>> GetPostsAsync(string? searchTerm = null,
             int? locationId = null, LocationLevel? locationLevel = null, int? categoryId = null,
+            int? minPrice = null, int? maxPrice = null, SortBy? sortBy = null, SortDirection? order = null,
             int page = 1, int pageSize = 10)
         {
             var query = _context.Posts
@@ -41,6 +35,16 @@ namespace Aloha.PostService.Repositories
                 .AsQueryable();
 
             query = query.Where(p => p.IsActive).Where(p => p.Status == PostStatus.Validated);
+
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
+            }
 
             if (locationId.HasValue)
             {
@@ -63,12 +67,27 @@ namespace Aloha.PostService.Repositories
                 query = query.Where(p => p.Title.Contains(searchTerm));
             }
 
+            // Apply base ordering
+            query = query.OrderByDescending(p => p.PushedAt.HasValue ? 1 : 0)
+                        .ThenByDescending(p => p.Priority);
+
+            // Apply custom sorting if specified
+            if (sortBy.HasValue)
+            {
+                query = sortBy switch
+                {
+                    SortBy.Price => order == SortDirection.Asc
+                        ? query.OrderBy(p => p.Price).ThenByDescending(p => p.Priority)
+                        : query.OrderByDescending(p => p.Price).ThenByDescending(p => p.Priority),
+                    SortBy.CreatedAt => order == SortDirection.Asc
+                        ? query.OrderBy(p => p.CreatedAt).ThenByDescending(p => p.Priority)
+                        : query.OrderByDescending(p => p.CreatedAt).ThenByDescending(p => p.Priority),
+                    _ => throw new BadRequestException($"Invalid sort by {sortBy}")
+                };
+            }
+
             var totalCount = await query.CountAsync();
             var posts = await query
-                .OrderByDescending(p => p.UpdatedAt)
-                .ThenByDescending(p => p.PushedAt.HasValue ? 1 : 0)
-                .ThenByDescending(p => p.Priority)
-                .ThenByDescending(p => p.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -111,51 +130,6 @@ namespace Aloha.PostService.Repositories
                     TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
                 }
             };
-        }
-
-        public async Task<PagedData<Post>> GetPostsByCategoryIdAsync(int categoryId, int page = 1, int pageSize = 10)
-        {
-            var query = _context.Posts
-                .Include(p => p.Images)
-                .Where(p => p.CategoryId == categoryId);
-
-            var totalCount = await query.CountAsync();
-            var posts = await query
-                .OrderByDescending(p => p.UpdatedAt)
-                .ThenByDescending(p => p.Priority)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return new PagedData<Post>
-            {
-                Items = posts,
-                Meta = new PaginationMeta
-                {
-                    CurrentPage = page,
-                    PageSize = pageSize,
-                    TotalItems = totalCount,
-                    TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
-                }
-            };
-        }
-
-        public async Task<IEnumerable<Post>> GetPostsByLocationAsync(int provinceCode, int? districtCode = null, int? wardCode = null)
-        {
-            var query = _context.Posts
-                .Include(p => p.Images)
-                .Where(p => p.ProvinceCode == provinceCode);
-
-            if (districtCode.HasValue)
-                query = query.Where(p => p.DistrictCode == districtCode.Value);
-
-            if (wardCode.HasValue)
-                query = query.Where(p => p.WardCode == wardCode.Value);
-
-            return await query
-                .OrderByDescending(p => p.UpdatedAt)
-                .ThenByDescending(p => p.Priority)
-                .ToListAsync();
         }
 
         public async Task<Post> CreatePostAsync(Post post)
