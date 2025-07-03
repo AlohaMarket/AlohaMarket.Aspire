@@ -89,7 +89,9 @@ app.MapControllers();
 app.MapReverseProxy(proxyPipeline =>
 {
     proxyPipeline.UseMiddleware<AuthenticatedRequestForwardingMiddleware>();
-}).RequireAuthorization();
+})
+    //.RequireAuthorization()
+    ;
 
 
 app.Run();
