@@ -55,7 +55,7 @@ namespace Aloha.PostService.Mapper
                 .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
 
             CreateMap<Models.Entity.Post, PostListResponse>()
-                .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images.FirstOrDefault(img => img.Order == 1)));
+                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Images.FirstOrDefault(img => img.Order == 1)));
 
             CreateMap<PostImage, PostImageResponse>();
         }

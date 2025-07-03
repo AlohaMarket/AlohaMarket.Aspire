@@ -17,6 +17,6 @@ namespace Aloha.MicroService.Post.Models.Responses
         public string? ProvinceText { get; set; }
         public string? DistrictText { get; set; }
         public string? WardText { get; set; }
-        public PostImageResponse Images { get; set; } = new();
+        public PostImageResponse Image { get; set; } = new();
     }
 }
