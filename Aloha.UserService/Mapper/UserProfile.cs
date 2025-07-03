@@ -1,4 +1,5 @@
-﻿using Aloha.UserService.Models.Entities;
+﻿using Aloha.MicroService.User.Models.Responses;
+using Aloha.UserService.Models.Entities;
 using Aloha.UserService.Models.Requests;
 using AutoMapper;
 
@@ -24,6 +25,8 @@ namespace Aloha.UserService.Mapper
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.BirthDate, opt => opt.MapFrom(src => src.BirthDate))
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
+
+            CreateMap<User, UserViewResponse>();
         }
     }
 }
