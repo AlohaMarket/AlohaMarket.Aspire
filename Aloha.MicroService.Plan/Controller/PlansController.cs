@@ -1,12 +1,14 @@
 ﻿using Aloha.MicroService.Plan.Models.Request;
 using Aloha.MicroService.Plan.Models.Response;
 using Aloha.MicroService.Plan.Service;
+using Aloha.Security.Authorizations;
+using Aloha.Shared.Meta;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aloha.MicroService.Plan.Controller
 {
     [ApiController]
-    [Route("api/plans")]
+    [Route("api/plan")]
     public class PlansController : ControllerBase
     {
         private readonly IPlanService _planService;
@@ -71,13 +73,14 @@ namespace Aloha.MicroService.Plan.Controller
             return NoContent();
         }
 
-        [HttpGet("user/{userId}")]
+        [HttpGet("me")]
         [ProducesResponseType(typeof(List<UserPlanResponse>), 200)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> GetUserPlans(Guid userId)
+        public async Task<IActionResult> GetUserPlans()
         {
+            var userId = Guid.Parse(User.GetUserId());
             var userPlans = await _planService.GetUserPlansAsync(userId);
-            return Ok(userPlans);
+            return Ok(ApiResponseBuilder.BuildResponse("Get user plan success fully", userPlans));
         }
 
         [HttpPost("subscribe")]
