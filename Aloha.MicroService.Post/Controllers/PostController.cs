@@ -3,6 +3,7 @@ using Aloha.PostService.Models.Entity;
 using Aloha.PostService.Models.Enums;
 using Aloha.PostService.Models.Requests;
 using Aloha.PostService.Services;
+using Aloha.Security.Authorizations;
 using Aloha.Shared.Meta;
 using Aloha.Shared.Validators;
 using Microsoft.AspNetCore.Authorization;
@@ -43,9 +44,9 @@ namespace Aloha.PostService.Controllers
 
         // This method is used to get all posts by user ID
         [HttpGet("user/{userId:guid}")]
-        public async Task<IActionResult> GetPostsByUserId(Guid userId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetPostsByUserId(Guid userId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] PostStatus? status = null)
         {
-            var posts = await postService.GetPostsByUserIdAsync(userId, page, pageSize);
+            var posts = await postService.GetPostsByUserIdAsync(userId, page, pageSize, status);
             return Ok(ApiResponseBuilder.BuildResponse("User posts retrieved successfully!", posts));
         }
 
@@ -57,21 +58,13 @@ namespace Aloha.PostService.Controllers
             return Ok(ApiResponseBuilder.BuildResponse($"Posts with status {status} retrieved successfully!", posts));
         }
 
-        [HttpGet("moderation")]
-        [Authorize(Roles = "ALOHA_ADMIN")]
-        public async Task<IActionResult> GetPostsForModeration()
-        {
-            var posts = await postService.GetPostsForModerationAsync();
-            return Ok(ApiResponseBuilder.BuildResponse("Posts for moderation retrieved successfully!", posts));
-        }
-
-        [HttpPost]
+        [HttpPost("create")]
         [ValidateModel]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> CreatePost([FromForm] PostCreateRequest request)
         {
-            // var userId = Guid.Parse(User.GetUserId());
-            var userId = Guid.NewGuid(); // For testing purposes, replace with actual user ID retrieval logic
+            var userId = Guid.Parse(User.GetUserId());
+            //var userId = Guid.NewGuid(); // For testing purposes, replace with actual user ID retrieval logic
             var post = await postService.CreatePostAsync(userId, request);
             return CreatedAtAction(nameof(GetPostById), new { postId = post.Id },
                 ApiResponseBuilder.BuildResponse("Post created successfully!", post));
@@ -84,17 +77,6 @@ namespace Aloha.PostService.Controllers
         {
             var post = await postService.UpdatePostAsync(postId, request);
             return Ok(ApiResponseBuilder.BuildResponse("Post updated successfully!", post));
-        }
-
-        [HttpPut("{postId:guid}/status")]
-        [Authorize(Roles = "ALOHA_ADMIN")]
-        public async Task<IActionResult> UpdatePostStatus(Guid postId, [FromBody] PostStatus status)
-        {
-            var post = await postService.UpdatePostStatusAsync(postId, status);
-            if (post == null)
-                return NotFound(ApiResponseBuilder.BuildResponse<object>("Post not found", null));
-
-            return Ok(ApiResponseBuilder.BuildResponse("Post status updated successfully!", post));
         }
 
         [HttpPut("{postId:guid}/activate")]
@@ -119,6 +101,18 @@ namespace Aloha.PostService.Controllers
             return Ok(ApiResponseBuilder.BuildResponse("Post pushed successfully!", post));
         }
 
+        [HttpPut("{postId:guid}/archived")]
+        [Authorize]
+        public async Task<IActionResult> ArchivedPost(Guid postId)
+        {
+            var userId = Guid.Parse(User.GetUserId());
+            var post = await postService.UpdatePostStatusAsync(userId, postId, PostStatus.Archived);
+            if (post == null)
+                return NotFound(ApiResponseBuilder.BuildResponse<object>("Post not found", null));
+
+            return Ok(ApiResponseBuilder.BuildResponse("Post pushed successfully!", post));
+        }
+
         [HttpDelete("{postId:guid}")]
         [Authorize]
         public async Task<IActionResult> DeletePost(Guid postId)
@@ -130,11 +124,23 @@ namespace Aloha.PostService.Controllers
             return Ok(ApiResponseBuilder.BuildResponse<object>("Post deleted successfully!", null));
         }
 
-        [HttpHead("{postId:guid}")]
-        public async Task<IActionResult> CheckPostExists(Guid postId)
+        // This method is used to get all posts by user ID
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> GetValidationPosts([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] PostStatus? status = null)
         {
-            var exists = await postService.PostExistsAsync(postId);
-            return exists ? Ok() : NotFound();
+            var userId = Guid.Parse(User.GetUserId());
+            var posts = await postService.GetPostsByUserIdAsync(userId, page, pageSize, status);
+            return Ok(ApiResponseBuilder.BuildResponse("User posts retrieved successfully!", posts));
+        }
+
+        [HttpGet("{postId}/after-create")]
+        [Authorize]
+        public async Task<IActionResult> GetPostAfterCreate([FromRoute] Guid postId)
+        {
+            var userId = Guid.Parse(User.GetUserId());
+            var posts = await postService.GetPostAfterCreate(postId, userId);
+            return Ok(ApiResponseBuilder.BuildResponse("User posts retrieved successfully!", posts));
         }
     }
 }

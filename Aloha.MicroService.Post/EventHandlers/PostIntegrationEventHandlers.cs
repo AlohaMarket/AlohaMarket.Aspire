@@ -6,13 +6,13 @@ using Aloha.PostService.Models.Entity;
 namespace Aloha.PostService.EventHandlers
 {
     public class PostIntegrationEventHandlers :
-    BaseEventHandler<PostDbContext, PostIntegrationEventHandlers>,
-    IRequestHandler<LocationValidEventModel>,
-    IRequestHandler<LocationInvalidEventModel>,
-    IRequestHandler<CategoryPathValidEventModel>,
-    IRequestHandler<CategoryPathInvalidEventModel>,
-    IRequestHandler<UserPlanValidEventModel>,
-    IRequestHandler<UserPlanInvalidEventModel>
+        BaseEventHandler<PostDbContext, PostIntegrationEventHandlers>,
+        IRequestHandler<LocationValidEventModel>,
+        IRequestHandler<LocationInvalidEventModel>,
+        IRequestHandler<CategoryPathValidEventModel>,
+        IRequestHandler<CategoryPathInvalidEventModel>,
+        IRequestHandler<UserPlanValidEventModel>,
+        IRequestHandler<UserPlanInvalidEventModel>
     {
 
         public PostIntegrationEventHandlers(

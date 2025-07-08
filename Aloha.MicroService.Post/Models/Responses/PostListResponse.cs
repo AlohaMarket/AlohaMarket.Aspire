@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Aloha.PostService.Models.Entity;
 using Aloha.PostService.Models.Responses;
 
 namespace Aloha.MicroService.Post.Models.Responses
@@ -18,5 +15,7 @@ namespace Aloha.MicroService.Post.Models.Responses
         public string? DistrictText { get; set; }
         public string? WardText { get; set; }
         public PostImageResponse Image { get; set; } = new();
+        public DateTime CreatedAt { get; set; }
+        public PostStatus Status { get; set; }
     }
 }
