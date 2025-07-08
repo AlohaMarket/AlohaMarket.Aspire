@@ -32,7 +32,7 @@ namespace Aloha.UserService.Controllers
 
         [HttpPost("register")]
         [ValidateModel]
-        [Authorize] // Add this attribute to require authentication
+        [Authorize]
         public async Task<IActionResult> CreateUser()
         {
             var request = new CreateUserRequest
@@ -77,8 +77,8 @@ namespace Aloha.UserService.Controllers
             return Ok(ApiResponseBuilder.BuildResponse(data: user, message: "Get User Profile Successfully"));
         }
 
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetUserInfo([FromQuery] Guid id)
+        [HttpGet("seller/{id:guid}")]
+        public async Task<IActionResult> GetUserInfo([FromRoute] Guid id)
         {
             var user = await userService.GetUserByIdAsync(id);
             return Ok(ApiResponseBuilder.BuildResponse(data: mapper.Map<UserViewResponse>(user), message: "Get User Info Successfully"));

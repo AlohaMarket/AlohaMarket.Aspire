@@ -8,10 +8,8 @@
         public string PlanName { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public int UsedPosts { get; set; }
-        public int RemainingPosts { get; set; }
-        public int UsedPushes { get; set; }
-        public int RemainingPushes { get; set; }
+        public int RemainPosts { get; set; }
+        public int RemainPushes { get; set; }
         public bool IsActive { get; set; }
     }
 }

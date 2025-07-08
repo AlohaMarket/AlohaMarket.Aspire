@@ -19,7 +19,7 @@ namespace Aloha.PostService.Repositories
         public async Task<Post?> GetPostByIdAsync(Guid postId)
         {
             return await _context.Posts
-                .Include(p => p.Images)
+                .Include(p => p.Images).AsNoTracking()
                 .Where(p => p.IsActive)
                 .Where(p => p.Status == PostStatus.Validated)
                 .FirstOrDefaultAsync(p => p.Id == postId);
@@ -32,6 +32,7 @@ namespace Aloha.PostService.Repositories
         {
             var query = _context.Posts
                 .Include(p => p.Images.Where(img => img.Order == 1))
+                .AsNoTracking()
                 .AsQueryable();
 
             query = query.Where(p => p.IsActive).Where(p => p.Status == PostStatus.Validated);
@@ -68,7 +69,7 @@ namespace Aloha.PostService.Repositories
             }
 
             // Apply base ordering
-            query = query.OrderByDescending(p => p.PushedAt.HasValue ? 1 : 0)
+            query = query.OrderByDescending(p => p.CreatedAt)
                         .ThenByDescending(p => p.Priority);
 
             // Apply custom sorting if specified
@@ -105,11 +106,17 @@ namespace Aloha.PostService.Repositories
             };
         }
 
-        public async Task<PagedData<Post>> GetPostsByUserIdAsync(Guid userId, int page = 1, int pageSize = 10)
+        public async Task<PagedData<Post>> GetPostsByUserIdAsync(Guid userId, int page = 1, int pageSize = 10, PostStatus? postStatus = null)
         {
             var query = _context.Posts
                 .Include(p => p.Images)
-                .Where(p => p.UserId == userId);
+                .Where(p => p.UserId == userId)
+                .Where(p => p.IsActive)
+                .AsNoTracking()
+                .AsQueryable();
+
+            if (postStatus.HasValue)
+                query = query.Where(p => p.Status == postStatus.Value);
 
             var totalCount = await query.CountAsync();
             var posts = await query
@@ -202,15 +209,6 @@ namespace Aloha.PostService.Repositories
             post.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
             return post;
-        }
-
-        public async Task<IEnumerable<Post>> GetPostsForModerationAsync()
-        {
-            return await _context.Posts
-                .Include(p => p.Images)
-                .Where(p => p.Status == PostStatus.PendingValidation || p.IsViolation)
-                .OrderByDescending(p => p.CreatedAt)
-                .ToListAsync();
         }
 
         public async Task<IEnumerable<Post>> GetPostsByStatusAsync(PostStatus status)

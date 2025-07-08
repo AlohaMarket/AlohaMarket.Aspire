@@ -85,9 +85,18 @@ namespace Aloha.PostService.Services
             };
         }
 
-        public async Task<PagedData<PostListResponse>> GetPostsByUserIdAsync(Guid userId, int page = 1, int pageSize = 10)
+        public async Task<PagedData<PostListResponse>> GetPostsByUserIdAsync(Guid userId, int page = 1, int pageSize = 10, PostStatus? postStatus = null)
         {
-            var posts = await _postRepository.GetPostsByUserIdAsync(userId, page, pageSize);
+            if (userId == Guid.Empty)
+                throw new BadRequestException("User ID cannot be empty");
+
+            if (page < 1)
+                throw new BadRequestException("Page number must be greater than 0");
+
+            if (postStatus.HasValue && !Enum.IsDefined(typeof(PostStatus), postStatus.Value))
+                throw new BadRequestException("Invalid post status");
+
+            var posts = await _postRepository.GetPostsByUserIdAsync(userId, page, pageSize, postStatus);
             return new PagedData<PostListResponse>
             {
                 Items = _mapper.Map<IEnumerable<PostListResponse>>(posts.Items),
@@ -229,11 +238,20 @@ namespace Aloha.PostService.Services
             return result;
         }
 
-        public async Task<PostCreateResponse?> UpdatePostStatusAsync(Guid postId, PostStatus status)
+        public async Task<PostCreateResponse?> UpdatePostStatusAsync(Guid userId, Guid postId, PostStatus status)
         {
-            var post = await _postRepository.UpdatePostStatusAsync(postId, status);
+            var post = await _postRepository.GetPostByIdAsync(postId);
             if (post is null)
-                return null;
+                throw new NotFoundException($"Post with ID {postId} not found");
+
+            if (post.UserId != userId)
+                throw new UnauthorizedException($"User {userId} is not authorized to update post {postId}");
+
+            // Validate status
+            if (!Enum.IsDefined(typeof(PostStatus), status))
+                throw new BadRequestException("Invalid post status");
+
+            post = await _postRepository.UpdatePostStatusAsync(postId, status);
 
             _logger.LogInformation("Updated post {PostId} status to {Status}", postId, status);
 
@@ -270,12 +288,6 @@ namespace Aloha.PostService.Services
             return _mapper.Map<PostCreateResponse>(post);
         }
 
-        public async Task<IEnumerable<PostCreateResponse>> GetPostsForModerationAsync()
-        {
-            var posts = await _postRepository.GetPostsForModerationAsync();
-            return _mapper.Map<IEnumerable<PostCreateResponse>>(posts);
-        }
-
         public async Task<IEnumerable<PostCreateResponse>> GetPostsByStatusAsync(PostStatus status)
         {
             var posts = await _postRepository.GetPostsByStatusAsync(status);
@@ -287,18 +299,15 @@ namespace Aloha.PostService.Services
             return await _postRepository.PostExistsAsync(postId);
         }
 
-        public async Task<PagedData<PostListResponse>> GetFeaturedPostsAsync(int page = 1, int pageSize = 10)
+        public async Task<PostCreateResponse> GetPostAfterCreate(Guid postId, Guid userId)
         {
-            if (page < 1)
-                throw new BadRequestException("Page number must be greater than 0");
-
-            var posts = await _postRepository.GetPostsAsync(page: page, pageSize: pageSize);
-
-            return new PagedData<PostListResponse>
-            {
-                Items = _mapper.Map<IEnumerable<PostListResponse>>(posts.Items),
-                Meta = posts.Meta
-            };
+            var post = await _postRepository.GetPostByIdAsync(postId);
+            if (post is null)
+                throw new NotFoundException($"Post with ID {postId} not found");
+            if (post.UserId != userId)
+                throw new UnauthorizedException($"User {userId} is not authorized to access post {postId}");
+            _logger.LogInformation("Retrieved post after creation with ID {PostId} for user {UserId}", postId, userId);
+            return _mapper.Map<PostCreateResponse>(post);
         }
     }
 }
