@@ -72,6 +72,10 @@ public static class ApplicationServiceExtensions
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_Post>());
 
+        var notificationService = builder.AddProjectWithPostfix<Projects.Aloha_NotificationService>()
+           .SetupKafka<Projects.Aloha_NotificationService>(
+               kafka);
+
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
             .WithReference(userService)
             .WithReference(postService)
