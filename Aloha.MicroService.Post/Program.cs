@@ -125,7 +125,7 @@ public class Program
         });
 
         // Register application services
-        builder.Services.AddSharedServicesLocal<PostDbContext>(builder.Configuration);
+        builder.Services.AddSharedServices<PostDbContext>(builder.Configuration);
         builder.Services.AddScoped<IPostRepository, PostRepository>();
         builder.Services.AddScoped<IPostService, Services.PostService>();
         builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
