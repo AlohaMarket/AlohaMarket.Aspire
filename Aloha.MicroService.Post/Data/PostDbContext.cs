@@ -1,20 +1,20 @@
-using Aloha.MicroService.Post.Infrastructure.Entity;
+using Aloha.PostService.Models.Entity;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace Aloha.MicroService.Post.Infrastructure.Data
+namespace Aloha.PostService.Data
 {
     public class PostDbContext : DbContext
     {
         public PostDbContext(DbContextOptions<PostDbContext> options) : base(options) { }
 
-        public DbSet<Entity.Post> Posts { get; set; } = default!;
+        public DbSet<Models.Entity.Post> Posts { get; set; } = default!;
         public DbSet<PostImage> PostImages { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("PostServiceDB");
 
-            modelBuilder.Entity<Entity.Post>(entity =>
+            modelBuilder.Entity<Models.Entity.Post>(entity =>
             {
                 // Primary key and ID generation
                 entity.HasKey(e => e.Id);

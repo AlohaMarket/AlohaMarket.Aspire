@@ -14,6 +14,7 @@ using Aloha.UserService.Services;
 using dotenv.net;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
 
 namespace Aloha.UserService;
 
@@ -34,11 +35,11 @@ public class Program
                         .AllowAnyHeader();
             });
         });
-
-        // Add services to the container.
-
-        builder.Services.AddControllers();
-        // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+        builder.Services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+        builder.Services.AddAuthorization();
         builder.Services.AddOpenApi();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
@@ -125,7 +126,7 @@ public class Program
 
         builder.Services.AddSharedServices<UserDbContext>(builder.Configuration);
         builder.Services.AddScoped<IUserRepository, UserRepository>();
-        builder.Services.AddScoped<IUserService, UserService.Services.UserService>();
+        builder.Services.AddScoped<IUserService, Services.UserService>();
         builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
         builder.Services.AddAutoMapper(typeof(Program).Assembly);
 

@@ -1,12 +1,12 @@
 using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
-using Aloha.MicroService.Post.Infrastructure.Data;
+using Aloha.PostService.Data;
 using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 
-namespace Aloha.MicroService.Post.Bootstrapping
+namespace Aloha.PostService.Bootstrapping
 {
     public static class ApplicationServiceExtensions
     {
@@ -97,10 +97,12 @@ namespace Aloha.MicroService.Post.Bootstrapping
                     options.Topics.AddRange(eventConsumingTopics.Split(','));
                     options.IntegrationEventFactory = IntegrationEventFactory<PostCreatedIntegrationEvent>.Instance;
                     options.AcceptEvent = e =>
-                                e is LocationValidEventModel
-                                || e is LocationInvalidEventModel
-                                || e is CategoryPathValidModel
-                                || e is CategoryPathInvalidModel;
+                        e is LocationValidEventModel
+                        || e is LocationInvalidEventModel
+                        || e is CategoryPathValidEventModel
+                        || e is CategoryPathInvalidEventModel
+                        || e is UserPlanInvalidEventModel
+                        || e is UserPlanValidEventModel;
                 });
             }
 

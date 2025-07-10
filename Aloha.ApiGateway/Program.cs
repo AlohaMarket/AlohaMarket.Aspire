@@ -39,7 +39,7 @@ builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
     .AddTransforms(builderContext =>
     {
-        builderContext.AddRequestTransform(transformContext =>
+        builderContext.AddRequestTransform(async transformContext => await Task.Run(() =>
         {
             var httpContext = transformContext.HttpContext;
             var logger = httpContext.RequestServices.GetRequiredService<ILogger<Program>>();
@@ -53,8 +53,12 @@ builder.Services.AddReverseProxy()
                 // Forward it as-is (already includes "Bearer ...")
                 transformContext.ProxyRequest.Headers.Add("Authorization", authHeader.ToString());
             }
+            else
+            {
+                // If no Authorization header is present, log a warning
+                logger.LogWarning("No Authorization header found in the request.");
+            }
 
-            // Add optional debug/custom header
             transformContext.ProxyRequest.Headers.Add("Api-Gateway", "true");
 
             // Log headers
@@ -65,10 +69,7 @@ builder.Services.AddReverseProxy()
             {
                 logger.LogInformation("{Key} = {Value}", header.Key, string.Join(", ", header.Value));
             }
-            logger.LogInformation("End Forwarded Header:");
-
-            return ValueTask.CompletedTask;
-        });
+        }));
     });
 
 var app = builder.Build();
@@ -89,7 +90,9 @@ app.MapControllers();
 app.MapReverseProxy(proxyPipeline =>
 {
     proxyPipeline.UseMiddleware<AuthenticatedRequestForwardingMiddleware>();
-}).RequireAuthorization();
+})
+    //.RequireAuthorization()
+    ;
 
 
 app.Run();

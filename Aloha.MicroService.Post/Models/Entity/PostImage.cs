@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Aloha.MicroService.Post.Infrastructure.Entity
+namespace Aloha.PostService.Models.Entity
 {
     public class PostImage
     {

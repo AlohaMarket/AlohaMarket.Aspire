@@ -1,4 +1,5 @@
 ﻿using Aloha.Shared.Meta;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -61,7 +62,10 @@ namespace Aloha.Shared.Validators
                     message: "Validation failed"
                 );
 
-                context.Result = new BadRequestObjectResult(response);
+                context.Result = new ObjectResult(response)
+                {
+                    StatusCode = StatusCodes.Status422UnprocessableEntity
+                };
             }
         }
 

@@ -2,12 +2,12 @@
 
 namespace Aloha.EventBus.Models
 {
-    public class CategoryPathValidModel : IntegrationEvent
+    public class CategoryPathValidEventModel : IntegrationEvent
     {
         public Guid PostId { get; set; }
     }
 
-    public class CategoryPathInvalidModel : IntegrationEvent
+    public class CategoryPathInvalidEventModel : IntegrationEvent
     {
         public Guid PostId { get; set; }
         public string ErrorMessage { get; set; }

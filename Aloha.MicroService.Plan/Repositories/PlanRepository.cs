@@ -73,5 +73,31 @@ namespace Aloha.MicroService.Plan.Repositories
             await _context.UserPlans.AddAsync(userPlan);
             await _context.SaveChangesAsync();
         }
+        public async Task<UserPlan?> GetUserPlanByIdAsync(Guid? id)
+        {
+            return await _context.UserPlans
+                .AsNoTracking()
+                .Include(up => up.Plan)
+                .FirstOrDefaultAsync(up => up.Id == id && up.IsActive);
+        }
+
+        public async Task DecrementRemainPostsAsync(Guid userPlanId)
+        {
+            var userPlan = await _context.UserPlans
+                .FirstOrDefaultAsync(up => up.Id == userPlanId && up.IsActive);
+
+            if (userPlan != null)
+            {
+                userPlan.RemainPosts -= 1;
+                if (userPlan.RemainPosts == 0)
+                {
+                    userPlan.IsActive = false; 
+                }
+                await _context.SaveChangesAsync();
+            }
+
+        }
+
+
     }
 }

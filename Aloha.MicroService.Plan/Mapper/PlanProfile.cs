@@ -23,11 +23,7 @@ namespace Aloha.MicroService.Plan.Mapper
 
             CreateMap<Plans, PlanResponse>();
             CreateMap<UserPlan, UserPlanResponse>()
-                .ForMember(dest => dest.PlanName, opt => opt.MapFrom(src => src.Plan.Name))
-                .ForMember(dest => dest.RemainingPosts,
-                    opt => opt.MapFrom(src => src.Plan.MaxPosts - src.RemainPosts))
-                .ForMember(dest => dest.RemainingPushes,
-                    opt => opt.MapFrom(src => src.Plan.MaxPushes - src.RemainPushes));
+                .ForMember(dest => dest.PlanName, opt => opt.MapFrom(src => src.Plan.Name));
         }
     }
 

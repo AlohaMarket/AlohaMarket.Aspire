@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Aloha.MicroService.Plan.Service
 {
-    public class PlanService : IPlanService
+    public class PlanService : IPlanService  
     {
         private readonly PlanDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -112,5 +112,17 @@ namespace Aloha.MicroService.Plan.Service
                 }
             });
         }
+
+        public async Task<bool> IsValidUserPlan(Guid? id)
+        {
+            if (id == null) return false;
+            var userPlan = await _planRepository.GetUserPlansAsync(id.Value)
+                .ContinueWith(t => t.Result.FirstOrDefault(up => up.RemainPosts != 0), TaskContinuationOptions.OnlyOnRanToCompletion);
+            if (userPlan == null) return false;
+            _planRepository.DecrementRemainPostsAsync(userPlan.Id).Wait();
+            return true;
+        }
+
+
     }
 }

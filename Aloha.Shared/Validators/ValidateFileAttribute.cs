@@ -78,7 +78,10 @@ namespace Aloha.Shared.Extensions
                 message: "File validation failed"
             );
 
-            context.Result = new BadRequestObjectResult(response);
+            context.Result = new ObjectResult(response)
+            {
+                StatusCode = StatusCodes.Status422UnprocessableEntity
+            };
         }
     }
 }
