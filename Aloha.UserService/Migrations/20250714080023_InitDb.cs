@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Aloha.UserService.Migrations
+namespace Aloha.MicroService.User.Migrations
 {
     /// <inheritdoc />
     public partial class InitDb : Migration
@@ -21,6 +21,7 @@ namespace Aloha.UserService.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     UserName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     AvatarUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     PhoneNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     BirthDate = table.Column<DateOnly>(type: "date", nullable: true),
