@@ -1,6 +1,8 @@
 ﻿using Aloha.NotificationService.Models.Entities;
 using Aloha.NotificationService.Models.DTOs;
 using Aloha.NotificationService.Repositories;
+using Aloha.EventBus.Abstractions;
+using Aloha.EventBus.Models;
 
 namespace Aloha.NotificationService.Services
 {
@@ -9,47 +11,117 @@ namespace Aloha.NotificationService.Services
         private readonly IMessageRepository _messageRepository;
         private readonly IConversationRepository _conversationRepository;
         private readonly ILogger<ChatService> _logger;
-        
-        // Simple in-memory storage for testing user data
-        private static readonly Dictionary<string, UserDto> _mockUsers = new();
+        private readonly IEventPublisher _eventPublisher;
+        private readonly IUserProfileCache _userCache;
+
+        // Fallback mock users only for development/testing
+        private static readonly Dictionary<string, UserDto> _fallbackUsers = new();
 
         public ChatService(
             IMessageRepository messageRepository,
             IConversationRepository conversationRepository,
-            ILogger<ChatService> logger)
+            ILogger<ChatService> logger,
+            IEventPublisher eventPublisher,
+            IUserProfileCache userCache)
         {
             _messageRepository = messageRepository;
             _conversationRepository = conversationRepository;
             _logger = logger;
+            _eventPublisher = eventPublisher;
+            _userCache = userCache;
         }
 
         public async Task<UserDto?> GetUser(string userId)
-       {
-            // For testing, create mock user data if doesn't exist
-            if (!_mockUsers.ContainsKey(userId))
+        {
+            try
             {
-                var mockUser = new UserDto
+                // First, check cache
+                var cachedUser = await _userCache.GetUserAsync(userId);
+                if (cachedUser != null)
                 {
-                    Id = userId,
-                    Name = $"User {userId}",
-                    Email = $"user{userId}@test.com",
-                    Avatar = $"https://api.dicebear.com/7.x/avataaars/svg?seed={userId}",
-                    IsOnline = false
-                };
-                _mockUsers[userId] = mockUser;
+                    _logger.LogDebug("User {UserId} found in cache", userId);
+                    return cachedUser;
+                }
+
+                // Request from UserService via Kafka
+                _logger.LogInformation("Requesting user profile from UserService for userId: {UserId}", userId);
+
+                await _eventPublisher.PublishAsync(new UserChatRequestEventModel
+                {
+                    UserId = userId,
+                    RequestingService = "NotificationService"
+                });
+
+                // Wait for response with timeout (polling approach)
+                var maxWaitTime = TimeSpan.FromSeconds(3);
+                var pollingInterval = TimeSpan.FromMilliseconds(100);
+                var startTime = DateTime.UtcNow;
+
+                while (DateTime.UtcNow - startTime < maxWaitTime)
+                {
+                    await Task.Delay(pollingInterval);
+
+                    cachedUser = await _userCache.GetUserAsync(userId);
+                    if (cachedUser != null)
+                    {
+                        _logger.LogInformation("User profile received and cached for userId: {UserId}", userId);
+                        return cachedUser;
+                    }
+                }
+
+                _logger.LogWarning("Timeout waiting for user profile from UserService for userId: {UserId}", userId);
+
+                // Fallback to mock user for development
+                return await CreateFallbackUser(userId);
             }
-            
-            return await Task.FromResult(_mockUsers[userId]);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting user profile for userId: {UserId}", userId);
+                return await CreateFallbackUser(userId);
+            }
+        }
+
+        private async Task<UserDto> CreateFallbackUser(string userId)
+        {
+            if (_fallbackUsers.TryGetValue(userId, out var existingUser))
+            {
+                return existingUser;
+            }
+
+            var fallbackUser = new UserDto
+            {
+                Id = userId,
+                Name = $"User {userId}",
+                Email = $"user{userId}@fallback.com",
+                Avatar = $"https://api.dicebear.com/7.x/avataaars/svg?seed={userId}",
+                IsOnline = false
+            };
+
+            _fallbackUsers[userId] = fallbackUser;
+
+            // Also cache it for consistency
+            await _userCache.SetUserAsync(fallbackUser);
+
+            _logger.LogWarning("Created fallback user for userId: {UserId}", userId);
+            return fallbackUser;
         }
 
         public async Task SetUserOnlineStatus(string userId, bool isOnline)
         {
-            // Update mock user online status
-            var user = await GetUser(userId);
+            // Update cached user online status
+            var user = await _userCache.GetUserAsync(userId);
             if (user != null)
             {
                 user.IsOnline = isOnline;
-                _mockUsers[userId] = user;
+                await _userCache.SetUserAsync(user);
+                _logger.LogDebug("Updated online status for user {UserId}: {IsOnline}", userId, isOnline);
+            }
+
+            // Update in fallback storage if exists
+            if (_fallbackUsers.TryGetValue(userId, out var fallbackUser))
+            {
+                fallbackUser.IsOnline = isOnline;
+                _fallbackUsers[userId] = fallbackUser;
             }
 
             // Update in all conversations where user is participant
@@ -69,7 +141,7 @@ namespace Aloha.NotificationService.Services
         {
             var participants = await _conversationRepository.GetConversationParticipantsAsync(conversationId);
             var users = new List<UserDto>();
-            
+
             foreach (var participant in participants)
             {
                 var user = await GetUser(participant.UserId);
@@ -78,7 +150,7 @@ namespace Aloha.NotificationService.Services
                     users.Add(user);
                 }
             }
-            
+
             return users;
         }
 

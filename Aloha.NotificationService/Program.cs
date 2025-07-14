@@ -1,8 +1,18 @@
-using Aloha.NotificationService.Hubs;
-using Aloha.NotificationService.Services;
-using Aloha.ServiceDefaults.Hosting;
+using Aloha.EventBus;
+using Aloha.EventBus.Abstractions;
+using Aloha.EventBus.Kafka;
+using Aloha.EventBus.Models;
 using Aloha.NotificationService.Data;
+using Aloha.NotificationService.EventHandlers;
+using Aloha.NotificationService.Hubs;
 using Aloha.NotificationService.Repositories;
+using Aloha.NotificationService.Services;
+using Aloha.ServiceDefaults.DependencyInjection;
+using Aloha.ServiceDefaults.Hosting;
+using Aloha.Shared;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.OpenApi.Models;
 
 namespace Aloha.NotificationService;
 
@@ -30,9 +40,9 @@ public class Program
             options.AddDefaultPolicy(policy =>
             {
                 policy.WithOrigins("https://localhost:3000", "http://localhost:3000")
-                      .AllowAnyMethod()
-                      .AllowAnyHeader()
-                      .AllowCredentials();
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
             });
         });
         builder.Services.AddSignalR();
@@ -42,6 +52,84 @@ public class Program
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.MapType<IFormFile>(() => new OpenApiSchema
+            {
+                Type = "string",
+                Format = "binary"
+            });
+
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Aloha User Service API",
+                Version = "v1"
+            });
+
+            c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter your token:"
+            });
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = JwtBearerDefaults.AuthenticationScheme
+                        }
+                    },
+                    new List<string>()
+                }
+            });
+        });
+
+        builder.Services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+        });
+
+        // Register Kafka producer
+        builder.AddKafkaProducer("kafka");
+
+        // Register Kafka event publisher
+        var kafkaPublishTopic = builder.Configuration.GetValue<string>(Consts.Env_EventPublishingTopics);
+        if (!string.IsNullOrWhiteSpace(kafkaPublishTopic))
+        {
+            builder.AddKafkaEventPublisher(kafkaPublishTopic);
+        }
+        else
+        {
+            builder.Services.AddTransient<IEventPublisher, NullEventPublisher>();
+        }
+
+        // Add memory cache and user profile cache
+        builder.Services.AddMemoryCache();
+        builder.Services.AddSingleton<IUserProfileCache, MemoryUserProfileCache>();
+
+
+
+        // Configure Kafka consumer to include UserProfileResponseEventModel
+        var kafkaConsumeTopic = builder.Configuration.GetValue<string>(Consts.Env_EventConsumingTopics);
+        if (!string.IsNullOrWhiteSpace(kafkaConsumeTopic))
+        {
+            builder.AddKafkaEventConsumer(options =>
+            {
+                options.ServiceName = "NotificationService";
+                options.KafkaGroupId = "aloha-notification-service";
+                options.Topics.AddRange(kafkaConsumeTopic.Split(','));
+                options.IntegrationEventFactory = IntegrationEventFactory<UserProfileResponseEventModel>.Instance;
+                options.AcceptEvent = e => e.IsEvent<UserProfileResponseEventModel>();
+            });
+        }
 
         builder.Services.AddScoped<IChatService, ChatService>();
 
@@ -53,6 +141,12 @@ public class Program
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Aloha Chat Service API V1");
+                c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+            });
         }
 
         app.UseHttpsRedirection();
