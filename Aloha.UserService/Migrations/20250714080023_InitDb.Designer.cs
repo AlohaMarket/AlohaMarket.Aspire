@@ -9,10 +9,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Aloha.UserService.Migrations
+namespace Aloha.MicroService.User.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20250611155640_InitDb")]
+    [Migration("20250714080023_InitDb")]
     partial class InitDb
     {
         /// <inheritdoc />
@@ -21,7 +21,7 @@ namespace Aloha.UserService.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("UserServiceDB")
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "9.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -41,6 +41,10 @@ namespace Aloha.UserService.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");

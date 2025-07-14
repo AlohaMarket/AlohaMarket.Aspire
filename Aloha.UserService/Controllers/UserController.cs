@@ -38,7 +38,8 @@ namespace Aloha.UserService.Controllers
             var request = new CreateUserRequest
             {
                 Id = Guid.Parse(User.GetUserId()),
-                UserName = User.GetUserName()
+                UserName = User.GetUserName(),
+                Email = User.GetUserName()
             };
             var user = await userService.CreateUserAsync(request);
             return CreatedAtAction(nameof(GetUserById), new { userId = user.Id },

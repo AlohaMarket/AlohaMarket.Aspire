@@ -42,7 +42,8 @@ public static class ApplicationServiceExtensions
             .SetupKafka<Projects.Aloha_MicroService_User>(
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_Post>(),
-                GetTopicName<Projects.Aloha_MicroService_Location>());
+                GetTopicName<Projects.Aloha_MicroService_Location>(),
+                GetTopicName<Projects.Aloha_NotificationService>());
 
         var postService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Post>()
             .SetupKafka<Projects.Aloha_MicroService_Post>(
@@ -73,8 +74,9 @@ public static class ApplicationServiceExtensions
                 GetTopicName<Projects.Aloha_MicroService_Post>());
 
         var notificationService = builder.AddProjectWithPostfix<Projects.Aloha_NotificationService>()
-           .SetupKafka<Projects.Aloha_NotificationService>(
-               kafka);
+            .SetupKafka<Projects.Aloha_NotificationService>(
+                kafka,
+                GetTopicName<Projects.Aloha_MicroService_User>());
 
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
             .WithReference(userService)
