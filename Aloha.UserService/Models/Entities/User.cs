@@ -11,6 +11,10 @@ namespace Aloha.UserService.Models.Entities
         [StringLength(100)]
         public required string UserName { get; set; }
 
+        [StringLength(100)]
+        [EmailAddress]
+        public string? Email { get; set; }
+
         [StringLength(500)]
         public string? AvatarUrl { get; set; }
 
