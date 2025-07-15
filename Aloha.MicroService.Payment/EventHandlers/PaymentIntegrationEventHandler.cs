@@ -15,13 +15,11 @@ namespace Aloha.MicroService.Payment.EventHandlers
             {
                 logger.LogInformation("UserPlanProvisioningResultEvent: Success for PaymentId={PaymentId}, UserPlanId={UserPlanId}, Message={Message}",
                     request.PaymentId, request.UserPlanId, request.Message);
-                // TODO: Update payment status, notify user, etc.
             }
             else
             {
                 logger.LogWarning("UserPlanProvisioningResultEvent: Failed for PaymentId={PaymentId}, Message={Message}",
                     request.PaymentId, request.Message);
-                // TODO: Handle failure (compensation, notify user, etc.)
             }
             return Task.CompletedTask;
         }
