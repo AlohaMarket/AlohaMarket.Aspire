@@ -13,6 +13,7 @@ namespace Aloha.NotificationService.Services
         private readonly ILogger<ChatService> _logger;
         private readonly IEventPublisher _eventPublisher;
         private readonly IUserProfileCache _userCache;
+        private readonly IPostInfoCache _postCache;
 
         // Fallback mock users only for development/testing
         private static readonly Dictionary<string, UserDto> _fallbackUsers = new();
@@ -22,13 +23,15 @@ namespace Aloha.NotificationService.Services
             IConversationRepository conversationRepository,
             ILogger<ChatService> logger,
             IEventPublisher eventPublisher,
-            IUserProfileCache userCache)
+            IUserProfileCache userCache,
+            IPostInfoCache postCache) 
         {
             _messageRepository = messageRepository;
             _conversationRepository = conversationRepository;
             _logger = logger;
             _eventPublisher = eventPublisher;
             _userCache = userCache;
+            _postCache = postCache; 
         }
 
         public async Task<UserDto?> GetUser(string userId)
@@ -269,6 +272,54 @@ namespace Aloha.NotificationService.Services
         public async Task<long> GetUnreadMessageCount(string userId, string conversationId)
         {
             return await _messageRepository.GetUnreadMessageCountAsync(userId, conversationId);
+        }
+
+        public async Task<PostDto?> GetPostInfo(string postId)
+        {
+            try
+            {
+                // First, check cache
+                var cachedPost = await _postCache.GetPostAsync(postId);
+                if (cachedPost != null)
+                {
+                    _logger.LogDebug("Post {PostId} found in cache", postId);
+                    return cachedPost;
+                }
+
+                // Request from PostService via Kafka
+                _logger.LogInformation("Requesting post info from PostService for postId: {PostId}", postId);
+
+                await _eventPublisher.PublishAsync(new PostInfoRequestEventModel
+                {
+                    PostId = postId,
+                    RequestingService = "NotificationService"
+                });
+
+                // Wait for response with timeout (polling approach)
+                var maxWaitTime = TimeSpan.FromSeconds(3);
+                var pollingInterval = TimeSpan.FromMilliseconds(100);
+                var startTime = DateTime.UtcNow;
+
+                while (DateTime.UtcNow - startTime < maxWaitTime)
+                {
+                    await Task.Delay(pollingInterval);
+
+                    cachedPost = await _postCache.GetPostAsync(postId);
+                    if (cachedPost != null)
+                    {
+                        _logger.LogInformation("Post info received and cached for postId: {PostId}", postId);
+                        return cachedPost;
+                    }
+                }
+
+                _logger.LogWarning("Timeout waiting for post info from PostService for postId: {PostId}", postId);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting post info for postId: {PostId}", postId);
+                return null;
+            }
         }
     }
 }
