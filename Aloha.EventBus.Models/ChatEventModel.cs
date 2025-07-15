@@ -11,4 +11,10 @@ namespace Aloha.EventBus.Models
         public string UserId { get; set; } = string.Empty;
         public string RequestingService { get; set; } = "ChatService";
     }
+
+    public class PostChatRequestEventModel : IntegrationEvent
+    {
+        public string PostId { get; set; } = string.Empty;
+        public string RequestingService { get; set; } = "ChatService";
+    }
 }
