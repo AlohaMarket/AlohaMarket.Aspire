@@ -12,7 +12,8 @@ namespace Aloha.PostService.EventHandlers
         IRequestHandler<CategoryPathValidEventModel>,
         IRequestHandler<CategoryPathInvalidEventModel>,
         IRequestHandler<UserPlanValidEventModel>,
-        IRequestHandler<UserPlanInvalidEventModel>
+        IRequestHandler<UserPlanInvalidEventModel>,
+        IRequestHandler<PostChatRequestEventModel>
     {
 
         public PostIntegrationEventHandlers(
@@ -278,6 +279,52 @@ namespace Aloha.PostService.EventHandlers
             {
                 logger.LogInformation("No rollback needed for PostId={PostId}. UserPlanWasConsumed={UserPlanWasConsumed}, IsUserPlanValid={IsUserPlanValid}, IsLocationValid={IsLocationValid}, IsCategoryValid={IsCategoryValid}",
                     post.Id, post.UserPlanWasConsumed, post.IsUserPlanValid, post.IsLocationValid, post.IsCategoryValid);
+            }
+        }
+
+        public async Task Handle(PostChatRequestEventModel request, CancellationToken cancellationToken)
+        {
+            logger.LogInformation("Received PostChatRequest for PostId: {PostId} from service: {RequestingService}",
+                request.PostId, request.RequestingService);
+
+            try
+            {
+                if (!Guid.TryParse(request.PostId, out var postGuid))
+                {
+                    logger.LogWarning("Invalid PostId format: {PostId}", request.PostId);
+                    return;
+                }
+
+                // Use DbContext directly with Include for Images
+                var post = await dbContext.Posts
+                    .Include(p => p.Images)
+                    .FirstOrDefaultAsync(p => p.Id == postGuid, cancellationToken);
+
+                if (post == null)
+                {
+                    logger.LogWarning("Post not found for PostId: {PostId}", request.PostId);
+                    return;
+                }
+
+                // Get thumbnail URL (first image or empty)
+                var thumbnailUrl = post.Images?.FirstOrDefault()?.ImageUrl ?? string.Empty;
+
+                var response = new PostInfoResponseEventModel
+                {
+                    PostId = request.PostId,
+                    Title = post.Title,
+                    Price = post.Price,
+                    ThumbnailUrl = thumbnailUrl,
+                    Status = post.Status.ToString().ToLowerInvariant(),
+                    Currency = post.Currency
+                };
+
+                await eventPublisher.PublishAsync(response);
+                logger.LogInformation("Published PostInfoResponse for PostId: {PostId}", request.PostId);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error handling PostChatRequest for PostId: {PostId}", request.PostId);
             }
         }
     }

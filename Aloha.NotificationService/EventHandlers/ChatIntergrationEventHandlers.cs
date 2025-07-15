@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Models;
 using Aloha.NotificationService.Models.DTOs;
 using Aloha.NotificationService.Services;
@@ -12,7 +7,7 @@ namespace Aloha.NotificationService.EventHandlers
 {
     public class ChatIntergrationEventHandlers(
         ILogger<ChatIntergrationEventHandlers> logger,
-        IUserProfileCache userCache) : IRequestHandler<UserProfileResponseEventModel>
+        IUserProfileCache userCache, IPostInfoCache postCache) : IRequestHandler<UserProfileResponseEventModel>, IRequestHandler<PostInfoResponseEventModel>
     {
         public async Task Handle(UserProfileResponseEventModel request, CancellationToken cancellationToken)
         {
@@ -35,6 +30,32 @@ namespace Aloha.NotificationService.EventHandlers
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error caching user profile for UserId: {UserId}", request.UserId);
+            }
+        }
+
+        public async Task Handle(PostInfoResponseEventModel request, CancellationToken cancellationToken)
+        {
+            logger.LogInformation("Received PostInfoResponseEvent for PostId: {PostId}", request.PostId);
+
+            try
+            {
+                var postDto = new PostDto
+                {
+                    Id = request.PostId,
+                    Title = request.Title,
+                    Price = request.Price,
+                    ThumbnailUrl = request.ThumbnailUrl,
+                    Status = request.Status,
+                    Currency = request.Currency
+                };
+
+                await postCache.SetPostAsync(postDto);
+                logger.LogInformation("Post info cached successfully for PostId: {PostId}, Title: {Title}",
+                    request.PostId, request.Title);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error caching post info for PostId: {PostId}", request.PostId);
             }
         }
 
