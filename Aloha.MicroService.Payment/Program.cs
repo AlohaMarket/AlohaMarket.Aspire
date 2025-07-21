@@ -1,12 +1,12 @@
-using Aloha.MicroService.Payment.Endpoints;
-using System.Reflection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Aloha.Shared.Middlewares;
-using Aloha.EventBus.Kafka;
-using Aloha.EventBus.Abstractions;
 using Aloha.EventBus;
+using Aloha.EventBus.Abstractions;
+using Aloha.EventBus.Kafka;
 using Aloha.EventBus.Models;
+using Aloha.MicroService.Payment.Endpoints;
 using Aloha.Shared;
+using Aloha.Shared.Middlewares;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Reflection;
 
 namespace Aloha.MicroService.Payment;
 
@@ -118,16 +118,16 @@ public class Program
 
         var app = builder.Build();
         // Gọi seeder
-        using (var scope = app.Services.CreateScope())
-        {
-            var options = scope.ServiceProvider.GetRequiredService<IOptions<MongoSettings>>();
-            var mongoSettings = options.Value;
-            var mongoClient = new MongoClient(mongoSettings.ConnectionString);
-            var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
-            var collection = database.GetCollection<Payments>(mongoSettings.CollectionName);
+        //using (var scope = app.Services.CreateScope())
+        //{
+        //    var options = scope.ServiceProvider.GetRequiredService<IOptions<MongoSettings>>();
+        //    var mongoSettings = options.Value;
+        //    var mongoClient = new MongoClient(mongoSettings.ConnectionString);
+        //    var database = mongoClient.GetDatabase(mongoSettings.DatabaseName);
+        //    var collection = database.GetCollection<Payments>(mongoSettings.CollectionName);
 
-            await MongoDbSeeder.Seed(collection);
-        }
+        //    await MongoDbSeeder.Seed(collection);
+        //}
         app.MapDefaultEndpoints();
         app.MapPaymentEndpoints();
         // Configure the HTTP request pipeline.
