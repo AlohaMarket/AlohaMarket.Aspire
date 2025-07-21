@@ -3,15 +3,12 @@ using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Kafka;
 using Aloha.EventBus.Models;
 using Aloha.NotificationService.Data;
-using Aloha.NotificationService.EventHandlers;
 using Aloha.NotificationService.Hubs;
 using Aloha.NotificationService.Repositories;
 using Aloha.NotificationService.Services;
-using Aloha.ServiceDefaults.DependencyInjection;
 using Aloha.ServiceDefaults.Hosting;
 using Aloha.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.OpenApi.Models;
 
 namespace Aloha.NotificationService;
@@ -114,10 +111,9 @@ public class Program
         // Add memory cache and user profile cache
         builder.Services.AddMemoryCache();
         builder.Services.AddSingleton<IUserProfileCache, MemoryUserProfileCache>();
+        builder.Services.AddSingleton<IPostInfoCache, MemoryPostInfoCache>(); // Add this line
 
-
-
-        // Configure Kafka consumer to include UserProfileResponseEventModel
+        // Configure Kafka consumer to include PostInfoResponseEventModel
         var kafkaConsumeTopic = builder.Configuration.GetValue<string>(Consts.Env_EventConsumingTopics);
         if (!string.IsNullOrWhiteSpace(kafkaConsumeTopic))
         {
@@ -127,7 +123,7 @@ public class Program
                 options.KafkaGroupId = "aloha-notification-service";
                 options.Topics.AddRange(kafkaConsumeTopic.Split(','));
                 options.IntegrationEventFactory = IntegrationEventFactory<UserProfileResponseEventModel>.Instance;
-                options.AcceptEvent = e => e.IsEvent<UserProfileResponseEventModel>();
+                options.AcceptEvent = e => e.IsEvent<UserProfileResponseEventModel, PostInfoResponseEventModel>();
             });
         }
 

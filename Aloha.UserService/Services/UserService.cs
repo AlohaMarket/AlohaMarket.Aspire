@@ -93,5 +93,17 @@ namespace Aloha.UserService.Services
         {
             return await userRepository.UserExistsAsync(userId);
         }
+
+        public async Task<User> UpdateUserStatusAsync(Guid userId, bool isActive)
+        {
+            var user = await userRepository.GetUserByIdAsync(userId);
+            if (user == null)
+                throw new NotFoundException($"User with id {userId} not found.");
+
+            user.IsActive = isActive;
+            user.UpdatedAt = DateTime.UtcNow;
+            return await userRepository.UpdateUserAsync(user);
+        }
+
     }
 }

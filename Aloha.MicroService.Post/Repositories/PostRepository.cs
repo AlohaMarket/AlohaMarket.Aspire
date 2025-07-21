@@ -2,6 +2,7 @@ using Aloha.MicroService.Post.Models.Enums;
 using Aloha.PostService.Data;
 using Aloha.PostService.Models.Entity;
 using Aloha.PostService.Models.Enums;
+using Aloha.PostService.Models.Responses;
 using Aloha.Shared.Exceptions;
 using Aloha.Shared.Meta;
 
@@ -211,13 +212,103 @@ namespace Aloha.PostService.Repositories
             return post;
         }
 
-        public async Task<IEnumerable<Post>> GetPostsByStatusAsync(PostStatus status)
+        public async Task<PagedData<Post>> GetPostsByStatusAsync(int page, int pageSize, PostStatus? status)
         {
-            return await _context.Posts
+            var query = _context.Posts
                 .Include(p => p.Images)
-                .Where(p => p.Status == status)
-                .OrderByDescending(p => p.CreatedAt)
+                .Where(p => p.IsActive)
+                .AsNoTracking()
+                .AsQueryable();
+
+            if (status.HasValue)
+            {
+                query = query.Where(p => p.Status == status.Value);
+            }
+
+            query = query.OrderByDescending(p => p.CreatedAt);
+
+            var totalCount = await query.CountAsync();
+            var posts = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+            return new PagedData<Post>
+            {
+                Items = posts,
+                Meta = new PaginationMeta
+                {
+                    CurrentPage = page,
+                    PageSize = pageSize,
+                    TotalItems = totalCount,
+                    TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+                }
+            };
+        }
+
+        public async Task<PagedData<Post>> GetViolationPostsAsync(int page = 1, int pageSize = 10)
+        {
+            var query = _context.Posts
+                .Include(p => p.Images)
+                .Where(p => p.IsViolation == true)
+                .Where(p => p.Status != PostStatus.Deleted && p.Status != PostStatus.Rejected)
+                .AsNoTracking()
+                .OrderByDescending(p => p.UpdatedAt);
+
+            var totalCount = await query.CountAsync();
+            var posts = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedData<Post>
+            {
+                Items = posts,
+                Meta = new PaginationMeta
+                {
+                    CurrentPage = page,
+                    PageSize = pageSize,
+                    TotalItems = totalCount,
+                    TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+                }
+            };
+        }
+
+        public async Task<Post?> RecoveryViolationPostAsync(Guid postId)
+        {
+            var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == postId);
+            if (post == null)
+                return null;
+
+            if (!post.IsViolation)
+                return null; // Post is not in violation status
+
+            post.IsViolation = false;
+            post.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return post;
+        }
+
+        public async Task<PostStatisticsResponse> GetPostStatisticsAsync()
+        {
+            var totalPosts = await _context.Posts.CountAsync();
+            var pendingPosts = await _context.Posts.CountAsync(p => p.Status == PostStatus.PendingValidation);
+            var validatedPosts = await _context.Posts.CountAsync(p => p.Status == PostStatus.Validated);
+            var invalidPosts = await _context.Posts.CountAsync(p => p.Status == PostStatus.Invalid);
+            var rejectedPosts = await _context.Posts.CountAsync(p => p.Status == PostStatus.Rejected);
+            var archivedPosts = await _context.Posts.CountAsync(p => p.Status == PostStatus.Archived);
+            var violationPosts = await _context.Posts.CountAsync(p => p.IsViolation == true && p.Status != PostStatus.Deleted && p.Status != PostStatus.Rejected);
+
+            return new PostStatisticsResponse
+            {
+                Total = totalPosts,
+                Pending = pendingPosts,
+                Validated = validatedPosts,
+                Invalid = invalidPosts,
+                Rejected = rejectedPosts,
+                Archived = archivedPosts,
+                Violation = violationPosts
+            };
         }
     }
 }

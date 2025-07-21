@@ -21,7 +21,11 @@ namespace Aloha.PostService.Services
         Task<PostCreateResponse?> UpdatePostStatusAsync(Guid userId, Guid postId, PostStatus status);
         Task<PostCreateResponse?> ActivatePostAsync(Guid postId, bool isActive);
         Task<PostCreateResponse?> PushPostAsync(Guid postId);
-        Task<IEnumerable<PostCreateResponse>> GetPostsByStatusAsync(PostStatus status);
+        Task<PagedData<PostListResponse>> GetPostsByStatusAsync(int page = 1, int pageSize = 10, PostStatus? status = null);
         Task<bool> PostExistsAsync(Guid postId);
+        Task<PostDetailResponse> ReportPostAsync(Guid userId, Guid postId);
+        Task<PagedData<PostListResponse>> GetViolationPostsAsync(int page = 1, int pageSize = 10);
+        Task<PostCreateResponse?> RecoveryViolationPostAsync(Guid postId);
+        Task<PostStatisticsResponse> GetPostStatisticsAsync();
     }
 }

@@ -12,5 +12,7 @@ namespace Aloha.UserService.Services
         Task<bool> DeleteUserAsync(Guid userId);
         Task<bool> UserExistsAsync(Guid userId);
         Task<User> UploadUserAvatar(Guid userId, IFormFile file);
+        Task<User> UpdateUserStatusAsync(Guid userId, bool isActive);
+
     }
 }

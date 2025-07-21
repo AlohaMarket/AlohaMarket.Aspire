@@ -98,6 +98,7 @@ namespace Aloha.MicroService.Plan.Controller
             return CreatedAtAction(nameof(GetUserPlans), new { userId = request.UserId }, subscription);
         }
 
+
         [HttpGet("users")]
         [ProducesResponseType(typeof(List<UserPlanResponse>), 200)]
         [ProducesResponseType(404)]
@@ -106,5 +107,19 @@ namespace Aloha.MicroService.Plan.Controller
             var userPlans = await _planService.GetAllUserPlanAsync();
             return Ok(ApiResponseBuilder.BuildResponse("Get all users plan success fully", userPlans));
         }
+
+        [HttpGet("user-plan/{userId:guid}")]
+        [ProducesResponseType(typeof(List<UserPlanResponse>), 200)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetUserPlansByUserId([FromRoute] Guid userId)
+        {
+            var userPlans = await _planService.GetUserPlansAsync(userId);
+            if (userPlans == null || !userPlans.Any())
+            {
+                return NotFound();
+            }
+            return Ok(userPlans);
+        }
+
     }
 }

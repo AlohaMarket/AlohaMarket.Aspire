@@ -1,3 +1,4 @@
+using Aloha.MicroService.User.Models.Requests;
 using Aloha.MicroService.User.Models.Responses;
 using Aloha.Security.Authorizations;
 using Aloha.Shared.Extensions;
@@ -21,6 +22,14 @@ namespace Aloha.UserService.Controllers
         {
             var users = await userService.GetAllUsersAsync();
             return Ok(ApiResponseBuilder.BuildResponse(data: users, message: "Get All Users Successfully"));
+        }
+
+        [HttpPatch("{userId:guid}/status")]
+        [Authorize(Roles = "ALOHA_ADMIN")]
+        public async Task<IActionResult> UpdateUserStatus([FromRoute] Guid userId, [FromBody] UpdateUserStatusRequest request)
+        {
+            var user = await userService.UpdateUserStatusAsync(userId, request.IsActive);
+            return Ok(ApiResponseBuilder.BuildResponse(message: "Update User Status Successfully", data: user));
         }
 
         [HttpGet("{userId:guid}")]
@@ -70,7 +79,7 @@ namespace Aloha.UserService.Controllers
         }
 
         [HttpGet("profile")]
-        [Authorize(Roles = "ALOHA_USER")]
+        [Authorize]
         public async Task<IActionResult> GetUserProfile()
         {
             var userId = Guid.Parse(User.GetUserId());
