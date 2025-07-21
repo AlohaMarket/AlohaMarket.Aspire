@@ -121,5 +121,14 @@ namespace Aloha.MicroService.Plan.Controller
             return Ok(userPlans);
         }
 
+        [HttpGet("users")]
+        [ProducesResponseType(typeof(List<UserPlanResponse>), 200)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetAllUserPlan()
+        {
+            var userPlans = await _planService.GetAllUserPlanAsync();
+            return Ok(ApiResponseBuilder.BuildResponse("Get all users plan success fully", userPlans));
+        }
+
     }
 }
