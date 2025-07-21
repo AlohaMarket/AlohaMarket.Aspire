@@ -34,7 +34,6 @@ namespace Aloha.PostService.Controllers
             return Ok(ApiResponseBuilder.BuildResponse("Posts retrieved successfully!", posts));
         }
 
-        // This method is used to get post details by post ID
         [HttpGet("{postId:guid}")]
         public async Task<IActionResult> GetPostById(Guid postId)
         {
@@ -42,7 +41,6 @@ namespace Aloha.PostService.Controllers
             return Ok(ApiResponseBuilder.BuildResponse("Post retrieved successfully!", post));
         }
 
-        // This method is used to get all posts by user ID
         [HttpGet("user/{userId:guid}")]
         public async Task<IActionResult> GetPostsByUserId(Guid userId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] PostStatus? status = null)
         {
@@ -50,11 +48,11 @@ namespace Aloha.PostService.Controllers
             return Ok(ApiResponseBuilder.BuildResponse("User posts retrieved successfully!", posts));
         }
 
-        [HttpGet("status/{status}")]
+        [HttpGet("status")]
         [Authorize(Roles = "ALOHA_ADMIN")]
-        public async Task<IActionResult> GetPostsByStatus(PostStatus status)
+        public async Task<IActionResult> GetPostsByStatus([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] PostStatus? status = null)
         {
-            var posts = await postService.GetPostsByStatusAsync(status);
+            var posts = await postService.GetPostsByStatusAsync(page, pageSize, status);
             return Ok(ApiResponseBuilder.BuildResponse($"Posts with status {status} retrieved successfully!", posts));
         }
 
@@ -64,7 +62,6 @@ namespace Aloha.PostService.Controllers
         public async Task<IActionResult> CreatePost([FromForm] PostCreateRequest request)
         {
             var userId = Guid.Parse(User.GetUserId());
-            //var userId = Guid.NewGuid(); // For testing purposes, replace with actual user ID retrieval logic
             var post = await postService.CreatePostAsync(userId, request);
             return CreatedAtAction(nameof(GetPostById), new { postId = post.Id },
                 ApiResponseBuilder.BuildResponse("Post created successfully!", post));
@@ -141,6 +138,33 @@ namespace Aloha.PostService.Controllers
             var userId = Guid.Parse(User.GetUserId());
             var posts = await postService.GetPostAfterCreate(postId, userId);
             return Ok(ApiResponseBuilder.BuildResponse("User posts retrieved successfully!", posts));
+        }
+
+        [HttpGet("violations")]
+        [Authorize(Roles = "ALOHA_ADMIN")]
+        public async Task<IActionResult> GetViolationPosts([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            var posts = await postService.GetViolationPostsAsync(page, pageSize);
+            return Ok(ApiResponseBuilder.BuildResponse("Violation posts retrieved successfully!", posts));
+        }
+
+        [HttpPut("{postId:guid}/recovery")]
+        [Authorize(Roles = "ALOHA_ADMIN")]
+        public async Task<IActionResult> RecoveryViolationPost(Guid postId)
+        {
+            var post = await postService.RecoveryViolationPostAsync(postId);
+            if (post == null)
+                return NotFound(ApiResponseBuilder.BuildResponse<object>("Post not found or not in violation status", null));
+
+            return Ok(ApiResponseBuilder.BuildResponse("Post recovered from violation successfully!", post));
+        }
+
+        [HttpGet("statistics")]
+        [Authorize(Roles = "ALOHA_ADMIN")]
+        public async Task<IActionResult> GetPostStatistics()
+        {
+            var statistics = await postService.GetPostStatisticsAsync();
+            return Ok(ApiResponseBuilder.BuildResponse("Post statistics retrieved successfully!", statistics));
         }
     }
 }
