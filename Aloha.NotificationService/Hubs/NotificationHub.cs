@@ -352,13 +352,14 @@ namespace Aloha.NotificationService.Hubs
                 await Groups.AddToGroupAsync(Context.ConnectionId, $"Conversation_{conversation.Id}");
 
                 // Notify caller about the created conversation
-                await Clients.Caller.SendAsync("ProductConversationCreated", new
+                await Clients.Caller.SendAsync("ConversationCreated", conversation);
+
+                // Notify other participants about the new conversation
+                foreach (var participantId in allParticipants.Where(p => p != userId))
                 {
-                    ConversationId = conversation.Id,
-                    ConversationType = conversation.ConversationType,
-                    ProductContext = conversation.ProductContext,
-                    Participants = conversation.Participants
-                });
+                    await Clients.Group($"User_{participantId}")
+                        .SendAsync("ConversationCreated", conversation);
+                }
 
                 _logger.LogInformation("Product conversation created for PostId: {PostId} by user: {UserId}",
                     postId, userId);
@@ -367,6 +368,61 @@ namespace Aloha.NotificationService.Hubs
             {
                 _logger.LogError(ex, "Error creating product conversation for PostId: {PostId}", postId);
                 await Clients.Caller.SendAsync("ConversationError", "Failed to create product conversation");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Update product context for an existing conversation
+        /// </summary>
+        public async Task UpdateProductContext(string conversationId, string productId)
+        {
+            var userId = Context.Items["UserId"]?.ToString() ?? Context.ConnectionId;
+
+            try
+            {
+                // Verify user is participant in this conversation
+                var isParticipant = await _chatService.IsUserInConversation(userId, conversationId);
+                if (!isParticipant)
+                {
+                    throw new HubException("You are not a participant in this conversation");
+                }
+
+                var updatedConversation = await _chatService.UpdateConversationProduct(conversationId, productId);
+
+                // Notify all participants about the product context update
+                await Clients.Group($"Conversation_{conversationId}")
+                    .SendAsync("ProductContextUpdated", new
+                    {
+                        ConversationId = conversationId,
+                        ProductContext = updatedConversation.ProductContext
+                    });
+
+                // Also send full conversation update
+                await Clients.Group($"Conversation_{conversationId}")
+                    .SendAsync("ConversationUpdated", updatedConversation);
+
+                // Additionally notify all participants in their personal rooms
+                var participants = await _chatService.GetConversationParticipants(conversationId);
+                foreach (var participant in participants)
+                {
+                    await Clients.Group($"User_{participant.Id}")
+                        .SendAsync("ConversationUpdated", updatedConversation);
+
+                    await Clients.Group($"User_{participant.Id}")
+                        .SendAsync("ProductContextUpdated", new
+                        {
+                            ConversationId = conversationId,
+                            ProductContext = updatedConversation.ProductContext
+                        });
+                }
+
+                _logger.LogInformation($"Product context updated for conversation {conversationId} by user {userId}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error updating product context for conversation {conversationId}");
+                await Clients.Caller.SendAsync("ConversationError", "Failed to update product context");
                 throw;
             }
         }
