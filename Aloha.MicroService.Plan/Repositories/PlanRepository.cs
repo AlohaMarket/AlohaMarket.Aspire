@@ -98,6 +98,13 @@ namespace Aloha.MicroService.Plan.Repositories
 
         }
 
-
+        public async Task<List<UserPlan>> GetAllUserPlanAsync()
+        {
+            return await _context.UserPlans
+                .AsNoTracking()
+                .Include(up => up.Plan)
+                .OrderByDescending(up => up.StartDate)
+                .ToListAsync();
+        }
     }
 }

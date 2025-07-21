@@ -123,6 +123,10 @@ namespace Aloha.MicroService.Plan.Service
             return true;
         }
 
-
+        public async Task<List<UserPlanResponse>> GetAllUserPlanAsync()
+        {
+            var userPlans = await _planRepository.GetAllUserPlanAsync();
+            return _mapper.Map<List<UserPlanResponse>>(userPlans);
+        }
     }
 }
