@@ -57,7 +57,8 @@ public static class ApplicationServiceExtensions
             .SetupKafka<Projects.Aloha_MicroService_Plan>(
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_User>(),
-                GetTopicName<Projects.Aloha_MicroService_Post>());
+                GetTopicName<Projects.Aloha_MicroService_Post>(),
+                GetTopicName<Projects.Aloha_MicroService_Payment>());
 
         // MongoDB services
         //var locationDb = mongoDb.AddDefaultDatabase<Projects.Aloha_MicroService_Location>();
@@ -77,13 +78,17 @@ public static class ApplicationServiceExtensions
             .SetupKafka<Projects.Aloha_NotificationService>(
                 kafka,
                 GetTopicName<Projects.Aloha_MicroService_User>());
-
+            var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
+           .WithReference(userService)
+           //.WithReference(planService);
+           .SetupKafka<Projects.Aloha_MicroService_Payment>(
+               kafka, GetTopicName<Projects.Aloha_MicroService_Plan>());
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
             .WithReference(userService)
             .WithReference(postService)
             .WithReference(locationService)
             .WithReference(categoryService)
-            //.WithReference(paymentService)
+            .WithReference(paymentService)
             .WithReference(planService)
             ;
         #endregion

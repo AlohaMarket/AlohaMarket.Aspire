@@ -38,13 +38,11 @@ namespace Aloha.MicroService.Payment.Controllers
             payment.PlanId = paymentDto.PlanId;
             await _paymentService.CreateAsync(payment);
 
-            var hardcodedUserId = Guid.Parse("5000a152-a3c9-4f47-9127-58ed71c7fc06");
-
             // Use a new GUID for PaymentId
             var createUserPlanCommand = new CreateUserPlanCommand
             {
                 PaymentId = payment.Id, 
-                UserId = hardcodedUserId,
+                UserId = Guid.Parse(payment.UserId),
                 PlanId = int.Parse(payment.PlanId),
                 Amount = payment.Price,
                 PaymentDate = payment.CreatedAt
