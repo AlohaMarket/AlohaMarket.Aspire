@@ -50,7 +50,6 @@ namespace Aloha.MicroService.Plan.Repositories
                 await _context.SaveChangesAsync();
             }
         }
-
         public async Task<bool> ExistsAsync(int id)
         {
             return await _context.Plans
@@ -80,7 +79,6 @@ namespace Aloha.MicroService.Plan.Repositories
                 .Include(up => up.Plan)
                 .FirstOrDefaultAsync(up => up.Id == id && up.IsActive);
         }
-
         public async Task DecrementRemainPostsAsync(Guid userPlanId)
         {
             var userPlan = await _context.UserPlans
@@ -97,7 +95,13 @@ namespace Aloha.MicroService.Plan.Repositories
             }
 
         }
-
-
+        public async Task<List<UserPlan>> GetAllUserPlanAsync()
+        {
+            return await _context.UserPlans
+                .AsNoTracking()
+                .Include(up => up.Plan)
+                .OrderByDescending(up => up.StartDate)
+                .ToListAsync();
+        }
     }
 }
