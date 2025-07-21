@@ -51,7 +51,8 @@ public static class ApplicationServiceExtensions
                 GetTopicName<Projects.Aloha_MicroService_User>(),
                 GetTopicName<Projects.Aloha_MicroService_Location>(),
                 GetTopicName<Projects.Aloha_MicroService_Plan>(),
-                GetTopicName<Projects.Aloha_MicroService_Category>());
+                GetTopicName<Projects.Aloha_MicroService_Category>(),
+                GetTopicName<Projects.Aloha_NotificationService>());
 
         var planService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Plan>()
             .SetupKafka<Projects.Aloha_MicroService_Plan>(
@@ -77,12 +78,13 @@ public static class ApplicationServiceExtensions
         var notificationService = builder.AddProjectWithPostfix<Projects.Aloha_NotificationService>()
             .SetupKafka<Projects.Aloha_NotificationService>(
                 kafka,
-                GetTopicName<Projects.Aloha_MicroService_User>());
-            var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
-           .WithReference(userService)
-           //.WithReference(planService);
-           .SetupKafka<Projects.Aloha_MicroService_Payment>(
-               kafka, GetTopicName<Projects.Aloha_MicroService_Plan>());
+                GetTopicName<Projects.Aloha_MicroService_User>(),
+                GetTopicName<Projects.Aloha_MicroService_Post>());
+        var paymentService = builder.AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>()
+       .WithReference(userService)
+       //.WithReference(planService);
+       .SetupKafka<Projects.Aloha_MicroService_Payment>(
+           kafka, GetTopicName<Projects.Aloha_MicroService_Plan>());
         var gatewayService = builder.AddProjectWithPostfix<Projects.Aloha_ApiGateway>()
             .WithReference(userService)
             .WithReference(postService)

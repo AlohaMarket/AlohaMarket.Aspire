@@ -116,5 +116,18 @@ namespace Aloha.NotificationService.Repositories
                 .Select(p => MongoDB.Bson.Serialization.BsonSerializer.Deserialize<ConversationParticipant>(p.AsBsonDocument))
                 ?? new List<ConversationParticipant>();
         }
+
+        public async Task<bool> UpdateConversationProductAsync(string conversationId, string? productId, string conversationType, ProductContext? productContext)
+        {
+            var filter = Builders<Conversation>.Filter.Eq("_id", ObjectId.Parse(conversationId));
+            var update = Builders<Conversation>.Update
+                .Set(c => c.ProductId, productId)
+                .Set(c => c.ConversationType, conversationType)
+                .Set(c => c.ProductContext, productContext)
+                .Set(c => c.UpdatedAt, DateTime.UtcNow);
+
+            var result = await _conversations.UpdateOneAsync(filter, update);
+            return result.ModifiedCount > 0;
+        }
     }
 }

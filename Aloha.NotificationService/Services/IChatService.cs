@@ -1,18 +1,20 @@
-﻿using Aloha.NotificationService.Models.Entities;
-using Aloha.NotificationService.Models.DTOs;
+﻿using Aloha.NotificationService.Models.DTOs;
+using Aloha.NotificationService.Models.Entities;
 
 namespace Aloha.NotificationService.Services
 {
     public interface IChatService
     {
         Task<UserDto?> GetUser(string userId);
+        Task<PostDto?> GetPostInfo(string postId); // Add this method
         Task SetUserOnlineStatus(string userId, bool isOnline);
 
         // Conversation management
         Task<bool> IsUserInConversation(string userId, string conversationId);
         Task<List<UserDto>> GetConversationParticipants(string conversationId);
-        Task<Conversation> CreateOrGetConversation(string[] userIds);
+        Task<Conversation> CreateOrGetConversation(string[] userIds, string? productId);
         Task<IEnumerable<Conversation>> GetUserConversations(string userId);
+        Task<Conversation?> UpdateConversationProduct(string conversationId, string? productId);
 
         // Message management
         Task<Message> CreateMessage(CreateMessageDto dto);

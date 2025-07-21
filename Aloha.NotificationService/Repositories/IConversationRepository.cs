@@ -13,5 +13,6 @@ namespace Aloha.NotificationService.Repositories
         Task<bool> UpdateParticipantOnlineStatusAsync(string conversationId, string userId, bool isOnline);
         Task<bool> UpdateParticipantLastReadAsync(string conversationId, string userId, DateTime lastReadAt);
         Task<IEnumerable<ConversationParticipant>> GetConversationParticipantsAsync(string conversationId);
+        Task<bool> UpdateConversationProductAsync(string conversationId, string? productId, string conversationType, ProductContext? productContext);
     }
 }

@@ -41,4 +41,14 @@ namespace Aloha.EventBus.Models
         public Guid PostId { get; set; }
         public Guid UserPlanId { get; set; }
     }
+
+    public class PostInfoResponseEventModel : IntegrationEvent
+    {
+        public string PostId { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public decimal Price { get; set; }
+        public string ThumbnailUrl { get; set; } = string.Empty;
+        public string Status { get; set; } = "active";
+        public string Currency { get; set; } = "VND";
+    }
 }

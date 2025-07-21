@@ -109,7 +109,8 @@ public class Program
                     || e is CategoryPathValidEventModel
                     || e is CategoryPathInvalidEventModel
                     || e is UserPlanInvalidEventModel
-                    || e is UserPlanValidEventModel;
+                    || e is UserPlanValidEventModel
+                    || e is PostChatRequestEventModel;
             });
         }
 
