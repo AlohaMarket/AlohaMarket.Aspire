@@ -3,6 +3,7 @@ using Aloha.MicroService.Plan.Models.Response;
 using Aloha.MicroService.Plan.Service;
 using Aloha.Security.Authorizations;
 using Aloha.Shared.Meta;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aloha.MicroService.Plan.Controller
@@ -99,15 +100,6 @@ namespace Aloha.MicroService.Plan.Controller
         }
 
 
-        [HttpGet("users")]
-        [ProducesResponseType(typeof(List<UserPlanResponse>), 200)]
-        [ProducesResponseType(404)]
-        public async Task<IActionResult> GetAllUserPlan()
-        {
-            var userPlans = await _planService.GetAllUserPlanAsync();
-            return Ok(ApiResponseBuilder.BuildResponse("Get all users plan success fully", userPlans));
-        }
-
         [HttpGet("user-plan/{userId:guid}")]
         [ProducesResponseType(typeof(List<UserPlanResponse>), 200)]
         [ProducesResponseType(404)]
@@ -121,12 +113,15 @@ namespace Aloha.MicroService.Plan.Controller
             return Ok(userPlans);
         }
 
-        [HttpGet("users")]
+        [HttpGet("all-userplans")]
         [ProducesResponseType(typeof(List<UserPlanResponse>), 200)]
         [ProducesResponseType(404)]
-        public async Task<IActionResult> GetAllUserPlan()
+        [Authorize(Roles = "ALOHA_ADMIN")]
+        public async Task<IActionResult> GetAllUserPlan(
+            [FromQuery] DateTime? startDate = null,
+            [FromQuery] DateTime? endDate = null)
         {
-            var userPlans = await _planService.GetAllUserPlanAsync();
+            var userPlans = await _planService.GetAllUserPlanAsync(startDate, endDate);
             return Ok(ApiResponseBuilder.BuildResponse("Get all users plan success fully", userPlans));
         }
 

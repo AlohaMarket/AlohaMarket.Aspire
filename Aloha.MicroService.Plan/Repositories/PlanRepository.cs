@@ -95,11 +95,25 @@ namespace Aloha.MicroService.Plan.Repositories
             }
 
         }
-        public async Task<List<UserPlan>> GetAllUserPlanAsync()
+        public async Task<List<UserPlan>> GetAllUserPlanAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
-            return await _context.UserPlans
+            var query = _context.UserPlans
                 .AsNoTracking()
                 .Include(up => up.Plan)
+                .AsQueryable();
+
+            // Apply date filtering if parameters are provided
+            if (startDate.HasValue)
+            {
+                query = query.Where(up => up.StartDate >= startDate.Value);
+            }
+
+            if (endDate.HasValue)
+            {
+                query = query.Where(up => up.StartDate <= endDate.Value);
+            }
+
+            return await query
                 .OrderByDescending(up => up.StartDate)
                 .ToListAsync();
         }
