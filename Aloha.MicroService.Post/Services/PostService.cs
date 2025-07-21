@@ -310,22 +310,22 @@ namespace Aloha.PostService.Services
             return _mapper.Map<PostCreateResponse>(post);
         }
 
-        public async Task<ApiResponse<PostDetailResponse>> ReportPostAsync(Guid userId, Guid postId)
+        public async Task<PostDetailResponse> ReportPostAsync(Guid userId, Guid postId)
         {
-            // Fetch the post (only active and "Validated" posts)
+            // Fetch and validate post
             var post = await _postRepository.GetPostByIdAsync(postId);
-            if (post == null)
-                throw new NotFoundException("Post not found or not active/Validated.");
+            if (post is null)
+                throw new NotFoundException($"Post with ID {postId} not found");
 
             // Prevent user from reporting their own post
             if (post.UserId == userId)
-                throw new BadRequestException("You cannot report your own post.");
+                throw new UnauthorizedException($"User {userId} is not authorized to report their own post");
 
             // If already reported, return success (idempotent)
             if (post.IsViolation)
             {
-                var alreadyReportedResponse = _mapper.Map<PostDetailResponse>(post);
-                return ApiResponseBuilder.BuildResponse("Post reported successfully.", alreadyReportedResponse);
+                _logger.LogInformation("Post {PostId} already reported as violation", postId);
+                return _mapper.Map<PostDetailResponse>(post);
             }
 
             // Mark as violation and update
@@ -333,8 +333,8 @@ namespace Aloha.PostService.Services
             post.UpdatedAt = DateTime.UtcNow;
             var updatedPost = await _postRepository.UpdatePostAsync(post);
 
-            var response = _mapper.Map<PostDetailResponse>(updatedPost);
-            return ApiResponseBuilder.BuildResponse("Post reported successfully.", response);
+            _logger.LogInformation("Post {PostId} reported as violation by user {UserId}", postId, userId);
+            return _mapper.Map<PostDetailResponse>(updatedPost);
         }
     }
 }

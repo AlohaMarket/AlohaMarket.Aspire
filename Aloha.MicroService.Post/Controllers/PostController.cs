@@ -149,10 +149,8 @@ namespace Aloha.PostService.Controllers
         {
             // Get the current user's ID from JWT claims
             var userId = Guid.Parse(User.GetUserId());
-            // Call the service to handle the report logic
-            var response = await postService.ReportPostAsync(userId, postId);
-            // Return the standard response envelope
-            return Ok(response);
+            var post = await postService.ReportPostAsync(userId, postId);
+            return Ok(ApiResponseBuilder.BuildResponse("Post reported successfully.", post));
         }
     }
 }

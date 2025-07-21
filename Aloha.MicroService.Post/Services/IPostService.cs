@@ -23,7 +23,6 @@ namespace Aloha.PostService.Services
         Task<PostCreateResponse?> PushPostAsync(Guid postId);
         Task<IEnumerable<PostCreateResponse>> GetPostsByStatusAsync(PostStatus status);
         Task<bool> PostExistsAsync(Guid postId);
-        // Reports a post as a violation. Idempotent and validates business rules.
-        Task<ApiResponse<PostDetailResponse>> ReportPostAsync(Guid userId, Guid postId);
+        Task<PostDetailResponse> ReportPostAsync(Guid userId, Guid postId);
     }
 }
