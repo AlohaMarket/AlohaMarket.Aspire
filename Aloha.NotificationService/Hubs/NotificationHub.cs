@@ -23,7 +23,7 @@ namespace Aloha.NotificationService.Hubs
             // For testing without auth, we'll use the connection ID as user identifier
             var userId = Context.GetHttpContext()?.Request.Query["userId"].FirstOrDefault() ?? Context.ConnectionId;
             Context.Items["UserId"] = userId;
-            
+
             _logger.LogInformation($"User {userId} connected to hub with connection {Context.ConnectionId}");
 
             // Join user to their personal room for notifications
@@ -326,6 +326,49 @@ namespace Aloha.NotificationService.Hubs
             // Implement push notification logic here
             // This could integrate with Firebase, OneSignal, or other push notification services
             _logger.LogInformation($"Would send push notification to user {userId}: {title}");
+        }
+
+        #endregion
+
+        #region Product Conversations
+
+        /// <summary>
+        /// Create a product-based conversation
+        /// </summary>
+        public async Task CreateProductConversation(string postId, string[] participantIds)
+        {
+            var userId = Context.Items["UserId"]?.ToString() ?? Context.ConnectionId;
+
+            try
+            {
+                // Include current user in participants if not already included
+                var allParticipants = participantIds.Contains(userId)
+                    ? participantIds
+                    : participantIds.Concat(new[] { userId }).ToArray();
+
+                var conversation = await _chatService.CreateOrGetConversation(allParticipants, postId);
+
+                // Join the conversation room
+                await Groups.AddToGroupAsync(Context.ConnectionId, $"Conversation_{conversation.Id}");
+
+                // Notify caller about the created conversation
+                await Clients.Caller.SendAsync("ProductConversationCreated", new
+                {
+                    ConversationId = conversation.Id,
+                    ConversationType = conversation.ConversationType,
+                    ProductContext = conversation.ProductContext,
+                    Participants = conversation.Participants
+                });
+
+                _logger.LogInformation("Product conversation created for PostId: {PostId} by user: {UserId}",
+                    postId, userId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating product conversation for PostId: {PostId}", postId);
+                await Clients.Caller.SendAsync("ConversationError", "Failed to create product conversation");
+                throw;
+            }
         }
 
         #endregion

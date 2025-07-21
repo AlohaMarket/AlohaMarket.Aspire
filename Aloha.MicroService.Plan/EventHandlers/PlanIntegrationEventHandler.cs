@@ -120,7 +120,7 @@ namespace Aloha.MicroService.Plan.EventHandlers
                     userPlan.RemainPosts -= 1;
 
                     // If the plan has no remaining posts, deactivate it
-                    if (userPlan.RemainPosts <= 0)
+                    if (userPlan.RemainPosts <= 0 && userPlan.RemainPushes <= 0)
                     {
                         userPlan.IsActive = false;
                     }

@@ -1,8 +1,8 @@
-﻿using Aloha.NotificationService.Models.Entities;
-using Aloha.NotificationService.Models.DTOs;
-using Aloha.NotificationService.Repositories;
-using Aloha.EventBus.Abstractions;
+﻿using Aloha.EventBus.Abstractions;
 using Aloha.EventBus.Models;
+using Aloha.NotificationService.Models.DTOs;
+using Aloha.NotificationService.Models.Entities;
+using Aloha.NotificationService.Repositories;
 
 namespace Aloha.NotificationService.Services
 {
@@ -24,14 +24,14 @@ namespace Aloha.NotificationService.Services
             ILogger<ChatService> logger,
             IEventPublisher eventPublisher,
             IUserProfileCache userCache,
-            IPostInfoCache postCache) 
+            IPostInfoCache postCache)
         {
             _messageRepository = messageRepository;
             _conversationRepository = conversationRepository;
             _logger = logger;
             _eventPublisher = eventPublisher;
             _userCache = userCache;
-            _postCache = postCache; 
+            _postCache = postCache;
         }
 
         public async Task<UserDto?> GetUser(string userId)
@@ -214,10 +214,10 @@ namespace Aloha.NotificationService.Services
             await _messageRepository.MarkMessagesAsReadAsync(userId, messageIds);
         }
 
-        public async Task<Conversation> CreateOrGetConversation(string[] userIds)
+        public async Task<Conversation> CreateOrGetConversation(string[] userIds, string? productId)
         {
-            // Check if conversation already exists
-            var existingConversation = await _conversationRepository.GetConversationByParticipantsAsync(userIds, null);
+            // Check if conversation already exists (including productId in search)
+            var existingConversation = await _conversationRepository.GetConversationByParticipantsAsync(userIds, productId);
             if (existingConversation != null)
             {
                 return existingConversation;
@@ -234,11 +234,42 @@ namespace Aloha.NotificationService.Services
                 }
             }
 
+            // Get post info if productId is provided
+            PostDto? postInfo = null;
+            ProductContext? productContext = null;
+            string conversationType = "chat"; // Default to simple chat
+
+            if (!string.IsNullOrEmpty(productId))
+            {
+                postInfo = await GetPostInfo(productId);
+                if (postInfo != null)
+                {
+                    conversationType = "product"; // Set to product conversation
+                    productContext = new ProductContext
+                    {
+                        ProductId = postInfo.Id,
+                        ProductName = postInfo.Title,
+                        ProductImage = postInfo.ThumbnailUrl,
+                        ProductPrice = postInfo.Price,
+                        // Note: You'll need to get seller info from post or users
+                        SellerId = "", // You might need to add this to PostDto
+                        SellerName = "" // You might need to add this to PostDto
+                    };
+
+                    _logger.LogInformation("Created product context for conversation with PostId: {PostId}, Title: {Title}",
+                        postInfo.Id, postInfo.Title);
+                }
+                else
+                {
+                    _logger.LogWarning("Could not retrieve post info for ProductId: {ProductId}", productId);
+                }
+            }
+
             // Create new conversation
             var conversation = new Conversation
             {
-                ConversationType = "chat", // Simple chat conversation
-                ProductId = null,
+                ConversationType = conversationType,
+                ProductId = productId,
                 LastMessageAt = DateTime.UtcNow,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -253,7 +284,7 @@ namespace Aloha.NotificationService.Services
                     LastReadAt = DateTime.UtcNow,
                     IsOnline = u.IsOnline
                 }).ToList(),
-                ProductContext = null // No product context needed
+                ProductContext = productContext
             };
 
             return await _conversationRepository.CreateAsync(conversation);
@@ -289,14 +320,14 @@ namespace Aloha.NotificationService.Services
                 // Request from PostService via Kafka
                 _logger.LogInformation("Requesting post info from PostService for postId: {PostId}", postId);
 
-                await _eventPublisher.PublishAsync(new PostInfoRequestEventModel
+                await _eventPublisher.PublishAsync(new PostChatRequestEventModel
                 {
                     PostId = postId,
                     RequestingService = "NotificationService"
                 });
 
                 // Wait for response with timeout (polling approach)
-                var maxWaitTime = TimeSpan.FromSeconds(3);
+                var maxWaitTime = TimeSpan.FromSeconds(5);
                 var pollingInterval = TimeSpan.FromMilliseconds(100);
                 var startTime = DateTime.UtcNow;
 

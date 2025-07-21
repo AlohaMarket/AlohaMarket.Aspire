@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
-using Aloha.NotificationService.Services;
 using Aloha.NotificationService.Models.Entities;
+using Aloha.NotificationService.Services;
+using Aloha.Security.Authorizations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Aloha.NotificationService.Controllers
 {
@@ -19,8 +20,8 @@ namespace Aloha.NotificationService.Controllers
         public async Task<ActionResult<IEnumerable<Conversation>>> GetUserConversations([FromQuery] string? userId = null)
         {
             // For testing without auth, get userId from query parameter or header
-            userId = userId ?? Request.Headers["UserId"].FirstOrDefault() ?? "test-user-1";
-            
+            userId = userId ?? User.GetUserId() ?? "test-user-1";
+
             var conversations = await _chatService.GetUserConversations(userId);
             return Ok(conversations);
         }
@@ -28,14 +29,14 @@ namespace Aloha.NotificationService.Controllers
         [HttpPost("conversations")]
         public async Task<ActionResult<Conversation>> CreateConversation([FromBody] CreateConversationRequest request)
         {
-            var conversation = await _chatService.CreateOrGetConversation(request.UserIds);
+            var conversation = await _chatService.CreateOrGetConversation(request.UserIds, request.ProductId);
             return Ok(conversation);
         }
 
         [HttpGet("conversations/{conversationId}/messages")]
         public async Task<ActionResult<IEnumerable<Message>>> GetConversationMessages(
-            string conversationId, 
-            [FromQuery] int page = 1, 
+            string conversationId,
+            [FromQuery] int page = 1,
             [FromQuery] int pageSize = 50,
             [FromQuery] string? userId = null)
         {
@@ -102,4 +103,4 @@ namespace Aloha.NotificationService.Controllers
     {
         public string Content { get; set; } = string.Empty;
     }
-} 
+}
