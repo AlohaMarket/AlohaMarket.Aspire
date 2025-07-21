@@ -11,5 +11,6 @@ namespace Aloha.UserService.Repositories
         Task<bool> DeleteUserAsync(Guid userId);
         Task<bool> UserExistsAsync(Guid userId);
         Task<User?> UserExistsByPhoneNumberAsync(string phoneNum);
+        Task<User> UpdateUserStatusAsync(Guid userId, bool isActive);
     }
 }
