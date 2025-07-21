@@ -319,6 +319,33 @@ namespace Aloha.PostService.Services
             return _mapper.Map<PostCreateResponse>(post);
         }
 
+        public async Task<PostDetailResponse> ReportPostAsync(Guid userId, Guid postId)
+        {
+            // Fetch and validate post
+            var post = await _postRepository.GetPostByIdAsync(postId);
+            if (post is null)
+                throw new NotFoundException($"Post with ID {postId} not found");
+
+            // Prevent user from reporting their own post
+            if (post.UserId == userId)
+                throw new UnauthorizedException($"User {userId} is not authorized to report their own post");
+
+            // If already reported, return success (idempotent)
+            if (post.IsViolation)
+            {
+                _logger.LogInformation("Post {PostId} already reported as violation", postId);
+                return _mapper.Map<PostDetailResponse>(post);
+            }
+
+            // Mark as violation and update
+            post.IsViolation = true;
+            post.UpdatedAt = DateTime.UtcNow;
+            var updatedPost = await _postRepository.UpdatePostAsync(post);
+
+            _logger.LogInformation("Post {PostId} reported as violation by user {UserId}", postId, userId);
+            return _mapper.Map<PostDetailResponse>(updatedPost);
+        }
+
         public async Task<PagedData<PostListResponse>> GetViolationPostsAsync(int page = 1, int pageSize = 10)
         {
             if (page < 1)

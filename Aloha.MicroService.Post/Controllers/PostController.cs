@@ -140,6 +140,16 @@ namespace Aloha.PostService.Controllers
             return Ok(ApiResponseBuilder.BuildResponse("User posts retrieved successfully!", posts));
         }
 
+        [HttpPut("{postId:guid}/report")]
+        [Authorize]
+        public async Task<IActionResult> ReportPost(Guid postId)
+        {
+            // Get the current user's ID from JWT claims
+            var userId = Guid.Parse(User.GetUserId());
+            var post = await postService.ReportPostAsync(userId, postId);
+            return Ok(ApiResponseBuilder.BuildResponse("Post reported successfully.", post));
+        }
+
         [HttpGet("violations")]
         [Authorize(Roles = "ALOHA_ADMIN")]
         public async Task<IActionResult> GetViolationPosts([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
