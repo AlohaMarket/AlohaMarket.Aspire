@@ -11,6 +11,7 @@ namespace Aloha.MicroService.Plan.Repositories
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);     
         Task<List<UserPlan>> GetUserPlansAsync(Guid userId);
+        Task<List<UserPlan>> GetAllUserPlanAsync();
         Task AddUserPlanAsync(UserPlan userPlan);
         Task<UserPlan?> GetUserPlanByIdAsync(Guid? id);
         Task DecrementRemainPostsAsync(Guid userPlanId);
