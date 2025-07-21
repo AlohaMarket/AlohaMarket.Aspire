@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Aloha.MicroService.Plan.Service
 {
-    public class PlanService : IPlanService  
+    public class PlanService : IPlanService
     {
         private readonly PlanDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -123,9 +123,9 @@ namespace Aloha.MicroService.Plan.Service
             return true;
         }
 
-        public async Task<List<UserPlanResponse>> GetAllUserPlanAsync()
+        public async Task<List<UserPlanResponse>> GetAllUserPlanAsync(DateTime? startDate = null, DateTime? endDate = null)
         {
-            var userPlans = await _planRepository.GetAllUserPlanAsync();
+            var userPlans = await _planRepository.GetAllUserPlanAsync(startDate, endDate);
             return _mapper.Map<List<UserPlanResponse>>(userPlans);
         }
     }
