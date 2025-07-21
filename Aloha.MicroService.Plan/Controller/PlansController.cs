@@ -97,5 +97,18 @@ namespace Aloha.MicroService.Plan.Controller
             var subscription = await _planService.SubscribeUserToPlanAsync(request.UserId, request.PlanId);
             return CreatedAtAction(nameof(GetUserPlans), new { userId = request.UserId }, subscription);
         }
+        [HttpGet("user-plan/{userId:guid}")]
+        [ProducesResponseType(typeof(List<UserPlanResponse>), 200)]
+        [ProducesResponseType(404)]
+        public async Task<IActionResult> GetUserPlansByUserId([FromRoute] Guid userId)
+        {
+            var userPlans = await _planService.GetUserPlansAsync(userId);
+            if (userPlans == null || !userPlans.Any())
+            {
+                return NotFound();
+            }
+            return Ok(userPlans);
+        }
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using Aloha.UserService.Data;
+﻿using Aloha.Shared.Exceptions;
+using Aloha.UserService.Data;
 using Aloha.UserService.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -58,5 +59,18 @@ namespace Aloha.UserService.Repositories
             return await context.Users
                 .FirstOrDefaultAsync(u => u.PhoneNumber == phoneNum && u.IsActive);
         }
+        public async Task<User> UpdateUserStatusAsync(Guid userId, bool isActive)
+        {
+            var user = await context.Users.FindAsync(userId);
+            if (user == null)
+                throw new NotFoundException($"User with id {userId} not found.");
+
+            user.IsActive = isActive;
+            user.UpdatedAt = DateTime.UtcNow;
+            context.Users.Update(user);
+            await context.SaveChangesAsync();
+            return user;
+        }
+
     }
 }
