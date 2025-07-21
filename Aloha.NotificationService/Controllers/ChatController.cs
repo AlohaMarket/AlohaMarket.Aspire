@@ -33,6 +33,19 @@ namespace Aloha.NotificationService.Controllers
             return Ok(conversation);
         }
 
+        [HttpPut("conversations/{conversationId}/product")]
+        public async Task<ActionResult<Conversation>> UpdateConversationProduct(
+            string conversationId, 
+            [FromBody] UpdateConversationProductRequest request)
+        {
+            var updatedConversation = await _chatService.UpdateConversationProduct(conversationId, request.ProductId);
+            if (updatedConversation == null)
+            {
+                return NotFound($"Conversation with id {conversationId} not found");
+            }
+            return Ok(updatedConversation);
+        }
+
         [HttpGet("conversations/{conversationId}/messages")]
         public async Task<ActionResult<IEnumerable<Message>>> GetConversationMessages(
             string conversationId,
@@ -96,6 +109,11 @@ namespace Aloha.NotificationService.Controllers
     public class CreateConversationRequest
     {
         public string[] UserIds { get; set; } = Array.Empty<string>();
+        public string? ProductId { get; set; }
+    }
+
+    public class UpdateConversationProductRequest
+    {
         public string? ProductId { get; set; }
     }
 

@@ -216,10 +216,20 @@ namespace Aloha.NotificationService.Services
 
         public async Task<Conversation> CreateOrGetConversation(string[] userIds, string? productId)
         {
-            // Check if conversation already exists (including productId in search)
-            var existingConversation = await _conversationRepository.GetConversationByParticipantsAsync(userIds, productId);
+            // Check if conversation already exists between these users (ignore productId)
+            var existingConversation = await _conversationRepository.GetConversationByParticipantsAsync(userIds, null);
             if (existingConversation != null)
             {
+                // If we have a different productId, update the existing conversation
+                if (existingConversation.ProductId != productId)
+                {
+                    _logger.LogInformation("Updating existing conversation {ConversationId} with new product: {ProductId}", 
+                        existingConversation.Id, productId);
+                    
+                    var updatedConversation = await UpdateConversationProduct(existingConversation.Id, productId);
+                    return updatedConversation ?? existingConversation;
+                }
+                
                 return existingConversation;
             }
 
@@ -293,6 +303,72 @@ namespace Aloha.NotificationService.Services
         public async Task<IEnumerable<Conversation>> GetUserConversations(string userId)
         {
             return await _conversationRepository.GetConversationsByUserIdAsync(userId);
+        }
+
+        public async Task<Conversation?> UpdateConversationProduct(string conversationId, string? productId)
+        {
+            // First get the existing conversation
+            var conversation = await _conversationRepository.GetByIdAsync(conversationId);
+            if (conversation == null)
+            {
+                _logger.LogWarning("Conversation not found for id: {ConversationId}", conversationId);
+                return null;
+            }
+
+            // Get post info if productId is provided
+            ProductContext? productContext = null;
+            string conversationType = "chat"; // Default to simple chat
+
+            if (!string.IsNullOrEmpty(productId))
+            {
+                var postInfo = await GetPostInfo(productId);
+                if (postInfo != null)
+                {
+                    conversationType = "product"; // Set to product conversation
+                    productContext = new ProductContext
+                    {
+                        ProductId = postInfo.Id,
+                        ProductName = postInfo.Title,
+                        ProductImage = postInfo.ThumbnailUrl,
+                        ProductPrice = postInfo.Price,
+                        SellerId = "", // You might need to add this to PostDto
+                        SellerName = "" // You might need to add this to PostDto
+                    };
+
+                    _logger.LogInformation("Updated product context for conversation {ConversationId} with PostId: {PostId}", 
+                        conversationId, postInfo.Id);
+                }
+                else
+                {
+                    _logger.LogWarning("Could not retrieve post info for ProductId: {ProductId}", productId);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Removed product context from conversation {ConversationId}", conversationId);
+            }
+
+            // Update the conversation in the database with all the new context
+            var updateSuccess = await _conversationRepository.UpdateConversationProductAsync(
+                conversationId, 
+                productId, 
+                conversationType, 
+                productContext);
+
+            if (!updateSuccess)
+            {
+                _logger.LogError("Failed to update conversation {ConversationId} in database", conversationId);
+                return null;
+            }
+
+            // Update the conversation object with new context for return
+            conversation.ProductId = productId;
+            conversation.ConversationType = conversationType;
+            conversation.ProductContext = productContext;
+            conversation.UpdatedAt = DateTime.UtcNow;
+
+            _logger.LogInformation("Successfully updated conversation {ConversationId} with new product context", conversationId);
+            return conversation;
         }
 
         public async Task<IEnumerable<Message>> GetConversationMessages(string conversationId, int page = 1, int pageSize = 50)

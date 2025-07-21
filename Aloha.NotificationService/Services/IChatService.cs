@@ -14,6 +14,7 @@ namespace Aloha.NotificationService.Services
         Task<List<UserDto>> GetConversationParticipants(string conversationId);
         Task<Conversation> CreateOrGetConversation(string[] userIds, string? productId);
         Task<IEnumerable<Conversation>> GetUserConversations(string userId);
+        Task<Conversation?> UpdateConversationProduct(string conversationId, string? productId);
 
         // Message management
         Task<Message> CreateMessage(CreateMessageDto dto);
