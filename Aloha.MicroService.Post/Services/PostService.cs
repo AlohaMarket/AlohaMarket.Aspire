@@ -309,5 +309,32 @@ namespace Aloha.PostService.Services
             _logger.LogInformation("Retrieved post after creation with ID {PostId} for user {UserId}", postId, userId);
             return _mapper.Map<PostCreateResponse>(post);
         }
+
+        public async Task<ApiResponse<PostDetailResponse>> ReportPostAsync(Guid userId, Guid postId)
+        {
+            // Fetch the post (only active and "Validated" posts)
+            var post = await _postRepository.GetPostByIdAsync(postId);
+            if (post == null)
+                throw new NotFoundException("Post not found or not active/Validated.");
+
+            // Prevent user from reporting their own post
+            if (post.UserId == userId)
+                throw new BadRequestException("You cannot report your own post.");
+
+            // If already reported, return success (idempotent)
+            if (post.IsViolation)
+            {
+                var alreadyReportedResponse = _mapper.Map<PostDetailResponse>(post);
+                return ApiResponseBuilder.BuildResponse("Post reported successfully.", alreadyReportedResponse);
+            }
+
+            // Mark as violation and update
+            post.IsViolation = true;
+            post.UpdatedAt = DateTime.UtcNow;
+            var updatedPost = await _postRepository.UpdatePostAsync(post);
+
+            var response = _mapper.Map<PostDetailResponse>(updatedPost);
+            return ApiResponseBuilder.BuildResponse("Post reported successfully.", response);
+        }
     }
 }

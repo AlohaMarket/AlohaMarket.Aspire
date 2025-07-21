@@ -142,5 +142,17 @@ namespace Aloha.PostService.Controllers
             var posts = await postService.GetPostAfterCreate(postId, userId);
             return Ok(ApiResponseBuilder.BuildResponse("User posts retrieved successfully!", posts));
         }
+
+        [HttpPut("{postId:guid}/report")]
+        [Authorize]
+        public async Task<IActionResult> ReportPost(Guid postId)
+        {
+            // Get the current user's ID from JWT claims
+            var userId = Guid.Parse(User.GetUserId());
+            // Call the service to handle the report logic
+            var response = await postService.ReportPostAsync(userId, postId);
+            // Return the standard response envelope
+            return Ok(response);
+        }
     }
 }
