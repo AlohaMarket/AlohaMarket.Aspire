@@ -70,7 +70,7 @@ namespace Aloha.UserService.Controllers
         }
 
         [HttpGet("profile")]
-        [Authorize(Roles = "ALOHA_USER")]
+        [Authorize]
         public async Task<IActionResult> GetUserProfile()
         {
             var userId = Guid.Parse(User.GetUserId());

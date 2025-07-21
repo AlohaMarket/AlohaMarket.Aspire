@@ -1,6 +1,7 @@
 using Aloha.MicroService.Post.Models.Enums;
 using Aloha.PostService.Models.Entity;
 using Aloha.PostService.Models.Enums;
+using Aloha.PostService.Models.Responses;
 using Aloha.Shared.Meta;
 
 namespace Aloha.PostService.Repositories
@@ -19,6 +20,9 @@ namespace Aloha.PostService.Repositories
         Task<Post?> UpdatePostStatusAsync(Guid postId, PostStatus status);
         Task<Post?> ActivatePostAsync(Guid postId, bool isActive);
         Task<Post?> PushPostAsync(Guid postId);
-        Task<IEnumerable<Post>> GetPostsByStatusAsync(PostStatus status);
+        Task<PagedData<Post>> GetPostsByStatusAsync(int page, int pageSize, PostStatus? status);
+        Task<PagedData<Post>> GetViolationPostsAsync(int page = 1, int pageSize = 10);
+        Task<Post?> RecoveryViolationPostAsync(Guid postId);
+        Task<PostStatisticsResponse> GetPostStatisticsAsync();
     }
 }

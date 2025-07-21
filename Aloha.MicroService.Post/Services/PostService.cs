@@ -288,10 +288,19 @@ namespace Aloha.PostService.Services
             return _mapper.Map<PostCreateResponse>(post);
         }
 
-        public async Task<IEnumerable<PostCreateResponse>> GetPostsByStatusAsync(PostStatus status)
+        public async Task<PagedData<PostListResponse>> GetPostsByStatusAsync(int page = 1, int pageSize = 10, PostStatus? status = null)
         {
-            var posts = await _postRepository.GetPostsByStatusAsync(status);
-            return _mapper.Map<IEnumerable<PostCreateResponse>>(posts);
+            if (page < 1)
+                throw new BadRequestException("Page number must be greater than 0");
+            if (status.HasValue && !Enum.IsDefined(typeof(PostStatus), status.Value))
+                throw new BadRequestException("Invalid post status");
+
+            var posts = await _postRepository.GetPostsByStatusAsync(page, pageSize, status);
+            return new PagedData<PostListResponse>
+            {
+                Items = _mapper.Map<IEnumerable<PostListResponse>>(posts.Items),
+                Meta = posts.Meta
+            };
         }
 
         public async Task<bool> PostExistsAsync(Guid postId)
@@ -335,6 +344,33 @@ namespace Aloha.PostService.Services
 
             _logger.LogInformation("Post {PostId} reported as violation by user {UserId}", postId, userId);
             return _mapper.Map<PostDetailResponse>(updatedPost);
+        }
+
+        public async Task<PagedData<PostListResponse>> GetViolationPostsAsync(int page = 1, int pageSize = 10)
+        {
+            if (page < 1)
+                throw new BadRequestException("Page number must be greater than 0");
+
+            var posts = await _postRepository.GetViolationPostsAsync(page, pageSize);
+            return new PagedData<PostListResponse>
+            {
+                Items = _mapper.Map<IEnumerable<PostListResponse>>(posts.Items),
+                Meta = posts.Meta
+            };
+        }
+
+        public async Task<PostCreateResponse?> RecoveryViolationPostAsync(Guid postId)
+        {
+            var post = await _postRepository.RecoveryViolationPostAsync(postId);
+            if (post == null)
+                return null;
+
+            return _mapper.Map<PostCreateResponse>(post);
+        }
+
+        public async Task<PostStatisticsResponse> GetPostStatisticsAsync()
+        {
+            return await _postRepository.GetPostStatisticsAsync();
         }
     }
 }
