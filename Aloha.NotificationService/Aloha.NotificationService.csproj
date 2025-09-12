@@ -7,9 +7,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Aspire.Hosting.Azure.SignalR" Version="9.3.0" />
-		<PackageReference Include="Aspire.Hosting.MongoDB" Version="9.3.0" />
-		<PackageReference Include="MongoDB.Driver" Version="3.4.0" />
+		<PackageReference Include="Aspire.Hosting.Azure.SignalR" Version="9.4.2" />
+		<PackageReference Include="Aspire.Hosting.MongoDB" Version="9.4.2" />
+		<PackageReference Include="MongoDB.Driver" Version="3.5.0" />
 	</ItemGroup>
 
 	<ItemGroup>
