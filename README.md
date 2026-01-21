@@ -1,4 +1,4 @@
-# Aloha Market (Aspire)
+# 🌺 Aloha Market (Aspire)
 
 Aloha Market is a .NET 9 microservices backend for a marketplace platform. The solution is orchestrated with .NET Aspire, uses Kafka for async integration, and exposes HTTP APIs through a YARP API gateway.
 
@@ -18,6 +18,76 @@ Build a modular marketplace backend that supports:
 - Kafka-based event bus publishes typed integration events per service topic.
 - PostgreSQL stores core CRUD data; MongoDB stores location, payment, and chat data.
 - ServiceDefaults adds OpenTelemetry, health checks, service discovery, and resilience.
+
+## 🔄 State Machine Diagram
+
+``` mermaid
+stateDiagram-v2
+    [*] --> Draft: Create Post
+    
+    state "Authentication" as Auth {
+        NotLoggedIn --> LoggedIn : Login/Register
+        LoggedIn --> NotLoggedIn : Logout
+    }
+
+    state "Post States" as Post {
+        Draft --> Pending : Submit Post
+        Pending --> Created : Approve Post
+        Created --> Draft : Edit Post
+        Created --> Inactive : Deactivate Post
+        Inactive --> Created : Activate Post
+        
+        state "Post Visibility" as Visibility {
+            Active --> Hidden : Hide Post
+            Hidden --> Active : Show Post
+        }
+    }
+
+    state "Plan Subscription" as Plan {
+        NoPlan --> ActivePlan : Subscribe
+        ActivePlan --> ExpiredPlan : Time Expires
+        ExpiredPlan --> ActivePlan : Renew Plan
+        
+        state ActivePlan {
+            HasPosts --> NoMorePosts : Reach Max Posts
+            HasPushes --> NoPushes : Use All Pushes
+        }
+    }
+
+    state "Category Management" as Category {
+        state "Category Hierarchy" as CH {
+            Root --> SubCategory : Add SubCategory
+            SubCategory --> SubCategory : Add Nested Category
+        }
+    }
+
+    state "Location Structure" as Location {
+        Province --> District : Select District
+        District --> Ward : Select Ward
+        Ward --> [*] : Complete Location
+    }
+    
+    state "Event Publishing" as Events {
+        Produced --> Consumed : Kafka Message Flow
+        Consumed --> Handled : Process Event
+        Handled --> [*] : Complete Event
+    }
+
+note right of Post
+    Posts can be in Draft, Pending,
+    Created, or Inactive states
+end note
+
+note right of Plan
+    Users must have an active plan
+    to create and push posts
+end note
+
+note left of Events
+    All state changes publish
+    integration events via Kafka
+end note
+```
 
 ## Aspire resources
 AppHost references Kafka, MongoDB, PostgreSQL, Azure SignalR, and RabbitMQ Aspire packages. Only Kafka is wired in code today; database resources are commented out, so supply external connection strings.
@@ -55,6 +125,21 @@ AppHost references Kafka, MongoDB, PostgreSQL, Azure SignalR, and RabbitMQ Aspir
   - Plan provisioning and validation results.
   - Payment-to-plan provisioning commands.
   - Chat user/post info lookup events.
+
+### Integration Events Flow
+
+```mermaid
+sequenceDiagram
+    participant Service as Service/Microservice
+    participant Publisher as EventPublisher
+    participant Kafka as Apache Kafka
+    participant Consumer as EventHandler
+    
+    Service->>Publisher: Publish Event
+    Publisher->>Kafka: Send to Topic
+    Kafka->>Consumer: Consume Event
+    Consumer->>Consumer: Process Event
+```
 
 ## Technology stack
 
@@ -169,6 +254,35 @@ Each service exposes Swagger UI in development. The UI is hosted at the service 
 - `Aloha.Security`, `Aloha.Shared`, `Aloha/Aloha.ServiceDefaults`: shared cross-cutting components.
 - `docker-compose.yml`: local Postgres + pgAdmin for Post service.
 
+## 🛠️ Development Guide
+
+### Adding a New Service
+
+1. Create a new project following the existing service template
+2. Register the service in `Aloha.AppHost`:
+```csharp
+builder.AddProjectWithPostfix<Your_Service>()
+       .SetupKafka<Your_Service>(kafka)
+       .WithReference(otherServices);
+```
+
+### Best Practices
+
+1. **Event Publishing**
+   - Use integration events for cross-service communication
+   - Follow the event naming convention
+   - Implement proper error handling
+
+2. **Database Management**
+   - Each service manages its own database
+   - Use migrations for schema changes
+   - Follow the repository pattern
+
+3. **Security**
+   - Implement JWT authentication
+   - Use environment variables for sensitive data
+   - Follow the principle of least privilege
+
 ## Architecture Report
 
 # Architecture Facts Report (AlohaMarket.Aspire)
@@ -238,6 +352,14 @@ Resume bullets ready
 - Implemented polyglot persistence: EF Core/PostgreSQL for user/post/category/plan services and MongoDB for location/payment/notification services.
 - Delivered real-time chat with SignalR hub events and REST chat endpoints.
 - Integrated VNPay and Momo payment callbacks with HMAC signature validation and Kafka-driven plan provisioning.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
 This project is licensed under the Unlicense License - see `LICENSE.txt`.
