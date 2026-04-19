@@ -1,30 +1,51 @@
-# 🌺 Aloha Market (Aspire)
+![.NET Aspire](https://img.shields.io/badge/.NET%20Aspire-Orchestration-6A38D6)
+![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-9-512BD4?logo=dotnet&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-Deployment-0078D4?logo=microsoftazure&logoColor=white)
+![YARP](https://img.shields.io/badge/YARP-API%20Gateway-0078D4)
+![Kafka](https://img.shields.io/badge/Kafka-Event%20Bus-231F20?logo=apachekafka&logoColor=white)
+![SignalR](https://img.shields.io/badge/SignalR-Realtime-009688)
+![Keycloak](https://img.shields.io/badge/Keycloak-Auth-4D4D4D?logo=keycloak&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-4169E1?logo=postgresql&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-Document%20Store-47A248?logo=mongodb&logoColor=white)
 
-Aloha Market is a .NET 9 microservices backend for a marketplace platform. The solution is orchestrated with .NET Aspire, uses Kafka for async integration, and exposes HTTP APIs through a YARP API gateway.
+# Aloha Market (Aspire)
+Aloha Market is a .NET 9 microservices backend for a marketplace platform. The solution uses .NET Aspire for orchestration, Kafka for asynchronous integration, and YARP as the API gateway.
 
-## Purpose
-Build a modular marketplace backend that supports:
-- User profiles, roles, and JWT-based authentication (Keycloak)
-- Marketplace listings with media uploads, search, and moderation workflows
+## Overview
+
+The system is designed around independent business services and data ownership:
+
+- User profiles, roles, and JWT-based authentication with Keycloak
+- Marketplace listings with media upload, search, and moderation workflows
 - Category and location validation with seed data
 - Subscription plans and user plan provisioning
 - VNPay and Momo payment flows with callbacks
-- Real-time chat and notifications over SignalR
-- Event-driven service communication and independent data ownership
+- Real-time chat and notifications with SignalR
+- Event-driven service communication over Kafka
 
-## Architecture overview
-- .NET Aspire AppHost orchestrates services and infrastructure resources.
-- API Gateway (YARP) provides a single entry point and forwards auth headers.
-- Kafka-based event bus publishes typed integration events per service topic.
-- PostgreSQL stores core CRUD data; MongoDB stores location, payment, and chat data.
-- ServiceDefaults adds OpenTelemetry, health checks, service discovery, and resilience.
+## Deployment architecture
 
-## 🔄 State Machine Diagram
+The diagram below shows a reference deployment topology for the platform.
 
-``` mermaid
+![Aloha Market deployment architecture](docs/Diagram.webp)
+
+### Deployment highlights
+
+- Azure Front Door + WAF protects the public entry point before traffic reaches the YARP gateway.
+- Azure Container Registry and Azure Container Apps host the gateway, Keycloak, and microservices.
+- Azure Database for PostgreSQL stores User, Post, Category, and Plan service data.
+- Azure Cosmos DB stores Location and Payment service data.
+- Azure Event Hubs Kafka endpoint provides managed event streaming for service-to-service integration.
+- Azure Key Vault, Application Insights, Log Analytics, Azure SignalR, and Private Endpoints provide secrets management, observability, realtime messaging, and network isolation.
+
+## Domain model
+
+### State machine
+
+```mermaid
 stateDiagram-v2
     [*] --> Draft: Create Post
-    
+
     state "Authentication" as Auth {
         NotLoggedIn --> LoggedIn : Login/Register
         LoggedIn --> NotLoggedIn : Logout
@@ -36,7 +57,7 @@ stateDiagram-v2
         Created --> Draft : Edit Post
         Created --> Inactive : Deactivate Post
         Inactive --> Created : Activate Post
-        
+
         state "Post Visibility" as Visibility {
             Active --> Hidden : Hide Post
             Hidden --> Active : Show Post
@@ -47,7 +68,7 @@ stateDiagram-v2
         NoPlan --> ActivePlan : Subscribe
         ActivePlan --> ExpiredPlan : Time Expires
         ExpiredPlan --> ActivePlan : Renew Plan
-        
+
         state ActivePlan {
             HasPosts --> NoMorePosts : Reach Max Posts
             HasPushes --> NoPushes : Use All Pushes
@@ -66,165 +87,183 @@ stateDiagram-v2
         District --> Ward : Select Ward
         Ward --> [*] : Complete Location
     }
-    
+
     state "Event Publishing" as Events {
         Produced --> Consumed : Kafka Message Flow
         Consumed --> Handled : Process Event
         Handled --> [*] : Complete Event
     }
-
-note right of Post
-    Posts can be in Draft, Pending,
-    Created, or Inactive states
-end note
-
-note right of Plan
-    Users must have an active plan
-    to create and push posts
-end note
-
-note left of Events
-    All state changes publish
-    integration events via Kafka
-end note
 ```
-
-## Aspire resources
-AppHost references Kafka, MongoDB, PostgreSQL, Azure SignalR, and RabbitMQ Aspire packages. Only Kafka is wired in code today; database resources are commented out, so supply external connection strings.
 
 ## Services
 
 ### Runtime services
 
-| Service | Project | Responsibilities | Data store | Events / integrations |
-| --- | --- | --- | --- | --- |
-| API Gateway | `Aloha.ApiGateway` | Reverse proxy, CORS, auth header forwarding, request logging | None | Keycloak JWT, YARP routes |
-| User Service | `Aloha.UserService` (`Aloha.MicroService.User`) | User profiles, avatars, admin status, seller info | PostgreSQL (EF Core) | Cloudinary, Kafka |
-| Post Service | `Aloha.MicroService.Post` | Listings, search/filtering, status changes, report/violation workflows | PostgreSQL (EF Core) | Cloudinary, Kafka |
-| Category Service | `Aloha.CategoryService` (`Aloha.MicroService.Category`) | Category CRUD, hierarchy path, seed from `Data/categories.json` | PostgreSQL (EF Core) | Kafka |
-| Location Service | `Aloha.LocationService` (`Aloha.MicroService.Location`) | Provinces/districts/wards lookup, seed from `Data/provinces.json` | MongoDB | Kafka |
-| Plan Service | `Aloha.MicroService.Plan` | Subscription plans, user plan history, admin reporting | PostgreSQL (EF Core) | Kafka, Keycloak roles |
-| Payment Service | `Aloha.MicroService.Payment` | Payment records, VNPay and Momo URLs, callback handling | MongoDB | Kafka (CreateUserPlanCommand) |
-| Notification Service | `Aloha.NotificationService` | Conversations, messages, SignalR hub (`/notificationHub`) | MongoDB | Kafka, SignalR |
+| Service              | Project                        | Responsibilities                                                      | Data store | Integrations          |
+| -------------------- | ------------------------------ | --------------------------------------------------------------------- | ---------- | --------------------- |
+| API Gateway          | `Aloha.ApiGateway`           | Reverse proxy, routing, CORS, auth header forwarding, request logging | None       | YARP, Keycloak JWT    |
+| User Service         | `Aloha.UserService`          | User profiles, avatars, admin status, seller info                     | PostgreSQL | Cloudinary, Kafka     |
+| Post Service         | `Aloha.MicroService.Post`    | Listings, filtering, search, status changes, reports, moderation      | PostgreSQL | Cloudinary, Kafka     |
+| Category Service     | `Aloha.CategoryService`      | Category CRUD, hierarchy path, seed data                              | PostgreSQL | Kafka                 |
+| Location Service     | `Aloha.LocationService`      | Province, district, and ward lookup data                              | MongoDB    | Kafka                 |
+| Plan Service         | `Aloha.MicroService.Plan`    | Subscription plans, user plans, admin reporting                       | PostgreSQL | Kafka, Keycloak roles |
+| Payment Service      | `Aloha.MicroService.Payment` | Payment records, VNPay and Momo flows, callbacks                      | MongoDB    | Kafka                 |
+| Notification Service | `Aloha.NotificationService`  | Conversations, messages, SignalR hub, chat notifications              | MongoDB    | Kafka, SignalR        |
 
 ### Shared libraries
-- `Aloha.EventBus`: integration event abstractions and MediatR-based dispatch.
-- `Aloha.EventBus.Kafka`: Kafka producer/consumer wiring using Aspire.Confluent.Kafka.
-- `Aloha.EventBus.Models`: typed event contracts (posts, plans, payments, chat, validation).
-- `Aloha.Security`: Keycloak JWT auth extension and claim helpers.
-- `Aloha.Shared`: API response helpers, validation attributes, converters, error handling.
-- `Aloha.ServiceDefaults`: OpenTelemetry, health checks, service discovery, Cloudinary, and shared DI.
-- `Aloha/Aloha.AppHost`: Aspire AppHost that wires all services and Kafka topics.
 
-## Event-driven integration
-- Each service publishes to a Kafka topic named after its Aspire project (underscores are replaced with dashes).
-- AppHost sets `EVENT_PUBLISHING_TOPICS` and `EVENT_CONSUMING_TOPICS` per service and creates topics for Post, User, Location, Category, Payment, Plan, and Notification.
-- Key event groups include:
-  - Post create/update/push events and plan rollback.
-  - Category and location validation results.
-  - Plan provisioning and validation results.
-  - Payment-to-plan provisioning commands.
-  - Chat user/post info lookup events.
+- `Aloha.EventBus`: integration event abstractions and MediatR-based dispatch
+- `Aloha.EventBus.Kafka`: Kafka producer and consumer wiring using Aspire.Confluent.Kafka
+- `Aloha.EventBus.Models`: typed contracts for posts, plans, payments, chat, and validation events
+- `Aloha.Security`: Keycloak JWT authentication extensions and claims helpers
+- `Aloha.Shared`: response helpers, validation attributes, converters, middleware, and common utilities
+- `Aloha.ServiceDefaults`: OpenTelemetry, health checks, service discovery, Cloudinary, and shared dependency registration
+- `Aloha.AppHost`: Aspire AppHost that wires projects and Kafka topics
 
-### Integration Events Flow
+## Integration model
+
+Each service publishes to a Kafka topic derived from its Aspire project name. AppHost assigns `EVENT_PUBLISHING_TOPICS` and `EVENT_CONSUMING_TOPICS` for each service and creates the required topics during startup.
+
+### Event flow
 
 ```mermaid
 sequenceDiagram
-    participant Service as Service/Microservice
+    participant Service as Service
     participant Publisher as EventPublisher
-    participant Kafka as Apache Kafka
+    participant Kafka as Kafka
     participant Consumer as EventHandler
-    
-    Service->>Publisher: Publish Event
-    Publisher->>Kafka: Send to Topic
-    Kafka->>Consumer: Consume Event
-    Consumer->>Consumer: Process Event
+
+    Service->>Publisher: Publish integration event
+    Publisher->>Kafka: Send to topic
+    Kafka->>Consumer: Consume event
+    Consumer->>Consumer: Process event
 ```
+
+### Topic wiring
+
+| Publishing service topic        | Consuming topics configured in AppHost                                                                                                                    |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Aloha-MicroService-User`     | `Aloha-MicroService-Post`, `Aloha-MicroService-Location`, `Aloha-NotificationService`                                                               |
+| `Aloha-MicroService-Post`     | `Aloha-MicroService-User`, `Aloha-MicroService-Location`, `Aloha-MicroService-Plan`, `Aloha-MicroService-Category`, `Aloha-NotificationService` |
+| `Aloha-MicroService-Plan`     | `Aloha-MicroService-User`, `Aloha-MicroService-Post`, `Aloha-MicroService-Payment`                                                                  |
+| `Aloha-MicroService-Location` | `Aloha-MicroService-Post`                                                                                                                               |
+| `Aloha-MicroService-Category` | `Aloha-MicroService-Post`                                                                                                                               |
+| `Aloha-MicroService-Payment`  | `Aloha-MicroService-Plan`                                                                                                                               |
+| `Aloha-NotificationService`   | `Aloha-MicroService-User`, `Aloha-MicroService-Post`                                                                                                  |
+
+## Data ownership
+
+| Service              | Store      |
+| -------------------- | ---------- |
+| API Gateway          | None       |
+| User Service         | PostgreSQL |
+| Post Service         | PostgreSQL |
+| Category Service     | PostgreSQL |
+| Plan Service         | PostgreSQL |
+| Location Service     | MongoDB    |
+| Payment Service      | MongoDB    |
+| Notification Service | MongoDB    |
 
 ## Technology stack
 
-### Technology
-- .NET 9 / C# / ASP.NET Core (controller APIs + minimal endpoints)
-- .NET Aspire (AppHost orchestration, service discovery, resilience)
-- Apache Kafka (async integration)
-- YARP Reverse Proxy (API gateway)
-- PostgreSQL + EF Core (Npgsql)
-- MongoDB
-- Keycloak JWT auth with role-based access (ALOHA_ADMIN, ALOHA_USER)
-- OpenTelemetry (metrics, traces, logs)
-- SignalR (notifications and chat)
-- Cloudinary + ImageSharp (media storage and optimization)
-- Docker (Kafka, optional database containers)
+### Platform
 
-### Package
-- NuGet: Aspire.Hosting.AppHost, Aspire.Hosting.Kafka, Aspire.Hosting.MongoDB, Aspire.Hosting.PostgreSQL, Aspire.Hosting.Azure.SignalR, Aspire.Hosting.RabbitMQ
-- NuGet: Aspire.Confluent.Kafka
-- NuGet: MediatR, AutoMapper
-- NuGet: Microsoft.EntityFrameworkCore, Microsoft.EntityFrameworkCore.Design, Microsoft.EntityFrameworkCore.Tools, Npgsql.EntityFrameworkCore.PostgreSQL
-- NuGet: MongoDB.Driver, MongoDB.Bson
-- NuGet: Microsoft.AspNetCore.Authentication.JwtBearer, Microsoft.AspNetCore.OpenApi, Microsoft.OpenApi.Readers
-- NuGet: Yarp.ReverseProxy
-- NuGet: Swashbuckle.AspNetCore.Swagger, Swashbuckle.AspNetCore.SwaggerGen, Swashbuckle.AspNetCore.SwaggerUI
-- NuGet: OpenTelemetry.Exporter.OpenTelemetryProtocol, OpenTelemetry.Extensions.Hosting, OpenTelemetry.Instrumentation.AspNetCore, OpenTelemetry.Instrumentation.Http, OpenTelemetry.Instrumentation.Runtime
-- NuGet: AspNetCore.HealthChecks.NpgSql, Microsoft.Extensions.ServiceDiscovery, Microsoft.Extensions.Http.Resilience, Microsoft.Extensions.Logging.Abstractions, Microsoft.Extensions.Configuration.Abstractions, Microsoft.Extensions.DependencyInjection.Abstractions
-- NuGet: CloudinaryDotNet, SixLabors.ImageSharp, dotenv.net
-- npm: commitizen, cz-conventional-changelog
+- .NET 9 / ASP.NET Core
+- .NET Aspire
+- Apache Kafka
+- YARP Reverse Proxy
+- PostgreSQL + EF Core + Npgsql
+- MongoDB
+- Keycloak JWT authentication
+- OpenTelemetry
+- SignalR
+- Cloudinary + ImageSharp
+- Docker
+
+### Key packages
+
+- `Aspire.Hosting.AppHost`
+- `Aspire.Hosting.Kafka`
+- `Aspire.Hosting.MongoDB`
+- `Aspire.Hosting.PostgreSQL`
+- `Aspire.Hosting.Azure.SignalR`
+- `Aspire.Hosting.RabbitMQ`
+- `Aspire.Confluent.Kafka`
+- `MediatR`
+- `AutoMapper`
+- `Microsoft.EntityFrameworkCore`
+- `Npgsql.EntityFrameworkCore.PostgreSQL`
+- `MongoDB.Driver`
+- `Microsoft.AspNetCore.Authentication.JwtBearer`
+- `Yarp.ReverseProxy`
+- `Swashbuckle.AspNetCore`
+- `OpenTelemetry.*`
+- `AspNetCore.HealthChecks.NpgSql`
+- `CloudinaryDotNet`
+- `SixLabors.ImageSharp`
+- `dotenv.net`
 
 ## Configuration
 
-### Kafka (event bus)
-- `EVENT_PUBLISHING_TOPICS` and `EVENT_CONSUMING_TOPICS` are set automatically by AppHost. Set them manually when running a single service.
-- When running outside Aspire, provide a Kafka connection string named `kafka` (bootstrap servers).
+### Kafka
 
-### API Gateway (YARP)
-- Add `ReverseProxy` routes and clusters in configuration (appsettings or environment variables). This repo does not include a default routes file.
+- `EVENT_PUBLISHING_TOPICS`
+- `EVENT_CONSUMING_TOPICS`
+- Connection string named `kafka` when running outside Aspire
+
+### API gateway
+
+- `ReverseProxy` routes and clusters in configuration
 
 ### Keycloak JWT
-Used by API Gateway, User, Post, and Plan services.
+
 - `Authentication:Authority`
 - `Authentication:Audience`
 
-### Cloudinary (Post and User services)
-Loaded from a root `.env` file or environment variables.
+### Cloudinary
+
 - `CLOUDINARY_CLOUDNAME`
 - `CLOUDINARY_APIKEY`
 - `CLOUDINARY_APISECRET`
 
-### PostgreSQL (User, Post, Category, Plan)
-- `ConnectionStrings:SupabaseConnection` (primary)
-- `ConnectionStrings:DefaultConnection` (fallback)
-- `ConnectionStrings:PostgresConnection` (used by AddSharedServicesLocal)
+### PostgreSQL
+
+- `ConnectionStrings:SupabaseConnection`
+- `ConnectionStrings:DefaultConnection`
+- `ConnectionStrings:PostgresConnection`
 
 ### MongoDB
+
 - Location service: `MongoSettings:ConnectionString`, `MongoSettings:DatabaseName`
 - Payment service: `MongoSettings:ConnectionString`, `MongoSettings:DatabaseName`, `MongoSettings:CollectionName`
 - Notification service: `MongoDbSettings:ConnectionString`, `MongoDbSettings:DatabaseName`
 
 ### Payment providers
+
 - VNPay: `Vnpay:Version`, `Vnpay:Command`, `Vnpay:TmnCode`, `Vnpay:CurrCode`, `Vnpay:Locale`, `Vnpay:BaseUrl`, `Vnpay:HashSecret`
-- VNPay callback: `PaymentCallBack:ReturnUrl`, `TimeZoneId`
+- Payment callback: `PaymentCallBack:ReturnUrl`, `TimeZoneId`
 - Momo: `MomoAPI:PartnerCode`, `MomoAPI:AccessKey`, `MomoAPI:SecretKey`, `MomoAPI:MomoApiUrl`, `MomoAPI:ReturnUrl`, `MomoAPI:NotifyUrl`, `MomoAPI:RequestType`
 - Frontend redirects: `FrontendRedirect:SuccessUrl`, `FrontendRedirect:FailedUrl`
 
-### OpenTelemetry
-- `OTEL_EXPORTER_OTLP_ENDPOINT` enables OTLP export.
+### Observability
 
-## Running locally
+- `OTEL_EXPORTER_OTLP_ENDPOINT`
+
+## Local development
 
 ### Prerequisites
-- .NET 9 SDK
-- Docker Desktop (Kafka and optional DB containers)
-- PostgreSQL and MongoDB instances
-- Keycloak (JWT issuer)
-- Cloudinary account (for media uploads)
 
-### Start the full solution with Aspire
+- .NET 9 SDK
+- Docker Desktop
+- PostgreSQL and MongoDB instances
+- Keycloak
+- Cloudinary account
+
+### Run the full solution with Aspire
 
 ```powershell
 dotnet run --project Aloha/Aloha.AppHost
 ```
-
-Kafka is provisioned by Aspire. In non-test runs, Kafka is persistent and includes Kafka UI.
 
 ### Run a single service
 
@@ -232,134 +271,67 @@ Kafka is provisioned by Aspire. In non-test runs, Kafka is persistent and includ
 dotnet run --project Aloha.UserService
 ```
 
-Provide the configuration values listed above for Kafka, databases, and authentication.
+Provide the required Kafka, database, and authentication settings when running a single service outside AppHost.
 
-### Optional: Post service PostgreSQL container
+### Optional PostgreSQL container
 
 ```powershell
 docker compose up -d
 ```
 
-Uses `docker-compose.yml` in the repo root to start Postgres and pgAdmin.
-
 ## API documentation
-Each service exposes Swagger UI in development. The UI is hosted at the service root (`/`) with OpenAPI at `/openapi/v1.json`.
+
+Each service exposes Swagger UI in development. The UI is hosted at the service root (`/`) and OpenAPI is available at `/openapi/v1.json`.
 
 ## Repository layout
-- `Aloha.Aspire.sln`: solution entry point.
-- `Aloha/Aloha.AppHost`: Aspire AppHost wiring (Kafka, project references, topic creation).
-- `Aloha.ApiGateway`: YARP reverse proxy and auth header forwarding.
-- `Aloha.UserService`, `Aloha.MicroService.Post`, `Aloha.CategoryService`, `Aloha.LocationService`, `Aloha.MicroService.Plan`, `Aloha.MicroService.Payment`, `Aloha.NotificationService`: microservices.
-- `Aloha.EventBus`, `Aloha.EventBus.Kafka`, `Aloha.EventBus.Models`: event bus and contracts.
-- `Aloha.Security`, `Aloha.Shared`, `Aloha/Aloha.ServiceDefaults`: shared cross-cutting components.
-- `docker-compose.yml`: local Postgres + pgAdmin for Post service.
 
-## 🛠️ Development Guide
+- `Aloha.Aspire.sln`: solution entry point
+- `Aloha/Aloha.AppHost`: Aspire AppHost wiring, project references, topic creation
+- `Aloha.ApiGateway`: YARP reverse proxy and auth forwarding
+- `Aloha.UserService`
+- `Aloha.MicroService.Post`
+- `Aloha.CategoryService`
+- `Aloha.LocationService`
+- `Aloha.MicroService.Plan`
+- `Aloha.MicroService.Payment`
+- `Aloha.NotificationService`
+- `Aloha.EventBus`, `Aloha.EventBus.Kafka`, `Aloha.EventBus.Models`: event bus and contracts
+- `Aloha.Security`, `Aloha.Shared`, `Aloha/Aloha.ServiceDefaults`: shared cross-cutting components
+- `docker-compose.yml`: local PostgreSQL and pgAdmin for development
 
-### Adding a New Service
+## Development notes
 
-1. Create a new project following the existing service template
-2. Register the service in `Aloha.AppHost`:
+### Adding a new service
+
+1. Create a new project following the existing service structure.
+2. Register the service in `Aloha.AppHost`.
+3. Configure Kafka topics and service references.
+4. Add the service-specific datastore and integration settings.
+
+Example:
+
 ```csharp
 builder.AddProjectWithPostfix<Your_Service>()
        .SetupKafka<Your_Service>(kafka)
        .WithReference(otherServices);
 ```
 
-### Best Practices
+### General practices
 
-1. **Event Publishing**
-   - Use integration events for cross-service communication
-   - Follow the event naming convention
-   - Implement proper error handling
+- Use integration events for cross-service communication.
+- Keep database ownership inside each service.
+- Use migrations for schema changes.
+- Keep sensitive values in environment variables or secret stores.
+- Apply least-privilege access to infrastructure and service dependencies.
 
-2. **Database Management**
-   - Each service manages its own database
-   - Use migrations for schema changes
-   - Follow the repository pattern
+## Contributing
 
-3. **Security**
-   - Implement JWT authentication
-   - Use environment variables for sensitive data
-   - Follow the principle of least privilege
-
-## Architecture Report
-
-# Architecture Facts Report (AlohaMarket.Aspire)
-
-1) Microservices inventory  
-8 services are wired into the Aspire AppHost; each has its own `Program.cs` entry point. Domains below are taken directly from controllers and gateway configuration.
-
-| Service | Domain/purpose | Entry project path | Aspire wiring |
-| --- | --- | --- | --- |
-| API Gateway | YARP reverse proxy + auth header forwarding | `Aloha.ApiGateway/Program.cs` | AppHost `AddProjectWithPostfix<Projects.Aloha_ApiGateway>()` |
-| User Service | User profiles/admin status/avatar | `Aloha.UserService/Program.cs` | `AddProjectWithPostfix<Projects.Aloha_MicroService_User>().SetupKafka(...)` |
-| Post Service | Listings/search/status/push/report | `Aloha.MicroService.Post/Program.cs` | `AddProjectWithPostfix<Projects.Aloha_MicroService_Post>().SetupKafka(...)` |
-| Category Service | Category CRUD + hierarchy path | `Aloha.CategoryService/Program.cs` | `AddProjectWithPostfix<Projects.Aloha_MicroService_Category>().SetupKafka(...)` |
-| Location Service | Province/ward lookups | `Aloha.LocationService/Program.cs` | `AddProjectWithPostfix<Projects.Aloha_MicroService_Location>().SetupKafka(...)` |
-| Plan Service | Plans + user plans | `Aloha.MicroService.Plan/Program.cs` | `AddProjectWithPostfix<Projects.Aloha_MicroService_Plan>().SetupKafka(...)` |
-| Payment Service | Payment records + VNPay/Momo endpoints | `Aloha.MicroService.Payment/Program.cs` | `AddProjectWithPostfix<Projects.Aloha_MicroService_Payment>().SetupKafka(...)` |
-| Notification Service | Chat + SignalR notifications | `Aloha.NotificationService/Program.cs` | `AddProjectWithPostfix<Projects.Aloha_NotificationService>().SetupKafka(...)` |
-
-2) Kafka usage  
-Kafka is implemented via `Aspire.Confluent.Kafka` with a custom MessageEnvelop serialized using `System.Text.Json`. AppHost creates one topic per service (name derived from the project type with underscores replaced by dashes) and sets `EVENT_PUBLISHING_TOPICS`/`EVENT_CONSUMING_TOPICS`. Consumers use explicit group IDs and event type filters.
-
-Topic wiring (derived names):
-| Publishing service topic | Consuming topics configured in AppHost |
-| --- | --- |
-| Aloha-MicroService-User | Aloha-MicroService-Post, Aloha-MicroService-Location, Aloha-NotificationService |
-| Aloha-MicroService-Post | Aloha-MicroService-User, Aloha-MicroService-Location, Aloha-MicroService-Plan, Aloha-MicroService-Category, Aloha-NotificationService |
-| Aloha-MicroService-Plan | Aloha-MicroService-User, Aloha-MicroService-Post, Aloha-MicroService-Payment |
-| Aloha-MicroService-Location | Aloha-MicroService-Post |
-| Aloha-MicroService-Category | Aloha-MicroService-Post |
-| Aloha-MicroService-Payment | Aloha-MicroService-Plan |
-| Aloha-NotificationService | Aloha-MicroService-User, Aloha-MicroService-Post |
-
-Event handling (consumer groups + event types):
-| Service | Group ID | AcceptEvent types | PublishAsync event types |
-| --- | --- | --- | --- |
-| User | aloha-user-service | UserChatRequestEventModel | TestReceiveEventModel, UserProfileResponseEventModel |
-| Post | aloha-post-service | LocationValid/Invalid, CategoryPathValid/Invalid, UserPlanValid/Invalid, PostChatRequestEventModel | PostCreatedIntegrationEvent, PostPushIntegrationEvent, RollbackUserPlanEventModel, PostInfoResponseEventModel |
-| Category | aloha-category-service | PostCreatedIntegrationEvent | CategoryPathValid/Invalid |
-| Location | aloha-location-service | PostCreatedIntegrationEvent | LocationValid/Invalid |
-| Plan | aloha-plan-service | PostCreatedIntegrationEvent, RollbackUserPlanEventModel, CreateUserPlanCommand, TestSendEventModel | UserPlanProvisioningResultEvent, UserPlanValid/Invalid |
-| Payment | aloha-payment-service | UserPlanProvisioningResultEvent | CreateUserPlanCommand |
-| Notification | aloha-notification-service | UserProfileResponseEventModel, PostInfoResponseEventModel | UserChatRequestEventModel, PostChatRequestEventModel |
-
-3) Data stores mapping  
-PostgreSQL (EF Core/Npgsql) is used by User/Post/Category/Plan services via shared `AddSharedServices<TContext>()`. MongoDB is used by Location/Payment/Notification services via `MongoClient`. API Gateway has no DB configuration.
-
-| Service | Store | Configuration evidence |
-| --- | --- | --- |
-| API Gateway | None | No DB config in Program |
-| User | PostgreSQL (EF Core) | `AddSharedServices<UserDbContext>()` |
-| Post | PostgreSQL (EF Core) | `AddSharedServices<PostDbContext>()` |
-| Category | PostgreSQL (EF Core) | `AddSharedServices<CategoryDbContext>()` |
-| Plan | PostgreSQL (EF Core) | `AddSharedServices<PlanDbContext>()` |
-| Location | MongoDB | `Configure<MongoSettings>` + `MongoClient` |
-| Payment | MongoDB | `Configure<MongoSettings>` + `MongoClient` |
-| Notification | MongoDB | `Configure<MongoDbSettings>` + `MongoClient` |
-
-4) Real-time & payments  
-SignalR is implemented only in NotificationService for chat/conversation notifications. Payment service integrates VNPay and Momo via HTTP endpoints; VNPay uses HMAC signature validation. No SignalR hooks are present in Payment service.
-
-5) Observability  
-ServiceDefaults wires OpenTelemetry logging, metrics, and tracing (ASP.NET Core + HttpClient + runtime). OTLP export is enabled when `OTEL_EXPORTER_OTLP_ENDPOINT` is set. No explicit traceparent propagation config was found in gateway or services beyond default instrumentation.
-
-Resume bullets ready
-- Orchestrated 8 ASP.NET Core microservices with .NET Aspire AppHost and a YARP-based API gateway.
-- Built a Kafka event bus on Aspire.Confluent.Kafka with JSON-serialized envelopes and per-service consumer groups.
-- Implemented polyglot persistence: EF Core/PostgreSQL for user/post/category/plan services and MongoDB for location/payment/notification services.
-- Delivered real-time chat with SignalR hub events and REST chat endpoints.
-- Integrated VNPay and Momo payment callbacks with HMAC signature validation and Kafka-driven plan provisioning.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+1. Fork the repository.
+2. Create a feature branch.
+3. Commit your changes.
+4. Push the branch.
+5. Open a pull request.
 
 ## License
-This project is licensed under the Unlicense License - see `LICENSE.txt`.
+
+This project is licensed under the Unlicense License. See `LICENSE.txt`.
